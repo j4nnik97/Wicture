@@ -273,24 +273,55 @@
 
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(()=>t.style.display='none', 2500); }
 
-        // --- Init ---
+// --- Init mit Sicherheits-Check ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Notbremse: Falls Supabase hängt, blende den Loader nach 4 Sekunden aus
+            const safetyTimeout = setTimeout(() => {
+                const loader = document.getElementById('loadingScreen');
+                if (loader && loader.style.display !== 'none') {
+                    loader.style.display = 'none';
+                    showToast("Verbindung dauert etwas länger...");
+                }
+            }, 4000);
+
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 const loader = document.getElementById('loadingScreen');
                 const modal = document.getElementById('loginModal');
                 
-                if (session) {
-                    const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
-                    if (prof) {
-                        state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
-                        state.isAuthenticated = true;
+                try {
+                    if (session) {
+                        // User ist eingeloggt, versuche Profil zu laden
+                        const { data: prof, error: profError } = await supabaseClient
+                            .from('users')
+                            .select('*')
+                            .eq('user_id', session.user.id)
+                            .single();
+
+                        if (profError) {
+                            console.error("Profil-Fehler:", profError);
+                            // Falls das Profil fehlt, trotzdem zum Login schicken oder Fehler zeigen
+                            handleLogout(); 
+                            return;
+                        }
+
+                        state.currentUser = { 
+                            username: prof.username, 
+                            displayName: prof.display_name, 
+                            color: prof.user_color 
+                        };
+                        
                         modal.style.display = 'none';
                         await loadData();
+                    } else {
+                        // Kein User eingeloggt
+                        modal.style.display = 'flex';
                     }
-                    loader.style.display = 'none';
-                } else {
-                    loader.style.display = 'none';
-                    modal.style.display = 'flex';
+                } catch (err) {
+                    console.error("Kritischer Init-Fehler:", err);
+                } finally {
+                    // In jedem Fall: Loader ausblenden und Timeout löschen
+                    clearTimeout(safetyTimeout);
+                    if (loader) loader.style.display = 'none';
                 }
             });
         });

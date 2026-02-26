@@ -4,53 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wicture</title>
-<style>
-    :root {
-        --color-teal-500: #21808d;
-        --color-border: rgba(94, 82, 64, 0.15);
-        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        /* Helle Farben */
-        --bg: #fcfcf9;
-        --surface: #ffffff;
-        --text: #13343b;
-    }
-
-    @media (prefers-color-scheme: dark) {
+    <style>
         :root {
-            --bg: #1a1c1c;
-            --surface: #262828;
-            --text: #f5f5f5;
-            --color-border: rgba(255, 255, 255, 0.1);
+            --color-teal-500: #21808d;
+            --color-border: rgba(94, 82, 64, 0.15);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --bg: #fcfcf9;
+            --surface: #ffffff;
+            --text: #13343b;
+            --input-bg: #ffffff;
         }
-    }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: var(--font-family); background: var(--bg); color: var(--text); padding-bottom: 70px; }
-    .header { position: sticky; top: 0; background: var(--surface); padding: 15px; border-bottom: 1px solid var(--color-border); z-index: 100; text-align: center; }
-    .header h1 { color: var(--color-teal-500); font-size: 20px; }
-    .main-content { max-width: 500px; margin: 0 auto; }
-    .view { display: none; }
-    .view.active { display: block; }
-    .post-card { background: var(--surface); border-bottom: 1px solid var(--color-border); margin-bottom: 10px; }
-    .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-    .post-info { padding: 12px; }
-    .post-actions { padding: 0 12px 10px; }
-    .action-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text); }
-    .action-btn.liked { color: #ff5459; }
-    .comments-list { font-size: 13px; margin-top: 10px; color: var(--text); border-top: 1px solid var(--color-border); padding-top: 8px; opacity: 0.8; }
-    .comment-input-group { display: flex; gap: 8px; margin-top: 10px; }
-    .comment-input { flex: 1; border: 1px solid var(--color-border); border-radius: 15px; padding: 5px 12px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--color-border); display: flex; height: 60px; }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text); opacity: 0.6; cursor: pointer; border: none; background: none; }
-    .nav-item.active { color: var(--color-teal-500); opacity: 1; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-    #loginModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
-    .modal-box { background: var(--surface); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; color: var(--text); }
-    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; margin-top: 10px; }
-    .btn-primary { background: var(--color-teal-500); color: white; }
-</style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1c1c;
+                --surface: #262828;
+                --text: #f5f5f5;
+                --color-border: rgba(255, 255, 255, 0.1);
+                --input-bg: #2d2f2f;
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-family); background: var(--bg); color: var(--text); padding-bottom: 70px; min-height: 100vh; }
+        
+        .header { position: sticky; top: 0; background: var(--surface); padding: 15px; border-bottom: 1px solid var(--color-border); z-index: 100; text-align: center; }
+        .header h1 { color: var(--color-teal-500); font-size: 20px; }
+        
+        .main-content { max-width: 500px; margin: 0 auto; min-height: 200px; }
+        .view { display: none; padding-top: 10px; }
+        .view.active { display: block; }
+        
+        .post-card { background: var(--surface); border-bottom: 1px solid var(--color-border); margin-bottom: 15px; }
+        .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: #eee; }
+        .post-info { padding: 12px; }
+        .post-actions { padding: 0 12px 10px; }
+        
+        .action-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text); }
+        .action-btn.liked { color: #ff5459; }
+        
+        .comments-list { font-size: 13px; margin: 10px 12px 12px; color: var(--text); border-top: 1px solid var(--color-border); padding-top: 8px; }
+        .comment-input-group { display: flex; gap: 8px; margin-top: 10px; }
+        .comment-input { flex: 1; border: 1px solid var(--color-border); border-radius: 15px; padding: 6px 12px; font-size: 13px; outline: none; background: var(--input-bg); color: var(--text); }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--color-border); display: flex; height: 60px; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text); opacity: 0.5; cursor: pointer; border: none; background: none; }
+        .nav-item.active { color: var(--color-teal-500); opacity: 1; font-weight: bold; }
+        
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+        .grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+
+        /* Login Modal Korrektur */
+        #loginModal { 
+            position: fixed; inset: 0; background: var(--bg); z-index: 2000; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-box { background: var(--surface); padding: 35px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .modal-box h2 { margin-bottom: 10px; color: var(--color-teal-500); }
+        
+        input[type="email"], input[type="password"] { 
+            width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--color-border); 
+            border-radius: 10px; background: var(--input-bg); color: var(--text); font-size: 14px;
+        }
+        
+        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+        .btn-primary { background: var(--color-teal-500); color: white; }
+        .btn:active { opacity: 0.8; }
+
+        #loadingScreen { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
+    </style>
 </head>
 <body>
+
+    <div id="loadingScreen"><b>Lädt...</b></div>
 
     <header class="header"><h1>Wicture</h1></header>
 
@@ -62,8 +88,8 @@
             <div id="exploreGrid" class="grid"></div>
         </div>
         <div id="uploadView" class="view" style="padding: 20px; text-align: center;">
-            <div id="uploadArea" style="border: 2px dashed #ccc; padding: 40px; border-radius: 15px;" onclick="document.getElementById('fileInput').click()">
-                <p>Foto für diese Woche wählen</p>
+            <div id="uploadArea" style="border: 2px dashed var(--color-border); padding: 40px; border-radius: 15px;" onclick="document.getElementById('fileInput').click()">
+                <p>Wochenfoto wählen</p>
             </div>
         </div>
         <div id="profileView" class="view">
@@ -78,10 +104,10 @@
         <button class="nav-item" data-view="profile"><span>Profil</span></button>
     </nav>
 
-    <div id="loginModal">
+    <div id="loginModal" style="display: none;">
         <div class="modal-box">
             <h2>Wicture</h2>
-            <p style="margin-bottom: 20px; font-size: 14px; color: #666;">Ein Foto pro Woche.</p>
+            <p style="margin-bottom: 25px; font-size: 14px; opacity: 0.7;">Ein Foto pro Woche.</p>
             <input type="email" id="loginEmail" placeholder="E-Mail">
             <input type="password" id="loginPassword" placeholder="Passwort">
             <button onclick="handleLogin()" class="btn btn-primary">Anmelden</button>
@@ -89,7 +115,7 @@
     </div>
 
     <input type="file" id="fileInput" accept="image/*" hidden>
-    <div id="toast" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:8px 16px; border-radius:20px; display:none; z-index:2000;"></div>
+    <div id="toast" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:8px 16px; border-radius:20px; display:none; z-index:4000;"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -99,7 +125,7 @@
 
         const state = { currentUser: null, posts: [], currentView: 'feed' };
 
-        // --- BILD-KOMPRESSION (DER CREDIT-RETTER) ---
+        // --- Bildverarbeitung ---
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -120,13 +146,13 @@
             });
         }
 
-        // --- Core Logik ---
         async function loadData() {
             const { data, error } = await supabaseClient.from('posts').select('*, post_likes(count), comments(*)').order('timestamp', { ascending: false });
             if (error) return;
 
             let myLikes = [];
-            const user = (await supabaseClient.auth.getUser()).data.user;
+            const userRes = await supabaseClient.auth.getUser();
+            const user = userRes.data.user;
             if (user) {
                 const { data: likes } = await supabaseClient.from('post_likes').select('post_id').eq('user_id', user.id);
                 if (likes) myLikes = likes.map(l => String(l.post_id));
@@ -139,8 +165,9 @@
         }
 
         function render() {
+            const feed = document.getElementById('feedContainer');
             if (state.currentView === 'feed') {
-                document.getElementById('feedContainer').innerHTML = state.posts.map(p => `
+                feed.innerHTML = state.posts.length ? state.posts.map(p => `
                     <div class="post-card">
                         <div class="post-info"><b>${p.display_name}</b></div>
                         <img src="${p.image}" class="post-img">
@@ -148,7 +175,7 @@
                             <button class="action-btn ${p.liked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">❤️ ${p.likes}</button>
                         </div>
                         <div class="post-info" style="padding-top:0;"><b>${p.username}</b> ${p.caption}</div>
-                        <div class="comments-list" style="margin: 0 12px 12px;">
+                        <div class="comments-list">
                             ${(p.comments || []).map(c => `<div><b>${c.username}:</b> ${c.content}</div>`).join('')}
                             <div class="comment-input-group">
                                 <input type="text" id="com-${p.id}" class="comment-input" placeholder="Schreiben...">
@@ -156,7 +183,7 @@
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `).join('') : '<p style="text-align:center; padding:20px;">Noch keine Posts.</p>';
             }
             if (state.currentView === 'explore') {
                 document.getElementById('exploreGrid').innerHTML = state.posts.map(p => `<img src="${p.image}" onclick="switchView('feed')">`).join('');
@@ -165,19 +192,32 @@
                 const myPosts = state.posts.filter(p => p.username === state.currentUser?.username);
                 document.getElementById('profileContent').innerHTML = `
                     <div style="text-align:center; margin-bottom:20px;">
-                        <h3>${state.currentUser?.displayName}</h3>
-                        <p>${myPosts.length} Wochen dabei</p>
-                        <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" class="btn" style="border:1px solid #ddd; width:auto; padding: 5px 15px;">Abmelden</button>
+                        <h3 style="color:var(--color-teal-500)">${state.currentUser?.displayName}</h3>
+                        <p style="font-size:12px; opacity:0.7;">${myPosts.length} Wochen dabei</p>
+                        <button onclick="handleLogout()" class="btn" style="border:1px solid var(--color-border); width:auto; padding: 5px 15px; font-size:12px; margin-top:10px; background:transparent; color:inherit;">Abmelden</button>
                     </div>
                     <div class="grid">${myPosts.map(p => `<img src="${p.image}">`).join('')}</div>
                 `;
             }
         }
 
+        // --- Actions ---
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message);
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        }
+
         async function submitPost() {
             const file = document.getElementById('fileInput').files[0];
             if (!file || !state.currentUser) return;
-            showToast("Verarbeite Bild...");
+            showToast("Wird hochgeladen...");
             const comp = await compressImage(file);
             const path = `posts/${state.currentUser.username}_${Date.now()}.jpg`;
             await supabaseClient.storage.from('wicture-images').upload(path, comp);
@@ -186,7 +226,7 @@
                 username: state.currentUser.username, display_name: state.currentUser.displayName,
                 user_color: state.currentUser.color, image_url: publicUrl, caption: 'Mein Wochenfoto'
             }]);
-            showToast("Gepostet! 🎉");
+            showToast("Gepostet!");
             switchView('feed');
             loadData();
         }
@@ -204,7 +244,8 @@
 
         async function toggleLike(postId) {
             const post = state.posts.find(p => p.id === postId);
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const userRes = await supabaseClient.auth.getUser();
+            const user = userRes.data.user;
             if (post.liked) await supabaseClient.from('post_likes').delete().match({ post_id: postId, user_id: user.id });
             else await supabaseClient.from('post_likes').insert([{ post_id: postId, user_id: user.id }]);
             loadData();
@@ -213,7 +254,8 @@
         async function addComment(postId) {
             const val = document.getElementById(`com-${postId}`).value;
             if (!val) return;
-            await supabaseClient.from('comments').insert([{ post_id: postId, user_id: (await supabaseClient.auth.getUser()).data.user.id, username: state.currentUser.username, content: val }]);
+            const userRes = await supabaseClient.auth.getUser();
+            await supabaseClient.from('comments').insert([{ post_id: postId, user_id: userRes.data.user.id, username: state.currentUser.username, content: val }]);
             loadData();
         }
 
@@ -222,47 +264,36 @@
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById(v + 'View').classList.add('active');
-            document.querySelector(`[data-view="${v}"]`).classList.add('active');
+            const navBtn = document.querySelector(`[data-view="${v}"]`);
+            if (navBtn) navBtn.classList.add('active');
             render();
         }
 
         document.querySelectorAll('.nav-item').forEach(btn => btn.onclick = () => switchView(btn.dataset.view));
 
-        async function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) alert(error.message);
-        }
-
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(()=>t.style.display='none', 2500); }
 
-// Fix für das Laden: Wir zeigen erst etwas an, wenn wir wissen wer eingeloggt ist
-    document.addEventListener('DOMContentLoaded', () => {
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            const modal = document.getElementById('loginModal');
-            
-            if (session) {
-                // User ist da
-                const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
-                state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                const loader = document.getElementById('loadingScreen');
+                const modal = document.getElementById('loginModal');
                 
-                modal.style.display = 'none'; // Login weg
-                await loadData(); // Daten laden
-                switchView('feed'); // Feed zeigen
-            } else {
-                // Kein User da
-                modal.style.display = 'flex'; // Login zeigen
-                document.getElementById('feedContainer').innerHTML = ""; // Screen leeren
-            }
+                if (session) {
+                    const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
+                    if (prof) {
+                        state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
+                        state.isAuthenticated = true;
+                        modal.style.display = 'none';
+                        await loadData();
+                    }
+                    loader.style.display = 'none';
+                } else {
+                    loader.style.display = 'none';
+                    modal.style.display = 'flex';
+                }
+            });
         });
-    });
-
-    // Hilfsfunktion: Falls das Modal durch CSS "display: none !important" blockiert war
-    function showLoginModal() { 
-        const m = document.getElementById('loginModal');
-        m.style.setProperty('display', 'flex', 'important'); 
-    }
-</script>
+    </script>
 </body>
 </html>

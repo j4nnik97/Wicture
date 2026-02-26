@@ -237,18 +237,32 @@
 
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(()=>t.style.display='none', 2500); }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (session) {
-                    const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
-                    state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
-                    document.getElementById('loginModal').style.setProperty('display', 'none', 'important');
-                    loadData();
-                } else {
-                    document.getElementById('loginModal').style.setProperty('display', 'flex', 'important');
-                }
-            });
+// Fix für das Laden: Wir zeigen erst etwas an, wenn wir wissen wer eingeloggt ist
+    document.addEventListener('DOMContentLoaded', () => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            const modal = document.getElementById('loginModal');
+            
+            if (session) {
+                // User ist da
+                const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
+                state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
+                
+                modal.style.display = 'none'; // Login weg
+                await loadData(); // Daten laden
+                switchView('feed'); // Feed zeigen
+            } else {
+                // Kein User da
+                modal.style.display = 'flex'; // Login zeigen
+                document.getElementById('feedContainer').innerHTML = ""; // Screen leeren
+            }
         });
-    </script>
+    });
+
+    // Hilfsfunktion: Falls das Modal durch CSS "display: none !important" blockiert war
+    function showLoginModal() { 
+        const m = document.getElementById('loginModal');
+        m.style.setProperty('display', 'flex', 'important'); 
+    }
+</script>
 </body>
 </html>

@@ -6,1201 +6,237 @@
     <title>Wicture</title>
     <style>
         :root {
-            --color-white: rgba(255, 255, 255, 1);
-            --color-cream-50: rgba(252, 252, 249, 1);
-            --color-cream-100: rgba(255, 255, 253, 1);
-            --color-gray-200: rgba(245, 245, 245, 1);
-            --color-gray-300: rgba(167, 169, 169, 1);
-            --color-gray-400: rgba(119, 124, 124, 1);
-            --color-slate-500: rgba(98, 108, 113, 1);
-            --color-brown-600: rgba(94, 82, 64, 1);
-            --color-charcoal-700: rgba(31, 33, 33, 1);
-            --color-charcoal-800: rgba(38, 40, 40, 1);
-            --color-slate-900: rgba(19, 52, 59, 1);
-            --color-teal-300: rgba(50, 184, 198, 1);
-            --color-teal-400: rgba(45, 166, 178, 1);
-            --color-teal-500: rgba(33, 128, 141, 1);
-            --color-teal-600: rgba(29, 116, 128, 1);
-            --color-teal-700: rgba(26, 104, 115, 1);
-            --color-red-400: rgba(255, 84, 89, 1);
-
-            --color-brown-600-rgb: 94, 82, 64;
-            --color-teal-500-rgb: 33, 128, 141;
-            --color-slate-900-rgb: 19, 52, 59;
-            --color-gray-400-rgb: 119, 124, 124;
-            --color-teal-300-rgb: 50, 184, 198;
-            --color-gray-300-rgb: 167, 169, 169;
-            --color-gray-200-rgb: 245, 245, 245;
-
-            --color-background: var(--color-cream-50);
-            --color-surface: var(--color-cream-100);
-            --color-text: var(--color-slate-900);
-            --color-text-secondary: var(--color-slate-500);
-            --color-primary: var(--color-teal-500);
-            --color-primary-hover: var(--color-teal-600);
-            --color-primary-active: var(--color-teal-700);
-            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
-            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
-            --color-btn-primary-text: var(--color-cream-50);
-            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
-            --color-error: rgba(255, 84, 89, 1);
-
-            --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            --radius-sm: 6px;
-            --radius-base: 8px;
-            --radius-lg: 12px;
-            --radius-full: 9999px;
-            --duration-normal: 250ms;
-            --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+            --color-teal-500: #21808d;
+            --color-border: rgba(94, 82, 64, 0.15);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --color-background: var(--color-charcoal-700);
-                --color-surface: var(--color-charcoal-800);
-                --color-text: var(--color-gray-200);
-                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
-                --color-primary: var(--color-teal-300);
-                --color-primary-hover: var(--color-teal-400);
-                --color-primary-active: rgba(41, 150, 161, 1);
-                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
-                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
-                --color-btn-primary-text: var(--color-slate-900);
-                --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
-                --color-error: rgba(255, 84, 89, 1);
-            }
-        }
-
-        @font-face {
-            font-family: 'FKGroteskNeue';
-            src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html {
-            font-family: var(--font-family-base);
-            -webkit-font-smoothing: antialiased;
-            background: var(--color-background);
-            color: var(--color-text);
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-logo svg {
-            width: 28px;
-            height: 28px;
-            color: var(--color-primary);
-        }
-
-        .header-logo h1 {
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: var(--color-text);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-base);
-            border: none;
-            background: transparent;
-            color: var(--color-text);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background var(--duration-normal) var(--ease-standard);
-        }
-
-        .btn-icon:hover { background: rgba(var(--color-brown-600-rgb), 0.08); }
-
-        @media (prefers-color-scheme: dark) {
-            .btn-icon:hover { background: rgba(var(--color-gray-400-rgb), 0.15); }
-        }
-
-        .btn-icon svg { width: 22px; height: 22px; }
-
-        /* Navigation Tabs */
-        .nav-tabs {
-            display: flex;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            border: none;
-            background: transparent;
-            color: var(--color-text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            font-family: var(--font-family-base);
-            cursor: pointer;
-            position: relative;
-            transition: color var(--duration-normal) var(--ease-standard);
-        }
-
-        .nav-tab.active {
-            color: var(--color-primary);
-            font-weight: 600;
-        }
-
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 16px;
-            right: 16px;
-            height: 2px;
-            background: var(--color-primary);
-            border-radius: 1px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 0 80px;
-        }
-
-        /* View Containers */
+        body { font-family: var(--font-family); background: #fcfcf9; padding-bottom: 70px; }
+        .header { position: sticky; top: 0; background: white; padding: 15px; border-bottom: 1px solid var(--color-border); z-index: 100; text-align: center; }
+        .header h1 { color: var(--color-teal-500); font-size: 20px; }
+        .main-content { max-width: 500px; margin: 0 auto; }
         .view { display: none; }
         .view.active { display: block; }
-
-        /* Weekly Banner */
-        .weekly-banner {
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .weekly-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .weekly-icon.can-post {
-            background: rgba(var(--color-teal-500-rgb), 0.12);
-            color: var(--color-primary);
-        }
-
-        .weekly-icon.posted {
-            background: rgba(var(--color-brown-600-rgb), 0.08);
-            color: var(--color-text-secondary);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .weekly-icon.can-post {
-                background: rgba(var(--color-teal-300-rgb), 0.15);
-            }
-            .weekly-icon.posted {
-                background: rgba(var(--color-gray-400-rgb), 0.12);
-            }
-        }
-
-        .weekly-icon svg { width: 22px; height: 22px; }
-
-        .weekly-info h3 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .weekly-info p {
-            font-size: 12px;
-            color: var(--color-text-secondary);
-        }
-
-        /* Post Card */
-        .post-card {
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .post-header {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .post-user-info {
-            flex: 1;
-        }
-
-        .post-username {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .post-meta {
-            font-size: 11px;
-            color: var(--color-text-secondary);
-        }
-
-        .post-image-container {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: var(--color-background);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .post-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .post-actions {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .action-btn {
-            border: none;
-            background: transparent;
-            color: var(--color-text);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: var(--font-family-base);
-            font-size: 13px;
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            transition: all var(--duration-normal) var(--ease-standard);
-        }
-
-        .action-btn:hover { opacity: 0.7; }
-
-        .action-btn svg { width: 22px; height: 22px; }
-
-        .action-btn.liked { color: var(--color-error); }
-
-        .like-count {
-            font-size: 13px;
-            font-weight: 600;
-            padding: 0 16px 4px;
-        }
-
-        .post-caption {
-            padding: 0 16px 12px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .post-caption strong {
-            font-weight: 600;
-            margin-right: 4px;
-        }
-
-        /* Profile View */
-        .profile-header {
-            padding: 24px 16px;
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: 600;
-            flex-shrink: 0;
-            border: 3px solid var(--color-primary);
-        }
-
-        .profile-stats {
-            display: flex;
-            gap: 24px;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--color-text-secondary);
-            margin-top: 2px;
-        }
-
-        .profile-bio {
-            padding: 16px;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .profile-bio h3 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .profile-bio p {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            line-height: 1.4;
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-            padding: 2px;
-        }
-
-        .grid-item {
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .grid-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity var(--duration-normal) var(--ease-standard);
-        }
-
-        .grid-item:hover img { opacity: 0.85; }
-
-        .grid-item-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transition: opacity var(--duration-normal) var(--ease-standard);
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            gap: 6px;
-        }
-
-        .grid-item:hover .grid-item-overlay { opacity: 1; }
-
-        /* Upload View */
-        .upload-area {
-            padding: 16px;
-        }
-
-        .upload-dropzone {
-            border: 2px dashed var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: 48px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all var(--duration-normal) var(--ease-standard);
-            background: var(--color-surface);
-        }
-
-        .upload-dropzone:hover {
-            border-color: var(--color-primary);
-            background: rgba(var(--color-teal-500-rgb), 0.04);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .upload-dropzone:hover {
-                background: rgba(var(--color-teal-300-rgb), 0.06);
-            }
-        }
-
-        .upload-dropzone svg {
-            width: 48px;
-            height: 48px;
-            color: var(--color-text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .upload-dropzone h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .upload-dropzone p {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-        }
-
-        .upload-preview {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .upload-preview.active {
-            display: flex;
-        }
-
-        .upload-preview-img {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            background: var(--color-background);
-        }
-
-        .upload-preview-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .upload-caption-input {
-            width: 100%;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-base);
-            padding: 12px;
-            font-size: 14px;
-            font-family: var(--font-family-base);
-            background: var(--color-surface);
-            color: var(--color-text);
-            resize: vertical;
-            min-height: 80px;
-            outline: none;
-            transition: border-color var(--duration-normal) var(--ease-standard);
-        }
-
-        .upload-caption-input:focus {
-            border-color: var(--color-primary);
-        }
-
-        .upload-caption-input::placeholder {
-            color: var(--color-text-secondary);
-        }
-
-        .upload-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: var(--radius-base);
-            font-size: 14px;
-            font-weight: 500;
-            font-family: var(--font-family-base);
-            cursor: pointer;
-            border: none;
-            transition: all var(--duration-normal) var(--ease-standard);
-        }
-
-        .btn:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--color-focus-ring);
-        }
-
-        .btn-primary {
-            background: var(--color-primary);
-            color: var(--color-btn-primary-text);
-            flex: 1;
-        }
-
-        .btn-primary:hover { background: var(--color-primary-hover); }
-        .btn-primary:active { background: var(--color-primary-active); }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--color-text-secondary);
-            border: 1px solid var(--color-border);
-        }
-
-        .btn-secondary:hover { background: rgba(var(--color-brown-600-rgb), 0.06); }
-
-        @media (prefers-color-scheme: dark) {
-            .btn-secondary:hover { background: rgba(var(--color-gray-400-rgb), 0.12); }
-        }
-
-        /* Disabled Upload */
-        .upload-disabled {
-            padding: 48px 24px;
-            text-align: center;
-            background: var(--color-surface);
-            border-radius: var(--radius-lg);
-        }
-
-        .upload-disabled svg {
-            width: 48px;
-            height: 48px;
-            color: var(--color-text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .upload-disabled h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .upload-disabled p {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            line-height: 1.5;
-        }
-
-        .countdown-timer {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 12px;
-            padding: 8px 16px;
-            background: rgba(var(--color-teal-500-rgb), 0.08);
-            border-radius: var(--radius-full);
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--color-primary);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .countdown-timer {
-                background: rgba(var(--color-teal-300-rgb), 0.1);
-            }
-        }
-
-        /* Empty State */
-        .empty-state {
-            padding: 64px 24px;
-            text-align: center;
-        }
-
-        .empty-state svg {
-            width: 56px;
-            height: 56px;
-            color: var(--color-text-secondary);
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .empty-state h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .empty-state p {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-        }
-
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--color-surface);
-            border-top: 1px solid var(--color-border);
-            display: flex;
-            z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom, 0);
-        }
-
-        .bottom-nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 0;
-            border: none;
-            background: transparent;
-            color: var(--color-text-secondary);
-            font-size: 10px;
-            font-family: var(--font-family-base);
-            cursor: pointer;
-            gap: 3px;
-            transition: color var(--duration-normal) var(--ease-standard);
-        }
-
-        .bottom-nav-item.active { color: var(--color-primary); }
-        .bottom-nav-item svg { width: 24px; height: 24px; }
-
-        .bottom-nav-item.upload-btn {
-            color: var(--color-primary);
-        }
-
-        .upload-plus-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-full);
-            background: var(--color-primary);
-            color: var(--color-btn-primary-text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .upload-plus-circle svg { width: 20px; height: 20px; }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--color-text);
-            color: var(--color-background);
-            padding: 10px 20px;
-            border-radius: var(--radius-full);
-            font-size: 13px;
-            font-weight: 500;
-            opacity: 0;
-            transition: all 300ms var(--ease-standard);
-            pointer-events: none;
-            white-space: nowrap;
-            z-index: 200;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* Week Label Badge */
-        .week-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            border-radius: var(--radius-full);
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: rgba(var(--color-teal-500-rgb), 0.1);
-            color: var(--color-primary);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .week-badge {
-                background: rgba(var(--color-teal-300-rgb), 0.12);
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 0; }
-
-        /* Responsive */
-        @media (min-width: 600px) {
-            .main-content {
-                border-left: 1px solid var(--color-border);
-                border-right: 1px solid var(--color-border);
-            }
-        }
+        .post-card { background: white; border-bottom: 1px solid var(--color-border); margin-bottom: 10px; }
+        .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+        .post-info { padding: 12px; }
+        .post-actions { padding: 0 12px 10px; }
+        .action-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
+        .action-btn.liked { color: #ff5459; }
+        .comments-list { font-size: 13px; margin-top: 10px; color: #444; border-top: 1px solid #eee; padding-top: 8px; }
+        .comment-input-group { display: flex; gap: 8px; margin-top: 10px; }
+        .comment-input { flex: 1; border: 1px solid #ddd; border-radius: 15px; padding: 5px 12px; font-size: 13px; outline: none; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--color-border); display: flex; height: 60px; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #666; cursor: pointer; border: none; background: none; }
+        .nav-item.active { color: var(--color-teal-500); }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+        .grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        #loginModal { display: none !important; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; }
+        .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: var(--color-teal-500); color: white; }
+        input[type="email"], input[type="password"] { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <circle cx="12" cy="12" r="3.5"/>
-                <circle cx="17.5" cy="6.5" r="1"/>
-            </svg>
-            <h1>Wicture</h1>
-        </div>
-        <div class="header-actions">
-            <button class="btn-icon" id="searchBtn" aria-label="Suche">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="7"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-            </button>
-        </div>
-    </header>
+    <header class="header"><h1>Wicture</h1></header>
 
-    <!-- Main Content -->
     <div class="main-content">
-
-        <!-- Feed View -->
-        <div class="view active" id="feedView">
-            <div class="weekly-banner" id="weeklyBanner"></div>
+        <div id="feedView" class="view active">
             <div id="feedContainer"></div>
         </div>
-
-        <!-- Explore View -->
-        <div class="view" id="exploreView">
-            <div style="padding: 12px 16px;">
-                <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">Entdecken</h2>
-                <p style="font-size: 12px; color: var(--color-text-secondary);">Die besten Fotos dieser Woche</p>
+        <div id="exploreView" class="view">
+            <div id="exploreGrid" class="grid"></div>
+        </div>
+        <div id="uploadView" class="view" style="padding: 20px; text-align: center;">
+            <div id="uploadArea" style="border: 2px dashed #ccc; padding: 40px; border-radius: 15px;" onclick="document.getElementById('fileInput').click()">
+                <p>Foto für diese Woche wählen</p>
             </div>
-            <div class="profile-grid" id="exploreGrid"></div>
         </div>
-
-        <!-- Upload View -->
-        <div class="view" id="uploadView">
-            <div class="upload-area" id="uploadArea"></div>
-        </div>
-
-        <!-- Profile View -->
-        <div class="view" id="profileView">
-            <div id="profileContent"></div>
+        <div id="profileView" class="view">
+            <div id="profileContent" style="padding: 20px;"></div>
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-        <button class="bottom-nav-item active" data-view="feed" aria-label="Feed">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            <span>Feed</span>
-        </button>
-        <button class="bottom-nav-item" data-view="explore" aria-label="Entdecken">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="7"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <span>Entdecken</span>
-        </button>
-        <button class="bottom-nav-item upload-btn" data-view="upload" aria-label="Hochladen">
-            <div class="upload-plus-circle">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-            </div>
-        </button>
-        <button class="bottom-nav-item" data-view="profile" aria-label="Profil">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span>Profil</span>
-        </button>
+        <button class="nav-item active" data-view="feed"><span>Feed</span></button>
+        <button class="nav-item" data-view="explore"><span>Entdecken</span></button>
+        <button class="nav-item" data-view="upload"><span>Posten</span></button>
+        <button class="nav-item" data-view="profile"><span>Profil</span></button>
     </nav>
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
-
-    <!-- Login Modal -->
-    <div id="loginModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
-        <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: 32px; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px; color: var(--color-primary); margin: 0 auto 12px;">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <circle cx="12" cy="12" r="3.5"/>
-                    <circle cx="17.5" cy="6.5" r="1"/>
-                </svg>
-                <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Willkommen bei Wicture</h2>
-                <p style="font-size: 14px; color: var(--color-text-secondary);">Ein Foto pro Woche. Nicht mehr, nicht weniger.</p>
-            </div>
-            
-            <div id="loginForm">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
-                    <input type="email" id="loginEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
-                </div>
-                <button onclick="handleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Anmelden</button>
-                <button onclick="showSignup()" class="btn btn-secondary" style="width: 100%;">Registrieren</button>
-            </div>
-
-            <div id="signupForm" style="display: none;">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Benutzername</label>
-                    <input type="text" id="signupUsername" placeholder="deinname" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
-                    <input type="text" id="signupDisplayName" placeholder="Dein Name" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
-                    <input type="email" id="signupEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
-                    <input type="password" id="signupPassword" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
-                </div>
-                <button onclick="handleSignup()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Konto erstellen</button>
-                <button onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Zurück zur Anmeldung</button>
-            </div>
+    <div id="loginModal">
+        <div class="modal-box">
+            <h2>Wicture</h2>
+            <p style="margin-bottom: 20px; font-size: 14px; color: #666;">Ein Foto pro Woche.</p>
+            <input type="email" id="loginEmail" placeholder="E-Mail">
+            <input type="password" id="loginPassword" placeholder="Passwort">
+            <button onclick="handleLogin()" class="btn btn-primary">Anmelden</button>
         </div>
     </div>
 
-    <!-- Hidden file input -->
     <input type="file" id="fileInput" accept="image/*" hidden>
+    <div id="toast" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:8px 16px; border-radius:20px; display:none; z-index:2000;"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // --- Supabase Configuration ---
-    const SUPABASE_URL = 'https://rkmsomwlhlsxfoqueyza.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrbXNvbXdsaGxzeGZvcXVleXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwODg3MTAsImV4cCI6MjA4NzY2NDcxMH0.KG6qS93ndM3KYyp5pw8utSHJUSoVMv7SUUZ9cCDbIVo';
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://rkmsomwlhlsxfoqueyza.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrbXNvbXdsaGxzeGZvcXVleXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwODg3MTAsImV4cCI6MjA4NzY2NDcxMH0.KG6qS93ndM3KYyp5pw8utSHJUSoVMv7SUUZ9cCDbIVo';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const state = { currentUser: null, posts: [], currentView: 'feed' };
 
-    const state = {
-        currentView: 'feed',
-        currentUser: null,
-        isAuthenticated: false,
-        posts: [],
-        weeklyPostDone: false,
-        nextPostAvailable: null
-    };
-
-    // --- Utility Functions ---
-    function getWeekLabel(timestamp) {
-        const date = new Date(timestamp);
-        const now = new Date();
-        const startOfWeek = d => {
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            return new Date(d.getFullYear(), d.getMonth(), diff);
-        };
-        if (startOfWeek(date).getTime() === startOfWeek(now).getTime()) return 'Diese Woche';
-        return 'Letzte Woche';
-    }
-
-    function timeAgo(ts) {
-        const diff = Date.now() - new Date(ts).getTime();
-        const mins = Math.floor(diff / 60000);
-        if (mins < 60) return mins + ' Min.';
-        const hours = Math.floor(diff / 3600000);
-        if (hours < 24) return hours + ' Std.';
-        return Math.floor(hours / 24) + ' T.';
-    }
-
-    function formatCountdown(targetTs) {
-        const diff = targetTs - Date.now();
-        if (diff <= 0) return 'Jetzt verfügbar!';
-        const hours = Math.floor(diff / 3600000);
-        const mins = Math.floor((diff % 3600000) / 60000);
-        return `${hours}Std ${mins}Min`;
-    }
-
-    function showToast(m) {
-        const t = document.getElementById('toast');
-        if (!t) return;
-        t.textContent = m; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2500);
-    }
-
-    // --- Rendering Functions ---
-    function renderWeeklyBanner() {
-        const banner = document.getElementById('weeklyBanner');
-        if (!state.currentUser || !banner) return;
-
-        const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - (weekStart.getDay() || 7) + 1);
-        weekStart.setHours(0,0,0,0);
-        
-        state.weeklyPostDone = state.posts.some(p => 
-            p.user.username === state.currentUser.username && p.timestamp >= weekStart.getTime()
-        );
-        state.nextPostAvailable = weekStart.getTime() + 604800000;
-
-        banner.innerHTML = state.weeklyPostDone 
-            ? `<div class="weekly-icon posted">✓</div><div class="weekly-info"><h3>Wochenfoto erledigt</h3><p>Nächster Post in ${formatCountdown(state.nextPostAvailable)}</p></div>`
-            : `<div class="weekly-icon can-post">📸</div><div class="weekly-info"><h3>Wochenfoto wartet!</h3><p>Teile dein Bild für diese Woche</p></div>`;
-    }
-
-    function renderFeed() {
-        const container = document.getElementById('feedContainer');
-        if (!container) return;
-        if (state.posts.length === 0) {
-            container.innerHTML = '<div class="empty-state"><h3>Keine Fotos</h3><p>Sei der Erste!</p></div>';
-            return;
+        // --- BILD-KOMPRESSION (DER CREDIT-RETTER) ---
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX = 1000;
+                        let w = img.width, h = img.height;
+                        if (w > MAX) { h *= MAX / w; w = MAX; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        canvas.toBlob(b => resolve(new File([b], file.name, {type: 'image/jpeg'})), 'image/jpeg', 0.8);
+                    };
+                };
+            });
         }
-        container.innerHTML = state.posts.map(post => `
-            <div class="post-card">
-                <div class="post-header">
-                    <div class="avatar" style="background:${post.user.color}22; color:${post.user.color}">${post.user.displayName.charAt(0)}</div>
-                    <div class="post-user-info"><b>${post.user.username}</b><div class="post-meta">${timeAgo(post.timestamp)}</div></div>
-                </div>
-                <div class="post-image-container"><img src="${post.image}" loading="lazy"></div>
-                <div class="post-actions">
-                    <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">❤️ ${post.likes}</button>
-                </div>
-                <div class="post-caption"><strong>${post.user.username}</strong> ${post.caption}</div>
-            </div>
-        `).join('');
-    }
 
-    function renderExplore() {
-        const grid = document.getElementById('exploreGrid');
-        if (!grid) return;
-        grid.innerHTML = [...state.posts].sort(() => 0.5 - Math.random()).map(p => `
-            <div class="grid-item" onclick="switchView('feed')"><img src="${p.image}"></div>
-        `).join('');
-    }
+        // --- Core Logik ---
+        async function loadData() {
+            const { data, error } = await supabaseClient.from('posts').select('*, post_likes(count), comments(*)').order('timestamp', { ascending: false });
+            if (error) return;
 
-    function renderProfile() {
-        const content = document.getElementById('profileContent');
-        if (!content || !state.currentUser) return;
-        const myPosts = state.posts.filter(p => p.user.username === state.currentUser.username);
-        content.innerHTML = `
-            <div class="profile-header">
-                <div class="profile-avatar" style="background:${state.currentUser.color}22; color:${state.currentUser.color}">${state.currentUser.displayName.charAt(0)}</div>
-                <div class="profile-stats"><div class="stat"><b>${myPosts.length}</b> Fotos</div></div>
-            </div>
-            <div class="profile-grid">${myPosts.map(p => `<div class="grid-item"><img src="${p.image}"></div>`).join('')}</div>
-            <button onclick="handleLogout()" class="btn btn-secondary" style="margin: 20px; width: calc(100% - 40px);">Abmelden</button>
-        `;
-    }
-
-    function renderUpload() {
-        const area = document.getElementById('uploadArea');
-        if (!area) return;
-        if (state.weeklyPostDone) {
-            area.innerHTML = '<div class="upload-disabled"><h3>Pause!</h3><p>Du hast diese Woche bereits gepostet.</p></div>';
-        } else {
-            area.innerHTML = '<div class="upload-dropzone" onclick="document.getElementById(\'fileInput\').click()"><h3>Foto wählen</h3><p>Tippe hier</p></div>';
-        }
-    }
-
-    // --- Database & Upload ---
-    async function loadPostsFromSupabase() {
-        try {
-            const { data, error } = await supabaseClient.from('posts').select('*, post_likes(count)').order('timestamp', { ascending: false });
-            if (error) throw error;
-            
             let myLikes = [];
-            const userRes = await supabaseClient.auth.getUser();
-            if (userRes.data.user) {
-                const { data: likes } = await supabaseClient.from('post_likes').select('post_id').eq('user_id', userRes.data.user.id);
+            const user = (await supabaseClient.auth.getUser()).data.user;
+            if (user) {
+                const { data: likes } = await supabaseClient.from('post_likes').select('post_id').eq('user_id', user.id);
                 if (likes) myLikes = likes.map(l => String(l.post_id));
             }
 
             state.posts = data.map(p => ({
-                id: String(p.id),
-                user: { username: p.username, displayName: p.display_name, color: p.user_color },
-                image: p.image_url,
-                caption: p.caption,
-                likes: p.post_likes[0]?.count || 0,
-                liked: myLikes.includes(String(p.id)),
-                timestamp: new Date(p.timestamp).getTime(),
-                weekLabel: getWeekLabel(p.timestamp)
+                ...p, id: String(p.id), image: p.image_url, liked: myLikes.includes(String(p.id)), likes: p.post_likes[0]?.count || 0
             }));
-            if (state.currentView === 'feed') renderFeed();
-            renderWeeklyBanner();
-        } catch (e) { console.error(e); }
-    }
+            render();
+        }
 
-    async function toggleLike(postId) {
-        if (!state.isAuthenticated) return showLoginModal();
-        const post = state.posts.find(p => p.id === postId);
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        try {
-            if (post.liked) {
-                await supabaseClient.from('post_likes').delete().match({ post_id: postId, user_id: user.id });
-                post.likes--;
-            } else {
-                await supabaseClient.from('post_likes').insert([{ post_id: postId, user_id: user.id }]);
-                post.likes++;
+        function render() {
+            if (state.currentView === 'feed') {
+                document.getElementById('feedContainer').innerHTML = state.posts.map(p => `
+                    <div class="post-card">
+                        <div class="post-info"><b>${p.display_name}</b></div>
+                        <img src="${p.image}" class="post-img">
+                        <div class="post-actions">
+                            <button class="action-btn ${p.liked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">❤️ ${p.likes}</button>
+                        </div>
+                        <div class="post-info" style="padding-top:0;"><b>${p.username}</b> ${p.caption}</div>
+                        <div class="comments-list" style="margin: 0 12px 12px;">
+                            ${(p.comments || []).map(c => `<div><b>${c.username}:</b> ${c.content}</div>`).join('')}
+                            <div class="comment-input-group">
+                                <input type="text" id="com-${p.id}" class="comment-input" placeholder="Schreiben...">
+                                <button onclick="addComment('${p.id}')" style="border:none; background:none; color:var(--color-teal-500); font-weight:600;">Post</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
             }
-            post.liked = !post.liked;
-            renderFeed();
-        } catch (e) { console.error(e); }
-    }
+            if (state.currentView === 'explore') {
+                document.getElementById('exploreGrid').innerHTML = state.posts.map(p => `<img src="${p.image}" onclick="switchView('feed')">`).join('');
+            }
+            if (state.currentView === 'profile') {
+                const myPosts = state.posts.filter(p => p.username === state.currentUser?.username);
+                document.getElementById('profileContent').innerHTML = `
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h3>${state.currentUser?.displayName}</h3>
+                        <p>${myPosts.length} Wochen dabei</p>
+                        <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" class="btn" style="border:1px solid #ddd; width:auto; padding: 5px 15px;">Abmelden</button>
+                    </div>
+                    <div class="grid">${myPosts.map(p => `<img src="${p.image}">`).join('')}</div>
+                `;
+            }
+        }
 
-    async function submitPost() {
-        const fileInput = document.getElementById('fileInput');
-        const file = fileInput.files[0];
-        if (!file || !state.currentUser) return;
-        
-        const btn = document.getElementById('postBtn');
-        btn.disabled = true; btn.textContent = 'Lädt...';
-
-        try {
-            const fileName = `${state.currentUser.username}_${Date.now()}.${file.name.split('.').pop()}`;
-            const { error: upErr } = await supabaseClient.storage.from('wicture-images').upload(`posts/${fileName}`, file);
-            if (upErr) throw upErr;
-
-            const { data: { publicUrl } } = supabaseClient.storage.from('wicture-images').getPublicUrl(`posts/${fileName}`);
-            const { error: insErr } = await supabaseClient.from('posts').insert([{
+        async function submitPost() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file || !state.currentUser) return;
+            showToast("Verarbeite Bild...");
+            const comp = await compressImage(file);
+            const path = `posts/${state.currentUser.username}_${Date.now()}.jpg`;
+            await supabaseClient.storage.from('wicture-images').upload(path, comp);
+            const { data: { publicUrl } } = supabaseClient.storage.from('wicture-images').getPublicUrl(path);
+            await supabaseClient.from('posts').insert([{
                 username: state.currentUser.username, display_name: state.currentUser.displayName,
-                user_color: state.currentUser.color, image_url: publicUrl,
-                caption: document.getElementById('captionInput').value, timestamp: new Date().toISOString()
+                user_color: state.currentUser.color, image_url: publicUrl, caption: 'Mein Wochenfoto'
             }]);
-            if (insErr) throw insErr;
-            
-            showToast('Gepostet! 🎉');
-            await loadPostsFromSupabase();
+            showToast("Gepostet! 🎉");
             switchView('feed');
-        } catch (e) { showToast('Fehler: ' + e.message); btn.disabled = false; }
-    }
+            loadData();
+        }
 
-    document.getElementById('fileInput').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = evt => {
-            document.getElementById('uploadArea').innerHTML = `
-                <div class="upload-preview active">
-                    <div class="upload-preview-img"><img src="${evt.target.result}"></div>
-                    <textarea id="captionInput" class="upload-caption-input" placeholder="Bildunterschrift..."></textarea>
-                    <button id="postBtn" class="btn btn-primary" onclick="submitPost()">Posten</button>
-                    <button class="btn btn-secondary" onclick="renderUpload()" style="margin-top:10px">Abbrechen</button>
-                </div>`;
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // --- Auth Actions ---
-    async function handleLogin() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        if (!email || !password) return showToast("Bitte Felder ausfüllen");
-        
-        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) showToast(error.message);
-    }
-
-    async function handleSignup() {
-        const email = document.getElementById('signupEmail').value.trim();
-        const password = document.getElementById('signupPassword').value;
-        const username = document.getElementById('signupUsername').value.trim();
-        const displayName = document.getElementById('signupDisplayName').value.trim();
-        
-        const { data, error } = await supabaseClient.auth.signUp({ email, password });
-        if (error) return showToast(error.message);
-
-        await supabaseClient.from('users').insert([{
-            user_id: data.user.id, username, display_name: displayName, email, user_color: '#21808D'
-        }]);
-        showToast('Konto erstellt! Bitte einloggen.');
-        showLogin();
-    }
-
-    async function handleLogout() {
-        await supabaseClient.auth.signOut();
-        location.reload();
-    }
-
-    function showLoginModal() { document.getElementById('loginModal').style.setProperty('display', 'flex', 'important'); }
-    function hideLoginModal() { document.getElementById('loginModal').style.setProperty('display', 'none', 'important'); }
-    function showSignup() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('signupForm').style.display = 'block'; }
-    function showLogin() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('signupForm').style.display = 'none'; }
-
-    // --- Navigation ---
-    function switchView(view) {
-        state.currentView = view;
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
-        document.getElementById(view + 'View').classList.add('active');
-        const navBtn = document.querySelector(`[data-view="${view}"]`);
-        if (navBtn) navBtn.classList.add('active');
-        
-        if (view === 'feed') renderFeed();
-        if (view === 'explore') renderExplore();
-        if (view === 'profile') renderProfile();
-        if (view === 'upload') renderUpload();
-    }
-
-    document.querySelectorAll('.bottom-nav-item').forEach(btn => {
-        btn.addEventListener('click', () => switchView(btn.dataset.view));
-    });
-
-    // --- Init ---
-    document.addEventListener('DOMContentLoaded', async () => {
-        await loadPostsFromSupabase();
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session) {
-                const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
-                if (prof) {
-                    state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
-                    state.isAuthenticated = true;
-                    hideLoginModal();
-                    renderWeeklyBanner();
-                }
-            } else {
-                showLoginModal();
+        document.getElementById('fileInput').onchange = () => {
+            const file = document.getElementById('fileInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('uploadArea').innerHTML = `<img src="${e.target.result}" style="width:100%; border-radius:10px; margin-bottom:10px;"><button onclick="submitPost()" class="btn btn-primary">Jetzt Posten</button>`;
+                };
+                reader.readAsDataURL(file);
             }
+        };
+
+        async function toggleLike(postId) {
+            const post = state.posts.find(p => p.id === postId);
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (post.liked) await supabaseClient.from('post_likes').delete().match({ post_id: postId, user_id: user.id });
+            else await supabaseClient.from('post_likes').insert([{ post_id: postId, user_id: user.id }]);
+            loadData();
+        }
+
+        async function addComment(postId) {
+            const val = document.getElementById(`com-${postId}`).value;
+            if (!val) return;
+            await supabaseClient.from('comments').insert([{ post_id: postId, user_id: (await supabaseClient.auth.getUser()).data.user.id, username: state.currentUser.username, content: val }]);
+            loadData();
+        }
+
+        function switchView(v) {
+            state.currentView = v;
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(v + 'View').classList.add('active');
+            document.querySelector(`[data-view="${v}"]`).classList.add('active');
+            render();
+        }
+
+        document.querySelectorAll('.nav-item').forEach(btn => btn.onclick = () => switchView(btn.dataset.view));
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message);
+        }
+
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(()=>t.style.display='none', 2500); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (session) {
+                    const { data: prof } = await supabaseClient.from('users').select('*').eq('user_id', session.user.id).single();
+                    state.currentUser = { username: prof.username, displayName: prof.display_name, color: prof.user_color };
+                    document.getElementById('loginModal').style.setProperty('display', 'none', 'important');
+                    loadData();
+                } else {
+                    document.getElementById('loginModal').style.setProperty('display', 'flex', 'important');
+                }
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

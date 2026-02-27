@@ -1073,34 +1073,6 @@
         // --- Rendering ---
 
         function renderWeeklyBanner() {
-		
-			// Dieser Teil gehört in deine Schleife, die die Posts rendert
-const commentsHtml = (post.comments || []).map(comment => `
-    <div class="comment-item" style="margin-bottom: 8px; font-size: 0.9rem;">
-        <span style="font-weight: bold; color: ${comment.user_color || '#333'}">
-            ${comment.display_name || comment.username}:
-        </span>
-        <span style="color: #4b5563;">${comment.content}</span>
-    </div>
-`).join('');
-
-const commentInputHtml = `
-    <div class="comment-section" style="border-top: 1px solid #eee; padding-top: 12px; margin-top: 12px;">
-        <div id="comments-container-${post.id}">
-            ${commentsHtml}
-        </div>
-        <div class="comment-input-group" style="display: flex; gap: 8px; margin-top: 12px;">
-            <input type="text" 
-                   id="comment-input-${post.id}" 
-                   placeholder="Kommentieren..." 
-                   style="flex: 1; border: 1px solid #ddd; padding: 8px 12px; border-radius: 20px; font-size: 0.9rem; outline: none;">
-            <button onclick="addComment('${post.id}')" 
-                    style="background: none; border: none; color: #2563eb; font-weight: 600; cursor: pointer; padding: 0 8px;">
-                Posten
-            </button>
-        </div>
-    </div>
-`;
             const banner = document.getElementById('weeklyBanner');
             checkWeeklyLimit();
 
@@ -1327,41 +1299,12 @@ const commentInputHtml = `
 
         // --- Actions ---
 
-     async function toggleLike(postId) {
-            const { data: auth } = await supabaseClient.auth.getUser();
-            if (!auth?.user) {
-                showToast('Bitte melde dich an');
-                return;
-            }
-
+        function toggleLike(postId) {
             const post = state.posts.find(p => p.id === postId);
             if (!post) return;
-
-            try {
-                if (post.liked) {
-                    // Like entfernen
-                    await supabaseClient
-                        .from('post_likes')
-                        .delete()
-                        .match({ post_id: postId, user_id: auth.user.id });
-                    
-                    post.likes = Math.max(0, post.likes - 1);
-                } else {
-                    // Like hinzufügen
-                    await supabaseClient
-                        .from('post_likes')
-                        .insert([{ post_id: postId, user_id: auth.user.id }]);
-                    
-                    post.likes += 1;
-                }
-
-                post.liked = !post.liked;
-                renderFeed(); 
-                // Der Zähler in der Tabelle 'posts' ist jetzt nur noch ein Backup, 
-                // da wir oben die echten Counts laden.
-            } catch (error) {
-                console.error("Like-Fehler:", error);
-            }
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+            renderFeed();
         }
 
        let selectedImageDataUrl = null;
@@ -1490,112 +1433,38 @@ const commentInputHtml = `
         // --- Supabase Helper Functions ---
 
         async function loadPostsFromSupabase() {
-    try {
-        // 1. Abfrage an Supabase: Posts + Likes zählen + Kommentare holen
-        const { data: postsData, error: postsError } = await supabaseClient
-            .from('posts')
-            .select(`
-                *,
-                post_likes (count),
-                comments (*)
-            `)
-            .order('timestamp', { ascending: false });
+            try {
+                const { data, error } = await supabaseClient
+                    .from('posts')
+                    .select('*')
+                    .order('timestamp', { ascending: false });
 
-        if (postsError) {
-            console.error("Supabase Query Error:", postsError);
-            throw postsError;
+                if (error) throw error;
+
+                state.posts = data.map(post => ({
+                    id: post.id,
+                    user: {
+                        username: post.username,
+                        displayName: post.display_name,
+                        color: post.user_color
+                    },
+                    image: post.image_url,
+                    caption: post.caption,
+                    likes: post.likes,
+                    liked: false,
+                    timestamp: new Date(post.timestamp).getTime(),
+                    weekLabel: getWeekLabel(new Date(post.timestamp).getTime())
+                }));
+                renderWeeklyBanner();
+                renderFeed();
+            } catch (error) {
+                console.error('Failed to load posts:', error);
+                showToast('Fehler beim Laden der Posts');
+                initSamplePosts();
+                renderWeeklyBanner();
+                renderFeed();
+            }
         }
-
-        // 2. Eigene Likes des Nutzers für die roten Herzen laden
-        let myLikes = [];
-        const { data: userData } = await supabaseClient.auth.getUser();
-        const user = userData?.user;
-
-        if (user) {
-            const { data: likesData } = await supabaseClient
-                .from('post_likes')
-                .select('post_id')
-                .eq('user_id', user.id);
-            if (likesData) myLikes = likesData.map(l => String(l.post_id));
-        }
-
-        // 3. WICHTIG: Daten Mapping (Hier lag der Fehler!)
-        state.posts = postsData.map(post => {
-            // Sicherstellen, dass wir den Like-Count richtig extrahieren
-            const likeCount = (post.post_likes && post.post_likes[0]) 
-                ? post.post_likes[0].count 
-                : 0;
-
-            // Kommentare sortieren (älteste zuerst, damit es ein Chat-Verlauf ist)
-            const sortedComments = (post.comments || []).sort((a, b) => 
-                new Date(a.created_at) - new Date(b.created_at)
-            );
-
-            return {
-                id: String(post.id),
-                user: {
-                    username: post.username,
-                    displayName: post.display_name,
-                    color: post.user_color
-                },
-                image: post.image_url, // <--- Das muss exakt so heißen wie in der DB
-                caption: post.caption,
-                likes: likeCount,
-                liked: myLikes.includes(String(post.id)),
-                comments: sortedComments,
-                timestamp: new Date(post.timestamp).getTime(),
-                weekLabel: getWeekLabel(new Date(post.timestamp).getTime())
-            };
-        });
-
-        // 4. UI aktualisieren
-        renderWeeklyBanner();
-        renderFeed();
-        
-    } catch (error) {
-        console.error('Failed to load posts:', error);
-        showToast('Fehler beim Laden der Galerie');
-    }
-}
-
-async function addComment(postId) {
-    const input = document.getElementById(`comment-input-${postId}`);
-    const content = input.value.trim();
-    if (!content) return;
-
-    // Button kurz deaktivieren, um Doppel-Klicks zu vermeiden
-    const btn = input.nextElementSibling;
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-
-    try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        
-        const { error } = await supabaseClient
-            .from('comments')
-            .insert([{
-                post_id: postId,
-                user_id: user.id,
-                username: state.currentUser.username,
-                display_name: state.currentUser.displayName,
-                user_color: state.currentUser.color,
-                content: content
-            }]);
-
-        if (error) throw error;
-
-        input.value = '';
-        // Einfach den Feed neu laden, um den neuen Kommentar zu sehen
-        await loadPostsFromSupabase(); 
-        
-    } catch (error) {
-        console.error("Fehler beim Kommentieren:", error);
-        showToast('Fehler beim Senden');
-    } finally {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-    }
-}
 
         async function savePostToSupabase(post) {
             try {

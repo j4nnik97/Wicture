@@ -1299,13 +1299,48 @@
 
         // --- Actions ---
 
-        function toggleLike(postId) {
-            const post = state.posts.find(p => p.id === postId);
-            if (!post) return;
-            post.liked = !post.liked;
-            post.likes += post.liked ? 1 : -1;
-            renderFeed();
+       async function toggleLike(postId) {
+    const post = state.posts.find(p => p.id === postId);
+    if (!post) return;
+    
+    const userId = state.currentUser.id; // UUID des Users
+    const isCurrentlyLiked = post.liked;
+
+    // 1. UI sofort updaten (Optimistic Update)
+    post.liked = !isCurrentlyLiked;
+    post.likes += post.liked ? 1 : -1;
+    renderFeed();
+
+    try {
+        if (!isCurrentlyLiked) {
+            // Like in die Datenbank einfügen
+            const { error } = await supabaseClient
+                .from('post_likes')
+                .insert([{ post_id: postId, user_id: userId }]);
+            if (error) throw error;
+                
+            // Zähler in posts Tabelle aktualisieren
+            await supabaseClient.from('posts').update({ likes: post.likes }).eq('id', postId);
+        } else {
+            // Like aus der Datenbank entfernen
+            const { error } = await supabaseClient
+                .from('post_likes')
+                .delete()
+                .match({ post_id: postId, user_id: userId });
+            if (error) throw error;
+                
+            // Zähler in posts Tabelle aktualisieren
+            await supabaseClient.from('posts').update({ likes: post.likes }).eq('id', postId);
         }
+    } catch (error) {
+        console.error("Fehler beim Speichern des Likes:", error);
+        // Bei Fehler: UI wieder zurücksetzen
+        post.liked = isCurrentlyLiked;
+        post.likes += isCurrentlyLiked ? 1 : -1;
+        renderFeed();
+        showToast('Fehler beim Speichern des Likes.');
+    }
+}
 
        let selectedImageDataUrl = null;
         let selectedFile = null; // NEU: Hier merken wir uns die echte Datei
@@ -1432,39 +1467,50 @@
 
         // --- Supabase Helper Functions ---
 
-        async function loadPostsFromSupabase() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('posts')
-                    .select('*')
-                    .order('timestamp', { ascending: false });
+async function loadPostsFromSupabase() {
+    try {
+        // 1. Alle Posts laden
+        const { data: postsData, error: postsError } = await supabaseClient
+            .from('posts')
+            .select('*')
+            .order('timestamp', { ascending: false });
 
-                if (error) throw error;
+        if (postsError) throw postsError;
 
-                state.posts = data.map(post => ({
-                    id: post.id,
-                    user: {
-                        username: post.username,
-                        displayName: post.display_name,
-                        color: post.user_color
-                    },
-                    image: post.image_url,
-                    caption: post.caption,
-                    likes: post.likes,
-                    liked: false,
-                    timestamp: new Date(post.timestamp).getTime(),
-                    weekLabel: getWeekLabel(new Date(post.timestamp).getTime())
-                }));
-                renderWeeklyBanner();
-                renderFeed();
-            } catch (error) {
-                console.error('Failed to load posts:', error);
-                showToast('Fehler beim Laden der Posts');
-                initSamplePosts();
-                renderWeeklyBanner();
-                renderFeed();
-            }
-        }
+        // 2. Alle Likes des AKTUELLEN Nutzers laden
+        const { data: likesData, error: likesError } = await supabaseClient
+            .from('post_likes')
+            .select('post_id')
+            .eq('user_id', state.currentUser.id); // UUID abgleichen
+
+        if (likesError) throw likesError;
+
+        // 3. Set aus den Post-IDs machen (für schnelles Durchsuchen)
+        const myLikedPostIds = new Set(likesData.map(like => like.post_id));
+
+        // 4. Posts in den State mappen
+        state.posts = postsData.map(post => ({
+            id: post.id, // Das ist jetzt eine UUID aus der DB
+            user: {
+                username: post.username,
+                displayName: post.display_name,
+                color: post.user_color
+            },
+            image: post.image_url,
+            caption: post.caption,
+            likes: post.likes, 
+            liked: myLikedPostIds.has(post.id), // <-- Hier passiert die Magie!
+            timestamp: new Date(post.timestamp).getTime(),
+            weekLabel: getWeekLabel(new Date(post.timestamp).getTime())
+        }));
+        
+        renderWeeklyBanner();
+        renderFeed();
+    } catch (error) {
+        console.error('Failed to load posts:', error);
+        showToast('Fehler beim Laden der Posts');
+    }
+}
 
         async function savePostToSupabase(post) {
             try {
@@ -1551,6 +1597,7 @@
                 }
 
                 state.currentUser = {
+					id: authData.user.id,
                     username: userProfile.username,
                     displayName: userProfile.display_name,
                     color: userProfile.user_color,
@@ -1624,6 +1671,7 @@
                 }
 
                 state.currentUser = {
+					id: authData.user.id,
                     username: username,
                     displayName: displayName,
                     color: userColor,

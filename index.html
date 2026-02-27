@@ -1489,74 +1489,48 @@ const commentInputHtml = `
 
         // --- Supabase Helper Functions ---
 
-        async function loadPostsFromSupabase() {
+async function loadPostsFromSupabase() {
     try {
-        // 1. Abfrage an Supabase: Posts + Likes zählen + Kommentare holen
-        const { data: postsData, error: postsError } = await supabaseClient
+        console.log('Loading posts...');
+        
+        // Einfache Query (keine Joins)
+        const { data: postsData, error } = await supabaseClient
             .from('posts')
-            .select(`
-                *,
-                post_likes (count),
-                comments (*)
-            `)
+            .select('*, username, display_name, user_color, image_url, caption, likes, timestamp')
             .order('timestamp', { ascending: false });
-
-        if (postsError) {
-            console.error("Supabase Query Error:", postsError);
-            throw postsError;
+            
+        if (error) {
+            console.error('Posts error:', error);
+            throw error;
         }
-
-        // 2. Eigene Likes des Nutzers für die roten Herzen laden
-        let myLikes = [];
-        const { data: userData } = await supabaseClient.auth.getUser();
-        const user = userData?.user;
-
-        if (user) {
-            const { data: likesData } = await supabaseClient
-                .from('post_likes')
-                .select('post_id')
-                .eq('user_id', user.id);
-            if (likesData) myLikes = likesData.map(l => String(l.post_id));
-        }
-
-        // 3. WICHTIG: Daten Mapping (Hier lag der Fehler!)
-        state.posts = postsData.map(post => {
-            // Sicherstellen, dass wir den Like-Count richtig extrahieren
-            const likeCount = (post.post_likes && post.post_likes[0]) 
-                ? post.post_likes[0].count 
-                : 0;
-
-            // Kommentare sortieren (älteste zuerst, damit es ein Chat-Verlauf ist)
-            const sortedComments = (post.comments || []).sort((a, b) => 
-                new Date(a.created_at) - new Date(b.created_at)
-            );
-
-            return {
-                id: String(post.id),
-                user: {
-                    username: post.username,
-                    displayName: post.display_name,
-                    color: post.user_color
-                },
-                image: post.image_url, // <--- Das muss exakt so heißen wie in der DB
-                caption: post.caption,
-                likes: likeCount,
-                liked: myLikes.includes(String(post.id)),
-                comments: sortedComments,
-                timestamp: new Date(post.timestamp).getTime(),
-                weekLabel: getWeekLabel(new Date(post.timestamp).getTime())
-            };
-        });
-
-        // 4. UI aktualisieren
+        
+        console.log('Posts loaded:', postsData.length);
+        
+        state.posts = postsData.map(post => ({
+            id: post.id,
+            user: {
+                username: post.username,
+                displayName: post.display_name,
+                color: post.user_color
+            },
+            image: post.image_url,
+            caption: post.caption,
+            likes: post.likes || 0,
+            timestamp: new Date(post.timestamp).getTime(),
+            weekLabel: getWeekLabel(new Date(post.timestamp))
+        }));
+        
         renderWeeklyBanner();
         renderFeed();
         
     } catch (error) {
-        console.error('Failed to load posts:', error);
-        showToast('Fehler beim Laden der Galerie');
+        console.error('Feed load failed:', error);
+        // Fallback zu Samples
+        initSamplePosts();
+        renderFeed();
     }
 }
+
 
 async function addComment(postId) {
     const input = document.getElementById(`comment-input-${postId}`);

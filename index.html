@@ -1299,14 +1299,14 @@
 
         // --- Actions ---
 
-       async function toggleLike(postId) {
+async function toggleLike(postId) {
     const post = state.posts.find(p => p.id === postId);
     if (!post) return;
     
-    const userId = state.currentUser.id; // UUID des Users
+    const userId = state.currentUser.id;
     const isCurrentlyLiked = post.liked;
 
-    // 1. UI sofort updaten (Optimistic Update)
+    // 1. UI sofort updaten
     post.liked = !isCurrentlyLiked;
     post.likes += post.liked ? 1 : -1;
     renderFeed();
@@ -1314,31 +1314,40 @@
     try {
         if (!isCurrentlyLiked) {
             // Like in die Datenbank einfügen
-            const { error } = await supabaseClient
+            const { error: insertError } = await supabaseClient
                 .from('post_likes')
                 .insert([{ post_id: postId, user_id: userId }]);
-            if (error) throw error;
+            if (insertError) throw insertError;
                 
             // Zähler in posts Tabelle aktualisieren
-            await supabaseClient.from('posts').update({ likes: post.likes }).eq('id', postId);
+            const { error: updateError } = await supabaseClient
+                .from('posts')
+                .update({ likes: post.likes })
+                .eq('id', postId);
+            if (updateError) throw updateError;
+            
         } else {
             // Like aus der Datenbank entfernen
-            const { error } = await supabaseClient
+            const { error: deleteError } = await supabaseClient
                 .from('post_likes')
                 .delete()
                 .match({ post_id: postId, user_id: userId });
-            if (error) throw error;
+            if (deleteError) throw deleteError;
                 
             // Zähler in posts Tabelle aktualisieren
-            await supabaseClient.from('posts').update({ likes: post.likes }).eq('id', postId);
+            const { error: updateError } = await supabaseClient
+                .from('posts')
+                .update({ likes: post.likes })
+                .eq('id', postId);
+            if (updateError) throw updateError;
         }
     } catch (error) {
         console.error("Fehler beim Speichern des Likes:", error);
-        // Bei Fehler: UI wieder zurücksetzen
+        // Bei Fehler: UI wieder zurücksetzen (verhindert das -1 Problem!)
         post.liked = isCurrentlyLiked;
         post.likes += isCurrentlyLiked ? 1 : -1;
         renderFeed();
-        showToast('Fehler beim Speichern des Likes.');
+        showToast('Blockiert: ' + error.message);
     }
 }
 
@@ -1417,7 +1426,10 @@
 
                 await savePostToSupabase(newPost);
 
-                state.posts.unshift(newPost);
+                // Lade den Feed direkt neu aus der Datenbank! 
+                // So hat der neue Post garantiert die richtige UUID aus Supabase.
+                await loadPostsFromSupabase(); 
+                
                 state.weeklyPostDone = true;
                 state.lastPostTimestamp = Date.now();
                 state.nextPostAvailable = getEndOfCurrentWeek();

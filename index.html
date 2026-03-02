@@ -1940,7 +1940,54 @@ async function loadPostsFromSupabase() {
             }
             return true;
         }
+// --- Init & Session Management ---
+        
+        async function initApp() {
+            console.log('Starte App und prüfe Login-Status...');
+            
+            // 1. Prüfen, ob Supabase eine aktive Session im Browser-Speicher hat
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            
+            if (session) {
+                console.log('Aktive Session gefunden!', session.user.email);
+                try {
+                    // User ist noch eingeloggt -> Lade sein Profil aus der DB
+                    const { data: userProfile, error: profileError } = await supabaseClient
+                        .from('users')
+                        .select('*')
+                        .eq('user_id', session.user.id) // Sicherer: Abfrage über user_id statt email
+                        .single();
+                        
+                    if (profileError) throw profileError;
+                    
+                    // State wiederherstellen
+                    state.currentUser = {
+                        id: session.user.id,
+                        username: userProfile.username,
+                        displayName: userProfile.display_name,
+                        color: userProfile.user_color,
+                        email: session.user.email
+                    };
+                    state.isAuthenticated = true;
+                    
+                    // App laden
+                    hideLoginModal();
+                    await loadPostsFromSupabase();
+                    return; // Erfolgreich initialisiert, wir brechen hier ab
+                    
+                } catch (e) {
+                    console.error("Fehler beim Wiederherstellen des Profils:", e);
+                    // Falls das Profil gelöscht wurde, zeigen wir das Login-Fenster
+                }
+            }
+            
+            // 2. Keine Session gefunden -> Zeige das Login-Fenster
+            console.log('Keine Session. Zeige Login.');
+            showLoginModal();
+        }
 
+        // --- Start ---
+        initApp();
         // --- Init ---
         console.log('Supabase client initialized:', !!supabaseClient);
         console.log('SUPABASE_URL:', SUPABASE_URL);

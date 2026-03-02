@@ -1144,7 +1144,7 @@
             }
         }
 
-      function renderFeed() {
+function renderFeed() {
             const container = document.getElementById('feedContainer');
 
             if (state.posts.length === 0) {
@@ -1185,7 +1185,7 @@
                                 <div class="post-meta">${timeAgo(post.timestamp)}</div>
                             </div>
                             
-								${post.user.username === state.currentUser.username ? `
+                            ${post.user.username === state.currentUser.username ? `
                                 <div style="margin-left: auto; display: flex; gap: 4px;">
                                     <button class="btn-icon" onclick="editPost('${post.id}')" style="color: var(--color-text-secondary); width: 32px; height: 32px;" title="Text bearbeiten">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;">
@@ -1201,9 +1201,12 @@
                                     </button>
                                 </div>
                             ` : ''}
+                        </div>
+                        
                         <div class="post-image-container">
                             <img src="${post.image}" alt="Foto von ${post.user.displayName}" loading="lazy">
                         </div>
+                        
                         <div class="post-actions">
                             <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
                                 <svg viewBox="0 0 24 24" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1222,6 +1225,7 @@
                                 </svg>
                             </button>
                         </div>
+                        
                         <div class="like-count">${post.likes} Gefällt mir</div>
                         <div class="post-caption"><strong>${post.user.username}</strong> ${post.caption}</div>
                         

@@ -1771,7 +1771,7 @@ async function loadPostsFromSupabase() {
             currentCommentPostId = null;
         }
 
-        function renderComments(comments) {
+function renderComments(comments) {
             const list = document.getElementById('commentsList');
             if (comments.length === 0) {
                 list.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary); padding: 40px 20px;">Noch keine Kommentare.<br>Sei der Erste! 💬</div>';
@@ -1779,14 +1779,22 @@ async function loadPostsFromSupabase() {
             }
             
             list.innerHTML = comments.map(c => `
-                <div class="comment-item">
+                <div class="comment-item" style="position: relative; padding-right: 30px;">
                     <div class="comment-avatar" style="background: ${c.user_color}22; color: ${c.user_color};">
-                        ${c.display_name.charAt(0)}
+                        ${c.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div class="comment-content">
                         <strong>${c.username}</strong> ${c.content}
                         <div class="comment-meta">${timeAgo(new Date(c.created_at).getTime())}</div>
                     </div>
+                    ${c.user_id === state.currentUser.id ? `
+                        <button onclick="deleteComment('${c.id}')" class="btn-icon" style="position: absolute; right: 0; top: 0; width: 28px; height: 28px; color: var(--color-text-secondary);" title="Kommentar löschen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    ` : ''}
                 </div>
             `).join('');
             
@@ -1841,6 +1849,35 @@ async function loadPostsFromSupabase() {
             }
         }
 
+		async function deleteComment(commentId) {
+            // Kurze Sicherheitsabfrage, damit man nicht aus Versehen löscht
+            if (!confirm('Möchtest du diesen Kommentar wirklich löschen?')) return;
+
+            try {
+                // 1. Kommentar aus der Supabase-Datenbank löschen
+                const { error } = await supabaseClient
+                    .from('comments')
+                    .delete()
+                    .eq('id', commentId);
+
+                if (error) throw error;
+
+                showToast('Kommentar gelöscht 🗑️');
+
+                // 2. Das Kommentar-Modal neu laden, damit der Kommentar verschwindet
+                if (currentCommentPostId) {
+                    await openComments(currentCommentPostId);
+                }
+
+                // 3. Den Feed im Hintergrund neu laden, damit der Zähler ("Alle X Kommentare ansehen") wieder stimmt
+                await loadPostsFromSupabase();
+
+            } catch (error) {
+                console.error('Fehler beim Löschen des Kommentars:', error);
+                showToast('Kommentar konnte nicht gelöscht werden.');
+            }
+        }
+		
 // --- Authentication Functions ---
         function showLoginModal() {
             document.getElementById('loginModal').style.display = 'flex';

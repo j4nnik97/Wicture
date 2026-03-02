@@ -1270,8 +1270,27 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="like-count">${post.likes} Gefällt mir</div>
+<div class="like-count">${post.likes} Gefällt mir</div>
                         <div class="post-caption"><strong>${post.user.username}</strong>${post.caption}</div>
+                        
+                        ${post.commentCount > 2 ? `
+                            <div style="padding: 0 16px 4px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer;" onclick="openComments('${post.id}')">
+                                Alle ${post.commentCount} Kommentare ansehen
+                            </div>
+                        ` : ''}
+                        
+                        ${post.recentComments && post.recentComments.length > 0 ? `
+                            <div style="padding: 0 16px 12px; font-size: 13px; line-height: 1.4;">
+                                ${post.recentComments.map(c => `
+                                    <div style="margin-bottom: 2px;">
+                                        <strong>${c.username}</strong> ${c.content}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div style="padding-bottom: 12px;"></div>'}
+
+                    </div>
+                `;
                     </div>
                 `;
             });
@@ -1584,10 +1603,17 @@ async function toggleLike(postId) {
 
 async function loadPostsFromSupabase() {
     try {
-        // 1. Alle Posts laden
+        // 1. Alle Posts laden UND gleichzeitig die dazugehörigen Kommentare (Nested Query)
         const { data: postsData, error: postsError } = await supabaseClient
             .from('posts')
-            .select('*')
+            .select(`
+                *,
+                comments (
+                    username,
+                    content,
+                    created_at
+                )
+            `)
             .order('timestamp', { ascending: false });
 
         if (postsError) throw postsError;
@@ -1596,28 +1622,39 @@ async function loadPostsFromSupabase() {
         const { data: likesData, error: likesError } = await supabaseClient
             .from('post_likes')
             .select('post_id')
-            .eq('user_id', state.currentUser.id); // UUID abgleichen
+            .eq('user_id', state.currentUser.id);
 
         if (likesError) throw likesError;
 
-        // 3. Set aus den Post-IDs machen (für schnelles Durchsuchen)
         const myLikedPostIds = new Set(likesData.map(like => like.post_id));
 
-        // 4. Posts in den State mappen
-        state.posts = postsData.map(post => ({
-            id: post.id, // Das ist jetzt eine UUID aus der DB
-            user: {
-                username: post.username,
-                displayName: post.display_name,
-                color: post.user_color
-            },
-            image: post.image_url,
-            caption: post.caption,
-            likes: post.likes, 
-            liked: myLikedPostIds.has(post.id), // <-- Hier passiert die Magie!
-            timestamp: new Date(post.timestamp).getTime(),
-            weekLabel: getWeekLabel(new Date(post.timestamp).getTime())
-        }));
+        // 3. Posts in den State mappen
+        state.posts = postsData.map(post => {
+            // Kommentare chronologisch sortieren (älteste zuerst)
+            const postComments = post.comments || [];
+            postComments.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            
+            // Nur die letzten 2 (neuesten) Kommentare für den Feed behalten
+            const recentComments = postComments.slice(-2);
+
+            return {
+                id: post.id,
+                user: {
+                    username: post.username,
+                    displayName: post.display_name,
+                    color: post.user_color
+                },
+                image: post.image_url,
+                caption: post.caption,
+                likes: post.likes,
+                liked: myLikedPostIds.has(post.id),
+                timestamp: new Date(post.timestamp).getTime(),
+                weekLabel: getWeekLabel(new Date(post.timestamp).getTime()),
+                // NEU: Kommentar-Daten für den Feed speichern
+                recentComments: recentComments,
+                commentCount: postComments.length
+            };
+        });
         
         renderWeeklyBanner();
         renderFeed();
@@ -1626,7 +1663,6 @@ async function loadPostsFromSupabase() {
         showToast('Fehler beim Laden der Posts');
     }
 }
-
         async function savePostToSupabase(post) {
             try {
                 const postData = {
@@ -1732,7 +1768,14 @@ async function loadPostsFromSupabase() {
                 
                 // Ansicht neu laden, damit der eigene Kommentar sofort sichtbar ist
                 await openComments(currentCommentPostId);
-                
+				
+                const feedPost = state.posts.find(p => p.id === currentCommentPostId);
+                if (feedPost) {
+                    feedPost.commentCount = (feedPost.commentCount || 0) + 1;
+                    feedPost.recentComments.push({ username: state.currentUser.username, content: content });
+                    if (feedPost.recentComments.length > 2) feedPost.recentComments.shift(); // Max 2 behalten
+                    renderFeed();
+                }
             } catch (error) {
                 console.error("Fehler beim Posten:", error);
                 showToast("Kommentar konnte nicht gepostet werden.");

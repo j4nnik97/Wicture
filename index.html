@@ -1722,6 +1722,7 @@ async function loadPostsFromSupabase() {
         async function savePostToSupabase(post) {
             try {
                 const postData = {
+                    user_id: post.user.id,
                     username: post.user.username,
                     display_name: post.user.displayName,
                     user_color: post.user.color,

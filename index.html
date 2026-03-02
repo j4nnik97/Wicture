@@ -1841,7 +1841,7 @@ async function loadPostsFromSupabase() {
             }
         }
 
-        // --- Authentication Functions ---
+// --- Authentication Functions ---
         function showLoginModal() {
             document.getElementById('loginModal').style.display = 'flex';
         }
@@ -1869,125 +1869,56 @@ async function loadPostsFromSupabase() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
-            if (!email || !password) {
-                showToast('Bitte alle Felder ausfüllen');
-                return;
-            }
-
-            console.log('Login attempt:', email);
+            if (!email || !password) return showToast('Bitte alle Felder ausfüllen');
 
             try {
-                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                console.log('Auth response:', authData, authError);
-
-                if (authError) {
-                    console.error('Auth error:', authError);
-                    throw authError;
-                }
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (authError) throw authError;
 
                 const { data: userProfile, error: userError } = await supabaseClient
                     .from('users')
                     .select('*')
-                    .eq('email', email)
+                    .eq('user_id', authData.user.id)
                     .single();
-
-                console.log('User profile:', userProfile, userError);
-
-                if (userError) {
-                    console.error('User profile error:', userError);
-                    throw userError;
-                }
+                if (userError) throw userError;
 
                 state.currentUser = {
-					id: authData.user.id,
+                    id: userProfile.id, // WICHTIG: Hier speichern wir jetzt die Profil-ID!
                     username: userProfile.username,
                     displayName: userProfile.display_name,
                     color: userProfile.user_color,
                     email: email
                 };
+                
                 state.isAuthenticated = true;
                 hideLoginModal();
                 await loadPostsFromSupabase();
                 showToast('Willkommen zurück! 👋');
             } catch (error) {
-                console.error('Login error details:', error);
-                showToast('Fehler: ' + error.message);
+                console.error('Login error:', error);
+                showToast('Fehler beim Anmelden.');
             }
         }
-		
-async function handleLogout() {
-            try {
-                // 1. Supabase Session beenden
-                const { error } = await supabaseClient.auth.signOut();
-                if (error) throw error;
 
-                // 2. Lokalen State zurücksetzen
-                state.currentUser = null;
-                state.isAuthenticated = false;
-                state.posts = []; 
-                state.weeklyPostDone = false;
-
-                // 3. UI leeren
-                document.getElementById('feedContainer').innerHTML = '';
-                document.getElementById('profileContent').innerHTML = '';
-                
-                // 4. Zurück zum Login
-                showToast('Erfolgreich abgemeldet 👋');
-                showLoginModal();
-                
-                // View im Hintergrund auf Feed zurücksetzen
-                switchView('feed');
-            } catch (error) {
-                console.error("Logout Fehler:", error);
-                showToast('Fehler beim Abmelden.');
-            }
-        }
-		
         async function handleSignup() {
             const username = document.getElementById('signupUsername').value.trim();
             const displayName = document.getElementById('signupDisplayName').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
 
-            if (!username || !displayName || !email || !password) {
-                showToast('Bitte alle Felder ausfüllen');
-                return;
-            }
+            if (!username || !displayName || !email || !password) return showToast('Bitte alle Felder ausfüllen');
+            if (password.length < 6) return showToast('Passwort muss mindestens 6 Zeichen haben');
 
-            if (password.length < 6) {
-                showToast('Passwort muss mindestens 6 Zeichen haben');
-                return;
-            }
-
-            console.log('Signup attempt:', username, email);
             showToast('Konto wird erstellt...');
 
             try {
-                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        emailRedirectTo: window.location.origin
-                    }
-                });
-
-                console.log('Signup auth response:', authData, authError);
-
-                if (authError) {
-                    console.error('Signup auth error:', authError);
-                    throw authError;
-                }
-
-                if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
-                    throw new Error('E-Mail bereits registriert');
-                }
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password });
+                if (authError) throw authError;
 
                 const userColor = generateUserColor();
-                const { error: insertError } = await supabaseClient
+                
+                // WICHTIG: Wir hängen .select().single() an, um die generierte Profil-ID direkt zurückzubekommen
+                const { data: newUser, error: insertError } = await supabaseClient
                     .from('users')
                     .insert([{
                         user_id: authData.user.id,
@@ -1995,62 +1926,63 @@ async function handleLogout() {
                         display_name: displayName,
                         email: email,
                         user_color: userColor
-                    }]);
+                    }])
+                    .select()
+                    .single();
 
-                console.log('User insert result:', insertError);
-
-                if (insertError) {
-                    console.error('User insert error:', insertError);
-                    throw insertError;
-                }
+                if (insertError) throw insertError;
 
                 state.currentUser = {
-					id: authData.user.id,
+                    id: newUser.id, // WICHTIG: Profil-ID!
                     username: username,
                     displayName: displayName,
                     color: userColor,
                     email: email
                 };
+                
                 state.isAuthenticated = true;
                 hideLoginModal();
                 await loadPostsFromSupabase();
                 showToast('Konto erfolgreich erstellt! 🎉');
             } catch (error) {
-                console.error('Signup error details:', error);
-                showToast('Fehler: ' + error.message);
+                console.error('Signup error:', error);
+                showToast('Fehler beim Registrieren.');
             }
         }
 
-        function checkAuth() {
-            if (!state.isAuthenticated) {
+        async function handleLogout() {
+            try {
+                await supabaseClient.auth.signOut();
+                state.currentUser = null;
+                state.isAuthenticated = false;
+                state.posts = []; 
+                state.weeklyPostDone = false;
+                document.getElementById('feedContainer').innerHTML = '';
+                document.getElementById('profileContent').innerHTML = '';
+                showToast('Erfolgreich abgemeldet 👋');
                 showLoginModal();
-                return false;
+                switchView('feed');
+            } catch (error) {
+                console.error("Logout Fehler:", error);
             }
-            return true;
         }
-// --- Init & Session Management ---
-        
+
+        // --- Init & Session Management ---
         async function initApp() {
-            console.log('Starte App und prüfe Login-Status...');
-            
-            // 1. Prüfen, ob Supabase eine aktive Session im Browser-Speicher hat
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {
-                console.log('Aktive Session gefunden!', session.user.email);
                 try {
-                    // User ist noch eingeloggt -> Lade sein Profil aus der DB
                     const { data: userProfile, error: profileError } = await supabaseClient
                         .from('users')
                         .select('*')
-                        .eq('user_id', session.user.id) // Sicherer: Abfrage über user_id statt email
+                        .eq('user_id', session.user.id)
                         .single();
                         
                     if (profileError) throw profileError;
                     
-                    // State wiederherstellen
                     state.currentUser = {
-                        id: session.user.id,
+                        id: userProfile.id, // WICHTIG: Profil-ID!
                         username: userProfile.username,
                         displayName: userProfile.display_name,
                         color: userProfile.user_color,
@@ -2058,19 +1990,13 @@ async function handleLogout() {
                     };
                     state.isAuthenticated = true;
                     
-                    // App laden
                     hideLoginModal();
                     await loadPostsFromSupabase();
-                    return; // Erfolgreich initialisiert, wir brechen hier ab
-                    
+                    return; 
                 } catch (e) {
-                    console.error("Fehler beim Wiederherstellen des Profils:", e);
-                    // Falls das Profil gelöscht wurde, zeigen wir das Login-Fenster
+                    console.error("Profil konnte nicht geladen werden:", e);
                 }
             }
-            
-            // 2. Keine Session gefunden -> Zeige das Login-Fenster
-            console.log('Keine Session. Zeige Login.');
             showLoginModal();
         }
 

@@ -859,6 +859,34 @@
         .comments-submit-btn:disabled {
             opacity: 0.5; cursor: not-allowed;
         }
+		.explore-item {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .explore-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6));
+            color: white;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .explore-item:hover .explore-item-overlay {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -1251,21 +1279,64 @@ function renderFeed() {
             container.innerHTML = html;
         }
 		
-        function renderExplore() {
-            const grid = document.getElementById('exploreGrid');
-            const shuffled = [...state.posts].sort(() => Math.random() - 0.5);
+       function renderExplore() {
+            const container = document.getElementById('exploreContainer');
+            
+            // 1. Berechne das Label der aktuellen Woche (wie beim Upload)
+            const now = new Date();
+            const currentWeekLabel = `Woche ${getWeekNumber(now)}, ${now.getFullYear()}`;
 
-            grid.innerHTML = shuffled.map(post => `
-                <div class="grid-item" onclick="showToast('${post.user.username}: ${post.caption.replace(/'/g, "\\'")}')">
-                    <img src="${post.image}" alt="Foto" loading="lazy">
-                    <div class="grid-item-overlay">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            // 2. Filter: Nur Posts aus DIESER Woche
+            // 3. Sortierung: Meiste Likes zuerst
+            const trendingPosts = state.posts
+                .filter(post => post.weekLabel === currentWeekLabel)
+                .sort((a, b) => b.likes - a.likes);
+
+            if (trendingPosts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
                         </svg>
-                        ${post.likes}
+                        <h3>Noch keine Trends</h3>
+                        <p>In dieser Woche (${currentWeekLabel}) wurden noch keine Fotos gepostet.</p>
                     </div>
+                `;
+                return;
+            }
+
+            // 4. Das Grid-Layout rendern
+            container.innerHTML = `
+                <div style="padding: 16px; font-weight: 700; color: var(--color-primary);">
+                    🔥 Top-Fotos dieser Woche
                 </div>
-            `).join('');
+                <div class="explore-grid">
+                    ${trendingPosts.map(post => `
+                        <div class="explore-item" onclick="scrollToPost('${post.id}')">
+                            <img src="${post.image}" alt="Trend" loading="lazy">
+                            <div class="explore-item-overlay">
+                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                                <span>${post.likes}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Hilfsfunktion: Springt im Feed zum ausgewählten Post
+        function scrollToPost(postId) {
+            switchView('feed');
+            setTimeout(() => {
+                const element = document.querySelector(`[data-post-id="${postId}"]`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.style.boxShadow = '0 0 0 2px var(--color-primary)';
+                    setTimeout(() => element.style.boxShadow = '', 2000);
+                }
+            }, 100);
         }
 
         function renderUpload() {

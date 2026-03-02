@@ -1176,10 +1176,15 @@
 
                 html += `
                     <div class="post-card" data-post-id="${post.id}">
-                        <div class="post-header">
+                      <div class="post-header">
                             <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color};">
-                                ${post.user.displayName.charAt(0)}
+                                ${post.user.displayName.charAt(0).toUpperCase()}
                             </div>
+                            <div class="post-user-info">
+                                <div class="post-username">${post.user.username}</div>
+                                <div class="post-meta">${timeAgo(post.timestamp)}</div>
+                            </div>
+                        </div>
                             <div class="post-user-info">
                                 <div class="post-username">${post.user.username}</div>
                                 <div class="post-meta">${timeAgo(post.timestamp)}</div>
@@ -1875,6 +1880,43 @@ function renderComments(comments) {
             } catch (error) {
                 console.error('Fehler beim Löschen des Kommentars:', error);
                 showToast('Kommentar konnte nicht gelöscht werden.');
+            }
+        }
+
+async function deletePost(postId, imageUrl) {
+            // 1. Sicherheitsabfrage
+            if (!confirm('Möchtest du dieses Foto wirklich löschen? Es wird endgültig entfernt.')) return;
+
+            try {
+                // 2. Extrahiere den Dateipfad aus der URL, um das Bild aus dem Storage zu löschen
+                const urlParts = imageUrl.split('/wicture-images/');
+                if (urlParts.length === 2) {
+                    const filePath = urlParts[1]; // Ergibt z.B. "posts/username_12345.jpg"
+                    await supabaseClient.storage.from('wicture-images').remove([filePath]);
+                }
+
+                // 3. Post aus der Datenbank löschen (Likes & Kommentare verschwinden durch CASCADE automatisch!)
+                const { error } = await supabaseClient
+                    .from('posts')
+                    .delete()
+                    .eq('id', postId);
+
+                if (error) throw error;
+
+                showToast('Foto erfolgreich gelöscht! 🗑️');
+
+                // 4. Lokalen State aktualisieren & Feed/Banner neu laden
+                // Dadurch wird auch automatisch erkannt, dass man diese Woche wieder posten darf!
+                await loadPostsFromSupabase();
+                
+                // Falls wir gerade im Profil sind, auch das Profil neu zeichnen
+                if (state.currentView === 'profile') {
+                    renderProfile();
+                }
+
+            } catch (error) {
+                console.error('Fehler beim Löschen des Posts:', error);
+                showToast('Foto konnte nicht gelöscht werden.');
             }
         }
 		

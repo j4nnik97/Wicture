@@ -1144,7 +1144,7 @@
             }
         }
 
-        function renderFeed() {
+      function renderFeed() {
             const container = document.getElementById('feedContainer');
 
             if (state.posts.length === 0) {
@@ -1176,7 +1176,7 @@
 
                 html += `
                     <div class="post-card" data-post-id="${post.id}">
-                      <div class="post-header">
+                        <div class="post-header">
                             <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color};">
                                 ${post.user.displayName.charAt(0).toUpperCase()}
                             </div>
@@ -1184,11 +1184,15 @@
                                 <div class="post-username">${post.user.username}</div>
                                 <div class="post-meta">${timeAgo(post.timestamp)}</div>
                             </div>
-                        </div>
-                            <div class="post-user-info">
-                                <div class="post-username">${post.user.username}</div>
-                                <div class="post-meta">${timeAgo(post.timestamp)}</div>
-                            </div>
+                            
+                            ${post.user.username === state.currentUser.username ? `
+                                <button class="btn-icon" onclick="deletePost('${post.id}', '${post.image}')" style="color: var(--color-text-secondary); width: 32px; height: 32px; margin-left: auto;" title="Post löschen">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            ` : ''}
                         </div>
                         <div class="post-image-container">
                             <img src="${post.image}" alt="Foto von ${post.user.displayName}" loading="lazy">
@@ -1211,8 +1215,8 @@
                                 </svg>
                             </button>
                         </div>
-<div class="like-count">${post.likes} Gefällt mir</div>
-                        <div class="post-caption"><strong>${post.user.username}</strong>${post.caption}</div>
+                        <div class="like-count">${post.likes} Gefällt mir</div>
+                        <div class="post-caption"><strong>${post.user.username}</strong> ${post.caption}</div>
                         
                         ${post.commentCount > 2 ? `
                             <div style="padding: 0 16px 4px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer;" onclick="openComments('${post.id}')">
@@ -1235,7 +1239,7 @@
 
             container.innerHTML = html;
         }
-
+		
         function renderExplore() {
             const grid = document.getElementById('exploreGrid');
             const shuffled = [...state.posts].sort(() => Math.random() - 0.5);

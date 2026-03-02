@@ -2002,13 +2002,6 @@ async function loadPostsFromSupabase() {
 
         // --- Start ---
         initApp();
-        // --- Init ---
-        console.log('Supabase client initialized:', !!supabaseClient);
-        console.log('SUPABASE_URL:', SUPABASE_URL);
-        
-        if (checkAuth()) {
-            loadPostsFromSupabase();
-        }
     </script>
 </body>
 </html>

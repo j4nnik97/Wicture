@@ -1811,7 +1811,7 @@ async function loadPostsFromSupabase() {
                 likes: post.likes,
                 liked: myLikedPostIds.has(post.id),
                 timestamp: new Date(post.timestamp).getTime(),
-                weekLabel: getWeekLabel(new Date(post.timestamp).getTime()),
+                weekLabel: post.week_label || `Woche ${getWeekNumber(new Date(post.timestamp))}, ${new Date(post.timestamp).getFullYear()}`,
                 // NEU: Kommentar-Daten für den Feed speichern
                 recentComments: recentComments,
                 commentCount: postComments.length

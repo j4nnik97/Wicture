@@ -1307,7 +1307,6 @@ function renderExplore() {
                 .sort((a, b) => b.likes - a.likes);
 
             if (trendingPosts.length === 0) {
-                // Wichtig: Wenn leer, brechen wir das Grid auf (grid-column: 1/-1)
                 container.innerHTML = `
                     <div class="empty-state" style="grid-column: 1 / -1;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1321,17 +1320,16 @@ function renderExplore() {
             }
 
             // 3. Das Grid-Layout rendern
-            // Beachte: Wir fügen die Bilder jetzt DIREKT als 'explore-item' ein.
-            // Der Titel "Top-Fotos" kommt in ein Element, das über alle 3 Spalten geht.
             container.innerHTML = `
                 <div style="grid-column: 1 / -1; padding: 16px; font-weight: 700; color: var(--color-primary);">
                     🔥 Top-Fotos dieser Woche
                 </div>
                 ${trendingPosts.map(post => `
-                    <div class="explore-item" onclick="scrollToPost('${post.id}')">
-                        <img src="${post.image}" alt="Trend" loading="lazy">
-                        <div class="explore-item-overlay">
-                            <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                    <div onclick="scrollToPost('${post.id}')" style="position: relative; aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; cursor: pointer;">
+                        <img src="${post.image}" alt="Trend" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        
+                        <div style="position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.6); color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px; font-weight: bold;">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
                             <span>${post.likes}</span>
@@ -1340,6 +1338,7 @@ function renderExplore() {
                 `).join('')}
             `;
         }
+		
         // Hilfsfunktion: Springt im Feed zum ausgewählten Post
         function scrollToPost(postId) {
             switchView('feed');

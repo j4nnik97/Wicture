@@ -1072,33 +1072,34 @@
             supabase: null
         };
 
-        function getWeekLabel(timestamp) {
-            const now = new Date();
-            const date = new Date(timestamp);
-            const startOfWeek = d => {
-                const day = d.getDay();
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-                return new Date(d.getFullYear(), d.getMonth(), diff);
-            };
-			
-            const currentWeekStart = startOfWeek(now).getTime();
-            const postWeekStart = startOfWeek(date).getTime();
+// 1. Diese Funktion muss ALLEINE stehen
+function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return weekNo;
+}
 
-            if (postWeekStart === currentWeekStart) return 'Diese Woche';
-            if (postWeekStart === currentWeekStart - 7 * 24 * 60 * 60 * 1000) return 'Letzte Woche';
+// 2. Danach kommt diese Funktion
+function getWeekLabel(timestamp) {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const startOfWeek = d => {
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.getFullYear(), d.getMonth(), diff);
+    };
+    const currentWeekStart = startOfWeek(now).getTime();
+    const postWeekStart = startOfWeek(date).getTime();
 
-            const weekNum = getISOWeek(date);
-            return 'KW ' + weekNum;
-        }
+    if (postWeekStart === currentWeekStart) return 'Diese Woche';
+    if (postWeekStart === currentWeekStart - 7 * 24 * 60 * 60 * 1000) return 'Letzte Woche';
 
-// Hilfsfunktion zur Berechnung der Kalenderwoche
-        function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return weekNo;
-        }
+    // Hier nutzen wir jetzt die obere Funktion
+    const weekNum = getWeekNumber(date);
+    return 'Woche ' + weekNum + ', ' + date.getFullYear();
+}
 		
         function getISOWeek(date) {
             const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -1295,7 +1296,7 @@ function renderFeed() {
         }
 		
        function renderExplore() {
-            const container = document.getElementById('exploreGrid');
+            const container = document.getElementById('exploreContainer');
             
             // 1. Berechne das Label der aktuellen Woche (wie beim Upload)
             const now = new Date();

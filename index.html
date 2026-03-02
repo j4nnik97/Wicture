@@ -1825,8 +1825,13 @@ async function loadPostsFromSupabase() {
         showToast('Fehler beim Laden der Posts');
     }
 }
-        async function savePostToSupabase(post) {
+		
+async function savePostToSupabase(post) {
             try {
+                // NEU: Hier berechnen wir das Label für die aktuelle Woche
+                const now = new Date();
+                const dbWeekLabel = `Woche ${getWeekNumber(now)}, ${now.getFullYear()}`;
+
                 const postData = {
                     user_id: post.user.id,
                     username: post.user.username,
@@ -1835,7 +1840,9 @@ async function loadPostsFromSupabase() {
                     image_url: post.image,
                     caption: post.caption,
                     likes: post.likes,
-                    timestamp: new Date(post.timestamp).toISOString()
+                    timestamp: new Date(post.timestamp).toISOString(),
+                    // WICHTIG: Das Feld für den Entdecken-Tab hinzufügen
+                    week_label: dbWeekLabel 
                 };
 
                 const { error } = await supabaseClient
@@ -1848,6 +1855,7 @@ async function loadPostsFromSupabase() {
                 throw error;
             }
         }
+		
 		let currentCommentPostId = null; // Merkt sich, welcher Post gerade kommentiert wird
 
         async function openComments(postId) {

@@ -1185,15 +1185,22 @@
                                 <div class="post-meta">${timeAgo(post.timestamp)}</div>
                             </div>
                             
-                            ${post.user.username === state.currentUser.username ? `
-                                <button class="btn-icon" onclick="deletePost('${post.id}', '${post.image}')" style="color: var(--color-text-secondary); width: 32px; height: 32px; margin-left: auto;" title="Post löschen">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                    </svg>
-                                </button>
+								${post.user.username === state.currentUser.username ? `
+                                <div style="margin-left: auto; display: flex; gap: 4px;">
+                                    <button class="btn-icon" onclick="editPost('${post.id}')" style="color: var(--color-text-secondary); width: 32px; height: 32px;" title="Text bearbeiten">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="btn-icon" onclick="deletePost('${post.id}', '${post.image}')" style="color: var(--color-error); width: 32px; height: 32px;" title="Post löschen">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                             ` : ''}
-                        </div>
                         <div class="post-image-container">
                             <img src="${post.image}" alt="Foto von ${post.user.displayName}" loading="lazy">
                         </div>
@@ -1921,6 +1928,42 @@ async function deletePost(postId, imageUrl) {
             } catch (error) {
                 console.error('Fehler beim Löschen des Posts:', error);
                 showToast('Foto konnte nicht gelöscht werden.');
+            }
+        }
+
+async function editPost(postId) {
+            // 1. Finde den aktuellen Post im lokalen State
+            const post = state.posts.find(p => p.id === postId);
+            if (!post) return;
+
+            // 2. Öffne ein Eingabefenster mit dem aktuellen Text
+            const newCaption = prompt('Bildunterschrift bearbeiten:', post.caption);
+            
+            // Wenn der Nutzer auf "Abbrechen" klickt oder den Text nicht ändert, mach nichts
+            if (newCaption === null || newCaption.trim() === post.caption) return;
+
+            try {
+                // 3. Neuen Text in Supabase speichern
+                const { error } = await supabaseClient
+                    .from('posts')
+                    .update({ caption: newCaption.trim() })
+                    .eq('id', postId);
+
+                if (error) throw error;
+
+                showToast('Text erfolgreich geändert! ✏️');
+
+                // 4. Feed neu laden, damit die Änderung sofort sichtbar ist
+                await loadPostsFromSupabase();
+                
+                // Falls wir im Profil sind, auch das Profil neu zeichnen
+                if (state.currentView === 'profile') {
+                    renderProfile();
+                }
+
+            } catch (error) {
+                console.error('Fehler beim Bearbeiten:', error);
+                showToast('Fehler beim Ändern des Textes.');
             }
         }
 		

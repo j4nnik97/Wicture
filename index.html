@@ -1294,22 +1294,22 @@ function renderFeed() {
             container.innerHTML = html;
         }
 		
-       function renderExplore() {
+function renderExplore() {
             const container = document.getElementById('exploreGrid');
             
-            // 1. Berechne das Label der aktuellen Woche (wie beim Upload)
+            // 1. Berechne das Label der aktuellen Woche
             const now = new Date();
             const currentWeekLabel = `Woche ${getWeekNumber(now)}, ${now.getFullYear()}`;
 
-            // 2. Filter: Nur Posts aus DIESER Woche
-            // 3. Sortierung: Meiste Likes zuerst
+            // 2. Filter & Sortierung
             const trendingPosts = state.posts
                 .filter(post => post.weekLabel === currentWeekLabel)
                 .sort((a, b) => b.likes - a.likes);
 
             if (trendingPosts.length === 0) {
+                // Wichtig: Wenn leer, brechen wir das Grid auf (grid-column: 1/-1)
                 container.innerHTML = `
-                    <div class="empty-state">
+                    <div class="empty-state" style="grid-column: 1 / -1;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
                         </svg>
@@ -1320,27 +1320,26 @@ function renderFeed() {
                 return;
             }
 
-            // 4. Das Grid-Layout rendern
+            // 3. Das Grid-Layout rendern
+            // Beachte: Wir fügen die Bilder jetzt DIREKT als 'explore-item' ein.
+            // Der Titel "Top-Fotos" kommt in ein Element, das über alle 3 Spalten geht.
             container.innerHTML = `
-                <div style="padding: 16px; font-weight: 700; color: var(--color-primary);">
+                <div style="grid-column: 1 / -1; padding: 16px; font-weight: 700; color: var(--color-primary);">
                     🔥 Top-Fotos dieser Woche
                 </div>
-                <div class="explore-grid">
-                    ${trendingPosts.map(post => `
-                        <div class="explore-item" onclick="scrollToPost('${post.id}')">
-                            <img src="${post.image}" alt="Trend" loading="lazy">
-                            <div class="explore-item-overlay">
-                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                                <span>${post.likes}</span>
-                            </div>
+                ${trendingPosts.map(post => `
+                    <div class="explore-item" onclick="scrollToPost('${post.id}')">
+                        <img src="${post.image}" alt="Trend" loading="lazy">
+                        <div class="explore-item-overlay">
+                            <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                            <span>${post.likes}</span>
                         </div>
-                    `).join('')}
-                </div>
+                    </div>
+                `).join('')}
             `;
         }
-
         // Hilfsfunktion: Springt im Feed zum ausgewählten Post
         function scrollToPost(postId) {
             switchView('feed');

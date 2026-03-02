@@ -1072,7 +1072,7 @@
             supabase: null
         };
 
-// 1. Diese Funktion muss ALLEINE stehen
+// Diese Funktion muss ALLEINE stehen
 function getWeekNumber(d) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
@@ -1081,7 +1081,6 @@ function getWeekNumber(d) {
     return weekNo;
 }
 
-// 2. Danach kommt diese Funktion
 function getWeekLabel(timestamp) {
     const now = new Date();
     const date = new Date(timestamp);
@@ -1090,13 +1089,13 @@ function getWeekLabel(timestamp) {
         const diff = d.getDate() - day + (day === 0 ? -6 : 1);
         return new Date(d.getFullYear(), d.getMonth(), diff);
     };
+    
     const currentWeekStart = startOfWeek(now).getTime();
     const postWeekStart = startOfWeek(date).getTime();
 
     if (postWeekStart === currentWeekStart) return 'Diese Woche';
     if (postWeekStart === currentWeekStart - 7 * 24 * 60 * 60 * 1000) return 'Letzte Woche';
 
-    // Hier nutzen wir jetzt die obere Funktion
     const weekNum = getWeekNumber(date);
     return 'Woche ' + weekNum + ', ' + date.getFullYear();
 }

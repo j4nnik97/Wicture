@@ -1250,9 +1250,11 @@ function renderFeed() {
                 html += `
                     <div class="post-card" data-post-id="${post.id}">
                         <div class="post-header">
-                            <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color};">
-                                ${post.user.displayName.charAt(0).toUpperCase()}
-                            </div>
+						<div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color}; overflow: hidden;">
+						${post.user.avatarUrl 
+						? `<img src="${post.user.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">` 
+						: post.user.displayName.charAt(0).toUpperCase()}
+					</div>
                             <div class="post-user-info">
                                 <div class="post-username">${post.user.username}</div>
                                 <div class="post-meta">${timeAgo(post.timestamp)}</div>
@@ -1780,7 +1782,8 @@ async function loadPostsFromSupabase() {
                 user: {
                     username: post.username,
                     displayName: post.display_name,
-                    color: post.user_color
+                    color: post.user_color,
+					avatarUrl: post.avatar_url
                 },
                 image: post.image_url,
                 caption: post.caption,
@@ -1813,6 +1816,7 @@ async function savePostToSupabase(post) {
                     username: post.user.username,
                     display_name: post.user.displayName,
                     user_color: post.user.color,
+					avatar_url: post.user.avatarUrl,
                     image_url: post.image,
                     caption: post.caption,
                     likes: post.likes,
@@ -2045,8 +2049,14 @@ function renderComments(comments) {
                         display_name: newName,
                         bio: newBio,
                         avatar_url: avatarUrl
+                    // NEU: Aktualisiert das Bild auch auf all deinen alten Posts im Feed!
+					await supabaseClient
+                    .from('posts')
+                    .update({ 
+                        display_name: newName,
+                        avatar_url: avatarUrl 
                     })
-                    .eq('id', state.currentUser.id);
+                    .eq('user_id', state.currentUser.id);
 
                 if (updateError) throw updateError;
 

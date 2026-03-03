@@ -1874,8 +1874,10 @@ function renderComments(comments) {
             
             list.innerHTML = comments.map(c => `
                 <div class="comment-item" style="position: relative; padding-right: 30px;">
-                    <div class="comment-avatar" style="background: ${c.user_color}22; color: ${c.user_color};">
-                        ${c.display_name.charAt(0).toUpperCase()}
+                    <div class="comment-avatar" style="background: ${c.user_color}22; color: ${c.user_color}; overflow: hidden;">
+                        ${c.avatar_url 
+                            ? `<img src="${c.avatar_url}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                            : c.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div class="comment-content">
                         <strong>${c.username}</strong> ${c.content}
@@ -1911,6 +1913,7 @@ function renderComments(comments) {
                 username: state.currentUser.username,
                 display_name: state.currentUser.displayName,
                 user_color: state.currentUser.color,
+				avatar_url: state.currentUser.avatarUrl,
                 content: content
                 // created_at wird von Supabase automatisch gesetzt!
             };
@@ -2063,6 +2066,15 @@ function renderComments(comments) {
                     .eq('user_id', state.currentUser.id);
                 
                 if (postUpdateError) console.error('Fehler beim Aktualisieren der alten Posts', postUpdateError);
+
+				// Aktualisiert das Bild und den Namen auch auf all deinen alten Kommentaren!
+                await supabaseClient
+                    .from('comments')
+                    .update({ 
+                        display_name: newName,
+                        avatar_url: avatarUrl 
+                    })
+                    .eq('user_id', state.currentUser.id);
 
                 // 4. Lokalen State aktualisieren
                 state.currentUser.displayName = newName;

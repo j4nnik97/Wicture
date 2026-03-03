@@ -887,6 +887,64 @@
         .explore-item:hover .explore-item-overlay {
             opacity: 1;
         }
+		
+		/* Search Modal */
+        .search-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--color-background);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .search-modal.open {
+            transform: translateY(0);
+        }
+        .search-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--color-surface);
+            position: sticky;
+            top: 0;
+        }
+        .search-input-wrapper {
+            flex: 1;
+        }
+        .search-input {
+            width: 100%;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            padding: 10px 16px;
+            font-size: 14px;
+            background: var(--color-background);
+            color: var(--color-text);
+            outline: none;
+            font-family: var(--font-family-base);
+        }
+        .search-input:focus {
+            border-color: var(--color-primary);
+        }
+        .search-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--color-card-border);
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
     </style>
 	
 	<meta name="mobile-web-app-capable" content="yes">
@@ -2606,64 +2664,6 @@ async function editPost(postId) {
                 console.error("Fehler bei der Suche:", error);
                 resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-error);">Fehler bei der Suche.</div>';
             }
-        }
-
-/* Search Modal */
-        .search-modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--color-background);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .search-modal.open {
-            transform: translateY(0);
-        }
-        .search-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--color-border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--color-surface);
-            position: sticky;
-            top: 0;
-        }
-        .search-input-wrapper {
-            flex: 1;
-        }
-        .search-input {
-            width: 100%;
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-full);
-            padding: 10px 16px;
-            font-size: 14px;
-            background: var(--color-background);
-            color: var(--color-text);
-            outline: none;
-            font-family: var(--font-family-base);
-        }
-        .search-input:focus {
-            border-color: var(--color-primary);
-        }
-        .search-results {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            cursor: pointer;
-            border-bottom: 1px solid var(--color-card-border);
-        }
-        .search-result-item:last-child {
-            border-bottom: none;
         }
 
         // --- Start ---

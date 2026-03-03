@@ -994,8 +994,38 @@
             <input type="text" class="comments-input" id="newCommentInput" placeholder="Kommentar hinzufügen..." autocomplete="off">
             <button class="comments-submit-btn" id="submitCommentBtn" onclick="postComment()">Posten</button>
         </div>
+   </div>
+    
+    <div id="editProfileModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: 24px; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-size: 18px; font-weight: 600;">Profil bearbeiten</h2>
+                <button class="btn-icon" onclick="closeEditProfileModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div id="editAvatarPreview" class="profile-avatar" style="margin: 0 auto 12px; cursor: pointer; position: relative; overflow: hidden;" onclick="document.getElementById('avatarInput').click()">
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" hidden onchange="handleAvatarSelect(event)">
+                <p style="font-size: 12px; color: var(--color-primary); cursor: pointer; font-weight: 600;" onclick="document.getElementById('avatarInput').click()">Profilbild ändern</p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
+                <input type="text" id="editDisplayName" style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Biografie</label>
+                <textarea id="editBio" rows="3" placeholder="Erzähl etwas über dich..." style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text); resize: none;"></textarea>
+            </div>
+
+            <button id="saveProfileBtn" onclick="saveProfile()" class="btn btn-primary" style="width: 100%;">Speichern</button>
+        </div>
     </div>
-    <!-- Toast -->
+
     <div class="toast" id="toast"></div>
 
     <!-- Login Modal -->
@@ -1400,61 +1430,6 @@ function renderExplore() {
             `;
         }
 
-        function renderProfile() {
-            const content = document.getElementById('profileContent');
-            const myPosts = state.posts.filter(p => p.user.username === state.currentUser.username);
-            const totalLikes = myPosts.reduce((sum, p) => sum + p.likes, 0);
-
-            content.innerHTML = `
-                <div class="profile-header">
-                    <div class="profile-avatar" style="background: ${state.currentUser.color}22; color: ${state.currentUser.color};">
-                        ${state.currentUser.displayName.charAt(0)}
-                    </div>
-                    <div class="profile-stats">
-                        <div class="stat">
-                            <div class="stat-number">${myPosts.length}</div>
-                            <div class="stat-label">Fotos</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">${totalLikes}</div>
-                            <div class="stat-label">Likes</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">${Math.floor(myPosts.length / 4) + 1}</div>
-                            <div class="stat-label">Wochen</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="profile-bio">
-                    <h3>${state.currentUser.displayName}</h3>
-                    <p>📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.</p>
-                </div>
-                ${myPosts.length > 0 ? `
-                    <div class="profile-grid">
-                        ${myPosts.map(post => `
-                            <div class="grid-item">
-                                <img src="${post.image}" alt="Mein Foto" loading="lazy">
-                                <div class="grid-item-overlay">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                    </svg>
-                                    ${post.likes}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <circle cx="12" cy="12" r="3.5"/>
-                        </svg>
-                        <h3>Noch keine Fotos</h3>
-                        <p>Poste dein erstes Wochenfoto!</p>
-                    </div>
-                `}
-            `;
-        }
 function renderProfile() {
             const content = document.getElementById('profileContent');
             const myPosts = state.posts.filter(p => p.user.username === state.currentUser.username);
@@ -1462,8 +1437,10 @@ function renderProfile() {
 
             content.innerHTML = `
                 <div class="profile-header">
-                    <div class="profile-avatar" style="background: ${state.currentUser.color}22; color: ${state.currentUser.color};">
-                        ${state.currentUser.displayName.charAt(0).toUpperCase()}
+                    <div class="profile-avatar" style="background: ${state.currentUser.color}22; color: ${state.currentUser.color}; overflow: hidden;">
+                        ${state.currentUser.avatarUrl 
+                            ? `<img src="${state.currentUser.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                            : state.currentUser.displayName.charAt(0).toUpperCase()}
                     </div>
                     <div class="profile-stats">
                         <div class="stat">
@@ -1492,9 +1469,10 @@ function renderProfile() {
 
                     <h3 style="padding-right: 40px;">${state.currentUser.displayName}</h3>
                     <p style="color: var(--color-text-secondary); font-size: 12px; margin-bottom: 8px;">@${state.currentUser.username}</p>
-                    <p>📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.</p>
                     
-                    <button class="btn btn-secondary" style="width: 100%; margin-top: 16px; padding: 6px 12px; font-size: 13px;" onclick="showToast('Profil bearbeiten kommt bald!')">
+                    <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.4;">${state.currentUser.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.'}</p>
+                    
+                    <button class="btn btn-secondary" style="width: 100%; margin-top: 16px; padding: 6px 12px; font-size: 13px;" onclick="openEditProfileModal()">
                         Profil bearbeiten
                     </button>
                 </div>
@@ -1502,7 +1480,7 @@ function renderProfile() {
                 ${myPosts.length > 0 ? `
                     <div class="profile-grid">
                         ${myPosts.map(post => `
-                            <div class="grid-item">
+                            <div class="grid-item" onclick="scrollToPost('${post.id}')">
                                 <img src="${post.image}" alt="Mein Foto" loading="lazy">
                                 <div class="grid-item-overlay">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
@@ -1989,6 +1967,109 @@ function renderComments(comments) {
                 showToast('Kommentar konnte nicht gelöscht werden.');
             }
         }
+// --- Profil bearbeiten Funktionen ---
+        let selectedAvatarFile = null;
+
+        function openEditProfileModal() {
+            const modal = document.getElementById('editProfileModal');
+            const preview = document.getElementById('editAvatarPreview');
+            
+            document.getElementById('editDisplayName').value = state.currentUser.displayName || '';
+            document.getElementById('editBio').value = state.currentUser.bio || '';
+            selectedAvatarFile = null;
+
+            // Aktuelles Bild oder Initiale in die Vorschau laden
+            preview.style.background = `${state.currentUser.color}22`;
+            preview.style.color = state.currentUser.color;
+            if (state.currentUser.avatarUrl) {
+                preview.innerHTML = `<img src="${state.currentUser.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                preview.innerHTML = state.currentUser.displayName.charAt(0).toUpperCase();
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        }
+
+        function handleAvatarSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            selectedAvatarFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('editAvatarPreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveProfile() {
+            const btn = document.getElementById('saveProfileBtn');
+            const newName = document.getElementById('editDisplayName').value.trim();
+            const newBio = document.getElementById('editBio').value.trim();
+
+            if (!newName) return showToast('Anzeigename darf nicht leer sein');
+
+            btn.disabled = true;
+            btn.textContent = 'Speichert...';
+
+            try {
+                let avatarUrl = state.currentUser.avatarUrl;
+
+                // 1. Neues Profilbild hochladen (falls ausgewählt)
+                if (selectedAvatarFile) {
+                    // Avatar klein komprimieren (400x400)
+                    const compressedFile = await compressImage(selectedAvatarFile, 400, 400, 0.9);
+                    const fileName = `avatar_${state.currentUser.id}_${Date.now()}.jpg`;
+                    const filePath = `avatars/${fileName}`;
+                    
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('wicture-images')
+                        .upload(filePath, compressedFile);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: publicUrlData } = supabaseClient.storage
+                        .from('wicture-images').getPublicUrl(filePath);
+                    
+                    avatarUrl = publicUrlData.publicUrl;
+                }
+
+                // 2. Datenbank aktualisieren
+                const { error: updateError } = await supabaseClient
+                    .from('users')
+                    .update({ 
+                        display_name: newName,
+                        bio: newBio,
+                        avatar_url: avatarUrl
+                    })
+                    .eq('id', state.currentUser.id);
+
+                if (updateError) throw updateError;
+
+                // 3. Lokalen State aktualisieren
+                state.currentUser.displayName = newName;
+                state.currentUser.bio = newBio;
+                state.currentUser.avatarUrl = avatarUrl;
+
+                showToast('Profil aktualisiert! ✨');
+                closeEditProfileModal();
+                renderProfile(); // Profilansicht sofort neu laden
+                
+                // Extra: Lade Posts neu, damit dort auch dein neuer Name steht
+                await loadPostsFromSupabase(); 
+
+            } catch (error) {
+                console.error('Fehler beim Profil-Speichern:', error);
+                showToast('Fehler beim Speichern.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Speichern';
+            }
+        }
 
 async function deletePost(postId, imageUrl) {
             // 1. Sicherheitsabfrage
@@ -2109,7 +2190,9 @@ async function editPost(postId) {
                     username: userProfile.username,
                     displayName: userProfile.display_name,
                     color: userProfile.user_color,
-                    email: email
+                    email: email,
+					avatarUrl: userProfile.avatar_url,
+                    bio: userProfile.bio
                 };
                 
                 state.isAuthenticated = true;
@@ -2208,7 +2291,9 @@ async function editPost(postId) {
                         username: userProfile.username,
                         displayName: userProfile.display_name,
                         color: userProfile.user_color,
-                        email: session.user.email
+                        email: session.user.email,
+						avatarUrl: userProfile.avatar_url,
+                        bio: userProfile.bio
                     };
                     state.isAuthenticated = true;
                     

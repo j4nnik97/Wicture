@@ -1563,7 +1563,6 @@ async function renderProfile() {
                 const myPosts = state.posts.filter(p => p.user.username === state.currentUser.username);
                 const totalLikes = myPosts.reduce((sum, p) => sum + p.likes, 0);
 
-                // Lade Anzahl der Follower und der Leute, denen du folgst aus Supabase
                 const { count: followersCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', state.currentUser.id);
                 const { count: followingCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', state.currentUser.id);
 
@@ -1574,18 +1573,10 @@ async function renderProfile() {
                                 ? `<img src="${escapeHTML(state.currentUser.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(state.currentUser.displayName).charAt(0).toUpperCase()}
                         </div>
-                        <div class="profile-stats" style="gap: 16px; flex-wrap: wrap; justify-content: center;">
+                        <div class="profile-stats">
                             <div class="stat">
                                 <div class="stat-number">${myPosts.length}</div>
                                 <div class="stat-label">Fotos</div>
-                            </div>
-                            <div class="stat" onclick="openUsersList('followers', '${state.currentUser.id}')" style="cursor: pointer;">
-                                <div class="stat-number">${followersCount || 0}</div>
-                                <div class="stat-label">Follower</div>
-                            </div>
-                            <div class="stat" onclick="openUsersList('following', '${state.currentUser.id}')" style="cursor: pointer;">
-                                <div class="stat-number">${followingCount || 0}</div>
-                                <div class="stat-label">Folgt</div>
                             </div>
                             <div class="stat">
                                 <div class="stat-number">${totalLikes}</div>
@@ -1611,6 +1602,15 @@ async function renderProfile() {
                         <p style="color: var(--color-text-secondary); font-size: 12px; margin-bottom: 8px;">@${escapeHTML(state.currentUser.username)}</p>
                         
                         <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.4;">${escapeHTML(state.currentUser.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.')}</p>
+                        
+                        <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px;">
+                            <div onclick="openUsersList('followers', '${state.currentUser.id}')" style="cursor: pointer;">
+                                <span style="font-weight: 600;">${followersCount || 0}</span> <span style="color: var(--color-text-secondary);">Follower</span>
+                            </div>
+                            <div onclick="openUsersList('following', '${state.currentUser.id}')" style="cursor: pointer;">
+                                <span style="font-weight: 600;">${followingCount || 0}</span> <span style="color: var(--color-text-secondary);">Folgt</span>
+                            </div>
+                        </div>
                         
                         <button class="btn btn-secondary" style="width: 100%; margin-top: 16px; padding: 6px 12px; font-size: 13px;" onclick="openEditProfileModal()">
                             Profil bearbeiten
@@ -1646,6 +1646,7 @@ async function renderProfile() {
                 console.error('Fehler beim Laden des eigenen Profils', e);
             }
         }
+		
         // --- Actions ---
 
 // --- Fremdes Profil anzeigen ---
@@ -1678,7 +1679,6 @@ async function viewUserProfile(username) {
                 const userPosts = state.posts.filter(p => p.user.username === username);
                 const totalLikes = userPosts.reduce((sum, p) => sum + p.likes, 0);
 
-                // Lade Follower/Folgt Zahlen für das fremde Profil
                 const { count: followersCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', userProfile.id);
                 const { count: followingCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', userProfile.id);
 
@@ -1699,18 +1699,10 @@ async function viewUserProfile(username) {
                                 ? `<img src="${escapeHTML(userProfile.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(userProfile.display_name).charAt(0).toUpperCase()}
                         </div>
-                        <div class="profile-stats" style="gap: 16px; flex-wrap: wrap; justify-content: center;">
+                        <div class="profile-stats">
                             <div class="stat">
                                 <div class="stat-number">${userPosts.length}</div>
                                 <div class="stat-label">Fotos</div>
-                            </div>
-                            <div class="stat" onclick="openUsersList('followers', '${userProfile.id}')" style="cursor: pointer;">
-                                <div class="stat-number">${followersCount || 0}</div>
-                                <div class="stat-label">Follower</div>
-                            </div>
-                            <div class="stat" onclick="openUsersList('following', '${userProfile.id}')" style="cursor: pointer;">
-                                <div class="stat-number">${followingCount || 0}</div>
-                                <div class="stat-label">Folgt</div>
                             </div>
                             <div class="stat">
                                 <div class="stat-number">${totalLikes}</div>
@@ -1726,6 +1718,15 @@ async function viewUserProfile(username) {
                     <div class="profile-bio">
                         <h3 style="margin-bottom: 4px;">${escapeHTML(userProfile.display_name)}</h3>
                         <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.4;">${escapeHTML(userProfile.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.')}</p>
+                        
+                        <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px;">
+                            <div onclick="openUsersList('followers', '${userProfile.id}')" style="cursor: pointer;">
+                                <span style="font-weight: 600;">${followersCount || 0}</span> <span style="color: var(--color-text-secondary);">Follower</span>
+                            </div>
+                            <div onclick="openUsersList('following', '${userProfile.id}')" style="cursor: pointer;">
+                                <span style="font-weight: 600;">${followingCount || 0}</span> <span style="color: var(--color-text-secondary);">Folgt</span>
+                            </div>
+                        </div>
                         
                         <button class="btn ${isFollowing ? 'btn-secondary' : 'btn-primary'}" style="width: 100%; margin-top: 16px; padding: 6px 12px; font-size: 13px;" onclick="toggleFollow('${userProfile.id}', '${escapeHTML(userProfile.username)}')">
                             ${isFollowing ? 'Entfolgen' : 'Folgen'}

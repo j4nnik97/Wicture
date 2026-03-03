@@ -1117,7 +1117,8 @@
             weeklyPostDone: false,
             lastPostTimestamp: null,
             nextPostAvailable: null,
-            supabase: null
+            supabase: null,
+			focusedPostId: null
         };
 
 // Diese Funktion muss ALLEINE stehen
@@ -1238,9 +1239,11 @@ function getWeekLabel(timestamp) {
 function renderFeed() {
             const container = document.getElementById('feedContainer');
 
-            // NEU: Filtere die Posts! Nur eigene Posts ODER Posts von Leuten, denen ich folge.
+// NEU: Der Filter erlaubt jetzt auch das fremde Bild mit dem Gast-Ausweis!
             const feedPosts = state.posts.filter(post => 
-                post.user.username === state.currentUser.username || state.following.has(String(post.user.id))
+                post.user.username === state.currentUser.username || 
+                state.following.has(String(post.user.id)) ||
+                post.id === state.focusedPostId
             );
 
             if (feedPosts.length === 0) {
@@ -1397,8 +1400,10 @@ function renderExplore() {
             `;
         }
 		
-        // Hilfsfunktion: Springt im Feed zum ausgewählten Post
+// Hilfsfunktion: Springt im Feed zum ausgewählten Post
         function scrollToPost(postId) {
+            state.focusedPostId = postId; // <--- NEU: Dem Bild den Gast-Ausweis geben
+            
             switchView('feed');
             setTimeout(() => {
                 const element = document.querySelector(`[data-post-id="${postId}"]`);
@@ -1899,8 +1904,12 @@ async function toggleLike(postId) {
             if (viewName === 'profile') renderProfile();
         }
 
-        document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+			document.querySelectorAll('.bottom-nav-item').forEach(btn => {
             btn.addEventListener('click', () => {
+                // NEU: Wenn man regulär auf den Feed klickt, verschwinden fremde Gast-Bilder
+                if (btn.dataset.view === 'feed') {
+                    state.focusedPostId = null; 
+                }
                 switchView(btn.dataset.view);
             });
         });

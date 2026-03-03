@@ -1056,6 +1056,20 @@
         </div>
     </div>
 
+	<div class="search-modal" id="usersModal">
+        <div class="search-header">
+            <button class="btn-icon" onclick="closeUsersModal()" aria-label="Zurück" style="margin-left: -8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <h2 id="usersModalTitle" style="font-size: 16px; font-weight: 600; flex: 1; text-align: center; margin-right: 32px;">Liste</h2>
+        </div>
+        <div class="search-results" id="usersModalList">
+            </div>
+    </div>
+
     <div class="comments-modal" id="commentsModal">
         <div class="comments-header">
             <h2 style="font-size: 16px; font-weight: 600;">Kommentare</h2>
@@ -1541,83 +1555,101 @@ function renderExplore() {
             `;
         }
 
-function renderProfile() {
+async function renderProfile() {
             const content = document.getElementById('profileContent');
-            const myPosts = state.posts.filter(p => p.user.username === state.currentUser.username);
-            const totalLikes = myPosts.reduce((sum, p) => sum + p.likes, 0);
+            content.innerHTML = '<div style="padding: 60px 20px; text-align: center; color: var(--color-text-secondary);">Lade Profil...</div>';
 
-            content.innerHTML = `
-                <div class="profile-header">
-                    <div class="profile-avatar" style="background: ${state.currentUser.color}22; color: ${state.currentUser.color}; overflow: hidden;">
-                        ${state.currentUser.avatarUrl 
-                            ? `<img src="${escapeHTML(state.currentUser.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
-                            : escapeHTML(state.currentUser.displayName).charAt(0).toUpperCase()}
-                    </div>
-                    <div class="profile-stats">
-                        <div class="stat">
-                            <div class="stat-number">${myPosts.length}</div>
-                            <div class="stat-label">Fotos</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">${totalLikes}</div>
-                            <div class="stat-label">Likes</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">${Math.floor(myPosts.length / 4) + 1}</div>
-                            <div class="stat-label">Wochen</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="profile-bio" style="position: relative;">
-                    <button onclick="handleLogout()" class="btn-icon" style="position: absolute; right: 16px; top: 16px; color: var(--color-error);" title="Abmelden">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                    </button>
+            try {
+                const myPosts = state.posts.filter(p => p.user.username === state.currentUser.username);
+                const totalLikes = myPosts.reduce((sum, p) => sum + p.likes, 0);
 
-                    <h3 style="padding-right: 40px;">${escapeHTML(state.currentUser.displayName)}</h3>
-                    <p style="color: var(--color-text-secondary); font-size: 12px; margin-bottom: 8px;">@${escapeHTML(state.currentUser.username)}</p>
-                    
-                    <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.4;">${escapeHTML(state.currentUser.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.')}</p>
-                    
-                    <button class="btn btn-secondary" style="width: 100%; margin-top: 16px; padding: 6px 12px; font-size: 13px;" onclick="openEditProfileModal()">
-                        Profil bearbeiten
-                    </button>
-                </div>
+                // Lade Anzahl der Follower und der Leute, denen du folgst aus Supabase
+                const { count: followersCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', state.currentUser.id);
+                const { count: followingCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', state.currentUser.id);
 
-                ${myPosts.length > 0 ? `
-                    <div class="profile-grid">
-                        ${myPosts.map(post => `
-                            <div class="grid-item" onclick="scrollToPost('${post.id}')">
-                                <img src="${escapeHTML(post.image)}" alt="Mein Foto" loading="lazy">
-                                <div class="grid-item-overlay">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                    </svg>
-                                    ${post.likes}
-                                </div>
+                content.innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-avatar" style="background: ${state.currentUser.color}22; color: ${state.currentUser.color}; overflow: hidden;">
+                            ${state.currentUser.avatarUrl 
+                                ? `<img src="${escapeHTML(state.currentUser.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                : escapeHTML(state.currentUser.displayName).charAt(0).toUpperCase()}
+                        </div>
+                        <div class="profile-stats" style="gap: 16px; flex-wrap: wrap; justify-content: center;">
+                            <div class="stat">
+                                <div class="stat-number">${myPosts.length}</div>
+                                <div class="stat-label">Fotos</div>
                             </div>
-                        `).join('')}
+                            <div class="stat" onclick="openUsersList('followers', '${state.currentUser.id}')" style="cursor: pointer;">
+                                <div class="stat-number">${followersCount || 0}</div>
+                                <div class="stat-label">Follower</div>
+                            </div>
+                            <div class="stat" onclick="openUsersList('following', '${state.currentUser.id}')" style="cursor: pointer;">
+                                <div class="stat-number">${followingCount || 0}</div>
+                                <div class="stat-label">Folgt</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${totalLikes}</div>
+                                <div class="stat-label">Likes</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${Math.floor(myPosts.length / 4) + 1}</div>
+                                <div class="stat-label">Wochen</div>
+                            </div>
+                        </div>
                     </div>
-                ` : `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <circle cx="12" cy="12" r="3.5"/>
-                        </svg>
-                        <h3>Noch keine Fotos</h3>
-                        <p>Poste dein erstes Wochenfoto!</p>
+                    
+                    <div class="profile-bio" style="position: relative;">
+                        <button onclick="handleLogout()" class="btn-icon" style="position: absolute; right: 16px; top: 16px; color: var(--color-error);" title="Abmelden">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                        </button>
+
+                        <h3 style="padding-right: 40px;">${escapeHTML(state.currentUser.displayName)}</h3>
+                        <p style="color: var(--color-text-secondary); font-size: 12px; margin-bottom: 8px;">@${escapeHTML(state.currentUser.username)}</p>
+                        
+                        <p style="white-space: pre-wrap; font-size: 13px; line-height: 1.4;">${escapeHTML(state.currentUser.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.')}</p>
+                        
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: 16px; padding: 6px 12px; font-size: 13px;" onclick="openEditProfileModal()">
+                            Profil bearbeiten
+                        </button>
                     </div>
-                `}
-            `;
+
+                    ${myPosts.length > 0 ? `
+                        <div class="profile-grid">
+                            ${myPosts.map(post => `
+                                <div class="grid-item" onclick="scrollToPost('${post.id}')">
+                                    <img src="${escapeHTML(post.image)}" alt="Mein Foto" loading="lazy">
+                                    <div class="grid-item-overlay">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                        </svg>
+                                        ${post.likes}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="12" cy="12" r="3.5"/>
+                            </svg>
+                            <h3>Noch keine Fotos</h3>
+                            <p>Poste dein erstes Wochenfoto!</p>
+                        </div>
+                    `}
+                `;
+            } catch(e) {
+                console.error('Fehler beim Laden des eigenen Profils', e);
+            }
         }
         // --- Actions ---
 
 // --- Fremdes Profil anzeigen ---
-       async function viewUserProfile(username) {
+async function viewUserProfile(username) {
             if (username === state.currentUser.username) {
                 switchView('profile');
                 return;
@@ -1640,10 +1672,15 @@ function renderProfile() {
                     .single();
 
                 if (error) throw error;
-				
-				const isFollowing = state.following.has(String(userProfile.id)); // <-- NEU
+                
+                const isFollowing = state.following.has(String(userProfile.id));
+
                 const userPosts = state.posts.filter(p => p.user.username === username);
                 const totalLikes = userPosts.reduce((sum, p) => sum + p.likes, 0);
+
+                // Lade Follower/Folgt Zahlen für das fremde Profil
+                const { count: followersCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', userProfile.id);
+                const { count: followingCount } = await supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', userProfile.id);
 
                 content.innerHTML = `
                     <div style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; background: var(--color-surface); position: sticky; top: 0; z-index: 10;">
@@ -1662,10 +1699,18 @@ function renderProfile() {
                                 ? `<img src="${escapeHTML(userProfile.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(userProfile.display_name).charAt(0).toUpperCase()}
                         </div>
-                        <div class="profile-stats">
+                        <div class="profile-stats" style="gap: 16px; flex-wrap: wrap; justify-content: center;">
                             <div class="stat">
                                 <div class="stat-number">${userPosts.length}</div>
                                 <div class="stat-label">Fotos</div>
+                            </div>
+                            <div class="stat" onclick="openUsersList('followers', '${userProfile.id}')" style="cursor: pointer;">
+                                <div class="stat-number">${followersCount || 0}</div>
+                                <div class="stat-label">Follower</div>
+                            </div>
+                            <div class="stat" onclick="openUsersList('following', '${userProfile.id}')" style="cursor: pointer;">
+                                <div class="stat-number">${followingCount || 0}</div>
+                                <div class="stat-label">Folgt</div>
                             </div>
                             <div class="stat">
                                 <div class="stat-number">${totalLikes}</div>
@@ -2666,7 +2711,61 @@ async function editPost(postId) {
             }
         }
 
-        // --- Start ---
+// --- Follower / Folgt Liste ---
+        function closeUsersModal() {
+            document.getElementById('usersModal').classList.remove('open');
+        }
+
+        async function openUsersList(type, userId) {
+            document.getElementById('usersModal').classList.add('open');
+            document.getElementById('usersModalTitle').textContent = type === 'followers' ? 'Follower' : 'Folgt';
+            const listContainer = document.getElementById('usersModalList');
+            listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-text-secondary);">Lade Liste...</div>';
+
+            try {
+                let targetUserIds = [];
+                
+                if (type === 'followers') {
+                    // Wer folgt dieser ID?
+                    const { data } = await supabaseClient.from('follows').select('follower_id').eq('following_id', userId);
+                    targetUserIds = data.map(d => d.follower_id);
+                } else {
+                    // Wem folgt diese ID?
+                    const { data } = await supabaseClient.from('follows').select('following_id').eq('follower_id', userId);
+                    targetUserIds = data.map(d => d.following_id);
+                }
+
+                if (targetUserIds.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-text-secondary);">Noch keine Einträge. 👤</div>';
+                    return;
+                }
+
+                // Hole die Profil-Infos der gefundenen Nutzer
+                const { data: users, error } = await supabaseClient.from('users').select('*').in('id', targetUserIds);
+                if (error) throw error;
+
+                // Rendere die Liste (mit Klick aufs Profil!)
+                listContainer.innerHTML = users.map(user => `
+                    <div class="search-result-item" onclick="closeUsersModal(); viewUserProfile('${escapeHTML(user.username)}')">
+                        <div class="avatar" style="background: ${user.user_color}22; color: ${user.user_color}; overflow: hidden;">
+                            ${user.avatar_url 
+                                ? `<img src="${escapeHTML(user.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                : escapeHTML(user.display_name).charAt(0).toUpperCase()}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 14px;">${escapeHTML(user.display_name)}</div>
+                            <div style="color: var(--color-text-secondary); font-size: 12px;">@${escapeHTML(user.username)}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error("Fehler beim Laden der Liste:", error);
+                listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-error);">Fehler beim Laden.</div>';
+            }
+        }
+       
+	   // --- Start ---
         initApp();
     </script>
 </body>

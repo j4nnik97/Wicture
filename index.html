@@ -1337,7 +1337,7 @@ function getWeekLabel(timestamp) {
 function renderFeed() {
             const container = document.getElementById('feedContainer');
 
-// NEU: Der Filter erlaubt jetzt auch das fremde Bild mit dem Gast-Ausweis!
+            // NEU: Der Filter erlaubt jetzt auch das fremde Bild mit dem Gast-Ausweis!
             const feedPosts = state.posts.filter(post => 
                 post.user.username === state.currentUser.username || 
                 state.following.has(String(post.user.id)) ||
@@ -1361,7 +1361,6 @@ function renderFeed() {
             let currentWeekLabel = '';
             let html = '';
 
-            // WICHTIG: Hier nutzen wir jetzt 'feedPosts' statt 'state.posts'
             feedPosts.forEach(post => {
                 if (post.weekLabel !== currentWeekLabel) {
                     currentWeekLabel = post.weekLabel;
@@ -1393,7 +1392,16 @@ function renderFeed() {
                                                 </svg>
                                                 LIVE
                                             </span>
-                                        ` : ''}
+                                        ` : `
+                                            <span style="color: var(--color-text-secondary); background: rgba(var(--color-gray-400-rgb), 0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 3px;">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                                    <polyline points="21 15 16 10 5 21"/>
+                                                </svg>
+                                                GALERIE
+                                            </span>
+                                        `}
                                     </div>
                                 </div>
                             </div>
@@ -1510,80 +1518,106 @@ function renderExplore() {
         }
 		
 // Hilfsfunktion: Springt im Feed zum ausgewählten Post
-        function openPostModal(postId) {
-            state.focusedPostId = postId; // <--- NEU: Dem Bild den Gast-Ausweis geben
+function openPostModal(postId) {
+            currentModalPostId = postId;
+            const post = state.posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const container = document.getElementById('postModalContent');
             
-            switchView('feed');
-            setTimeout(() => {
-                const element = document.querySelector(`[data-post-id="${postId}"]`);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    element.style.boxShadow = '0 0 0 2px var(--color-primary)';
-                    setTimeout(() => element.style.boxShadow = '', 2000);
-                }
-            }, 100);
-        }
-
-function renderUpload() {
-            const area = document.getElementById('uploadArea');
-            checkWeeklyLimit(); // Prüft in der Datenbank: Wurde diese Woche schon gepostet?
-
-            // 1. WENN SCHON GEPOSTET WURDE: Zeige die Sperre an
-            if (state.weeklyPostDone) {
-                area.innerHTML = `
-                    <div class="upload-disabled">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <h3>Du hast diese Woche bereits gepostet</h3>
-                        <p>Bei Wicture kannst du nur 1 Foto pro Woche teilen.<br>So bleibt jedes Bild besonders.</p>
-                        <div class="countdown-timer">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                            Nächster Post in ${formatCountdown(state.nextPostAvailable)}
+            container.innerHTML = `
+                <div class="post-card" style="border-bottom: none; margin-bottom: 40px;">
+                    <div class="post-header">
+                        <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" onclick="closePostModal(); viewUserProfile('${escapeHTML(post.user.username)}')">
+                            <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color}; overflow: hidden;">
+                                ${post.user.avatarUrl 
+                                    ? `<img src="${escapeHTML(post.user.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                    : escapeHTML(post.user.displayName).charAt(0).toUpperCase()}
+                            </div>
+                            <div class="post-user-info">
+                                <div class="post-username">${escapeHTML(post.user.username)}</div>
+                                <div class="post-meta" style="display: flex; align-items: center; gap: 6px;">
+                                    <span>${timeAgo(post.timestamp)}</span>
+                                    ${post.isCamera ? `
+                                        <span style="color: var(--color-primary); background: rgba(var(--color-teal-500-rgb), 0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 3px;">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+                                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                                <circle cx="12" cy="13" r="4"></circle>
+                                            </svg>
+                                            LIVE
+                                        </span>
+                                    ` : `
+                                        <span style="color: var(--color-text-secondary); background: rgba(var(--color-gray-400-rgb), 0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 9px; letter-spacing: 0.05em; display: flex; align-items: center; gap: 3px;">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 10px; height: 10px;">
+                                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                                <polyline points="21 15 16 10 5 21"/>
+                                            </svg>
+                                            GALERIE
+                                        </span>
+                                    `}
+                                </div>
+                            </div>
                         </div>
+                        
+                        ${post.user.username === state.currentUser.username ? `
+                            <div style="margin-left: auto; display: flex; gap: 4px;">
+                                <button class="btn-icon" onclick="editPost('${post.id}'); closePostModal();" style="color: var(--color-text-secondary); width: 32px; height: 32px;" title="Text bearbeiten">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-icon" onclick="deletePost('${post.id}', '${post.image}'); closePostModal();" style="color: var(--color-error); width: 32px; height: 32px;" title="Post löschen">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
-                `;
-                return; // WICHTIG: Das 'return' bricht hier ab, die Buttons unten werden nicht geladen!
-            }
-
-            // 2. WENN NOCH NICHT GEPOSTET WURDE: Zeige Kamera & Galerie
-            area.innerHTML = `
-                <div id="dropzoneContainer" style="display: flex; gap: 12px; flex-direction: column;">
-                    <div class="upload-dropzone" onclick="document.getElementById('cameraInput').click()" style="padding: 32px 16px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width: 36px; height: 36px; margin-bottom: 8px;">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                            <circle cx="12" cy="13" r="4"></circle>
-                        </svg>
-                        <h3>Kamera</h3>
-                        <p>Foto direkt aufnehmen</p>
+                    
+                    <div class="post-image-container">
+                        <img src="${escapeHTML(post.image)}" alt="Foto" loading="lazy">
                     </div>
-                    <div class="upload-dropzone" onclick="document.getElementById('fileInput').click()" style="padding: 32px 16px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width: 36px; height: 36px; margin-bottom: 8px;">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21 15 16 10 5 21"/>
-                        </svg>
-                        <h3>Galerie</h3>
-                        <p>Bild vom Gerät auswählen</p>
+                    
+                    <div class="post-actions">
+                        <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                            <svg viewBox="0 0 24 24" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
+                        <button class="action-btn" onclick="openComments('${post.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </button>
                     </div>
-                </div>
-                <div class="upload-preview" id="uploadPreview">
-                    <div class="upload-preview-img">
-                        <img id="previewImage" src="" alt="Vorschau">
-                    </div>
-                    <textarea class="upload-caption-input" id="captionInput" placeholder="Schreibe eine Bildunterschrift..." maxlength="300"></textarea>
-                    <div class="upload-actions">
-                        <button class="btn btn-secondary" onclick="cancelUpload()">Abbrechen</button>
-                        <button class="btn btn-primary" id="postBtn" onclick="submitPost()">Posten</button>
-                    </div>
+                    
+                    <div class="like-count" onclick="openLikesList('${post.id}')" style="cursor: pointer;">${post.likes} Gefällt mir</div>
+                    <div class="post-caption"><strong>${escapeHTML(post.user.username)}</strong> ${escapeHTML(post.caption)}</div>
+                    
+                    ${post.commentCount > 2 ? `
+                        <div style="padding: 0 16px 4px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer;" onclick="openComments('${post.id}')">
+                            Alle ${post.commentCount} Kommentare ansehen
+                        </div>
+                    ` : ''}
+                    
+                    ${post.recentComments && post.recentComments.length > 0 ? `
+                        <div style="padding: 0 16px 12px; font-size: 13px; line-height: 1.4;">
+                            ${post.recentComments.map(c => `
+                                <div style="margin-bottom: 2px;">
+                                    <strong>${escapeHTML(c.username)}</strong> ${escapeHTML(c.content)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<div style="padding-bottom: 12px;"></div>'}
                 </div>
             `;
+            
+            document.getElementById('postModal').classList.add('open');
         }
-
 async function renderProfile() {
             const content = document.getElementById('profileContent');
             content.innerHTML = '<div style="padding: 60px 20px; text-align: center; color: var(--color-text-secondary);">Lade Profil...</div>';

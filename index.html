@@ -1069,6 +1069,24 @@
         <div class="search-results" id="usersModalList">
             </div>
     </div>
+	
+	<div class="search-modal" id="usersModal">
+        </div>
+
+    <div class="search-modal" id="postModal">
+        <div class="search-header">
+            <button class="btn-icon" onclick="closePostModal()" aria-label="Zurück" style="margin-left: -8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <h2 style="font-size: 16px; font-weight: 600; flex: 1; text-align: center; margin-right: 32px;">Beitrag</h2>
+        </div>
+        <div class="search-results" id="postModalContent" style="padding: 0; overflow-x: hidden;">
+            </div>
+    </div>
+    <div class="comments-modal" id="commentsModal">
 
     <div class="comments-modal" id="commentsModal">
         <div class="comments-header">
@@ -1479,7 +1497,7 @@ function renderExplore() {
                     🔥 Top-Fotos dieser Woche
                 </div>
                 ${trendingPosts.map(post => `
-                    <div onclick="scrollToPost('${post.id}')" style="position: relative; aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; cursor: pointer;">
+                    <div onclick="openPostModal('${post.id}')" style="position: relative; aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; cursor: pointer;">
                         <img src="${post.image}" alt="Trend" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                         
                         <div style="position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.6); color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px; font-weight: bold;">
@@ -1494,7 +1512,7 @@ function renderExplore() {
         }
 		
 // Hilfsfunktion: Springt im Feed zum ausgewählten Post
-        function scrollToPost(postId) {
+        function openPostModal(postId) {
             state.focusedPostId = postId; // <--- NEU: Dem Bild den Gast-Ausweis geben
             
             switchView('feed');
@@ -1633,7 +1651,7 @@ async function renderProfile() {
                     ${myPosts.length > 0 ? `
                         <div class="profile-grid">
                             ${myPosts.map(post => `
-                                <div class="grid-item" onclick="scrollToPost('${post.id}')">
+                                <div class="grid-item" onclick="openPostModal('${post.id}')">
                                     <img src="${escapeHTML(post.image)}" alt="Mein Foto" loading="lazy">
                                     <div class="grid-item-overlay">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
@@ -1749,7 +1767,7 @@ async function viewUserProfile(username) {
                     ${userPosts.length > 0 ? `
                         <div class="profile-grid">
                             ${userPosts.map(post => `
-                                <div class="grid-item" onclick="scrollToPost('${post.id}')">
+                                <div class="grid-item" onclick="openPostModal('${post.id}')">
                                     <img src="${escapeHTML(post.image)}" alt="Foto" loading="lazy">
                                     <div class="grid-item-overlay">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
@@ -1826,6 +1844,10 @@ async function toggleLike(postId) {
     post.liked = !isCurrentlyLiked;
     post.likes += post.liked ? 1 : -1;
     renderFeed();
+
+if (typeof currentModalPostId !== 'undefined' && currentModalPostId === postId) {
+        openPostModal(postId); 
+    }
 
     try {
         if (!isCurrentlyLiked) {
@@ -2820,6 +2842,95 @@ async function editPost(postId) {
                 console.error("Fehler beim Laden der Likes:", error);
                 listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-error);">Fehler beim Laden.</div>';
             }
+        }
+	   
+	   // --- Einzelnen Beitrag als Modal anzeigen ---
+        let currentModalPostId = null;
+
+        function openPostModal(postId) {
+            currentModalPostId = postId;
+            const post = state.posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const container = document.getElementById('postModalContent');
+            
+            container.innerHTML = `
+                <div class="post-card" style="border-bottom: none; margin-bottom: 40px;">
+                    <div class="post-header">
+                        <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" onclick="closePostModal(); viewUserProfile('${escapeHTML(post.user.username)}')">
+                            <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color}; overflow: hidden;">
+                                ${post.user.avatarUrl 
+                                    ? `<img src="${escapeHTML(post.user.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                    : escapeHTML(post.user.displayName).charAt(0).toUpperCase()}
+                            </div>
+                            <div class="post-user-info">
+                                <div class="post-username">${escapeHTML(post.user.username)}</div>
+                                <div class="post-meta">${timeAgo(post.timestamp)}</div>
+                            </div>
+                        </div>
+                        
+                        ${post.user.username === state.currentUser.username ? `
+                            <div style="margin-left: auto; display: flex; gap: 4px;">
+                                <button class="btn-icon" onclick="editPost('${post.id}'); closePostModal();" style="color: var(--color-text-secondary); width: 32px; height: 32px;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-icon" onclick="deletePost('${post.id}', '${post.image}'); closePostModal();" style="color: var(--color-error); width: 32px; height: 32px;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="post-image-container">
+                        <img src="${escapeHTML(post.image)}" alt="Foto" loading="lazy">
+                    </div>
+                    
+                    <div class="post-actions">
+                        <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                            <svg viewBox="0 0 24 24" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
+                        <button class="action-btn" onclick="openComments('${post.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="like-count" onclick="openLikesList('${post.id}')" style="cursor: pointer;">${post.likes} Gefällt mir</div>
+                    <div class="post-caption"><strong>${escapeHTML(post.user.username)}</strong> ${escapeHTML(post.caption)}</div>
+                    
+                    ${post.commentCount > 2 ? `
+                        <div style="padding: 0 16px 4px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer;" onclick="openComments('${post.id}')">
+                            Alle ${post.commentCount} Kommentare ansehen
+                        </div>
+                    ` : ''}
+                    
+                    ${post.recentComments && post.recentComments.length > 0 ? `
+                        <div style="padding: 0 16px 12px; font-size: 13px; line-height: 1.4;">
+                            ${post.recentComments.map(c => `
+                                <div style="margin-bottom: 2px;">
+                                    <strong>${escapeHTML(c.username)}</strong> ${escapeHTML(c.content)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<div style="padding-bottom: 12px;"></div>'}
+                </div>
+            `;
+            
+            document.getElementById('postModal').classList.add('open');
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.remove('open');
+            currentModalPostId = null;
         }
 	   
 	   // --- Start ---

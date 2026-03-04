@@ -101,7 +101,7 @@
             z-index: 100;
             background: var(--color-surface);
             border-bottom: 1px solid var(--color-border);
-            padding: 12px 16px;
+            padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -787,7 +787,7 @@
             transform: translateY(0);
         }
         .comments-header {
-            padding: 12px 16px;
+            padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
             border-bottom: 1px solid var(--color-border);
             display: flex;
             align-items: center;
@@ -903,7 +903,7 @@
             transform: translateY(0);
         }
         .search-header {
-            padding: 12px 16px;
+            padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
             border-bottom: 1px solid var(--color-border);
             display: flex;
             align-items: center;
@@ -1422,7 +1422,7 @@ function renderFeed() {
                             </button>
                         </div>
                         
-                        <div class="like-count">${post.likes} Gefällt mir</div>
+                        <div class="like-count" onclick="openLikesList('${post.id}')" style="cursor: pointer;">${post.likes} Gefällt mir</div>
                         <div class="post-caption"><strong>${escapeHTML(post.user.username)}</strong> ${escapeHTML(post.caption)}</div>
                         
                         ${post.commentCount > 2 ? `
@@ -2766,6 +2766,46 @@ async function editPost(postId) {
             }
         }
        
+	   async function openLikesList(postId) {
+            document.getElementById('usersModal').classList.add('open');
+            document.getElementById('usersModalTitle').textContent = 'Gefällt ...';
+            const listContainer = document.getElementById('usersModalList');
+            listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-text-secondary);">Lade Liste...</div>';
+
+            try {
+                // Wer hat dieses Bild gelikt?
+                const { data: likes, error: likesError } = await supabaseClient.from('post_likes').select('user_id').eq('post_id', postId);
+                if (likesError) throw likesError;
+
+                if (likes.length === 0) {
+                    listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-text-secondary);">Noch keine Likes. 🤍</div>';
+                    return;
+                }
+
+                // Hole die Profil-Infos
+                const userIds = likes.map(l => l.user_id);
+                const { data: users, error: usersError } = await supabaseClient.from('users').select('*').in('id', userIds);
+                if (usersError) throw usersError;
+
+                // Liste rendern
+                listContainer.innerHTML = users.map(user => `
+                    <div class="search-result-item" onclick="closeUsersModal(); viewUserProfile('${escapeHTML(user.username)}')">
+                        <div class="avatar" style="background: ${user.user_color}22; color: ${user.user_color}; overflow: hidden;">
+                            ${user.avatar_url ? `<img src="${escapeHTML(user.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` : escapeHTML(user.display_name).charAt(0).toUpperCase()}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 14px;">${escapeHTML(user.display_name)}</div>
+                            <div style="color: var(--color-text-secondary); font-size: 12px;">@${escapeHTML(user.username)}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error("Fehler beim Laden der Likes:", error);
+                listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-error);">Fehler beim Laden.</div>';
+            }
+        }
+	   
 	   // --- Start ---
         initApp();
     </script>

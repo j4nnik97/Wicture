@@ -1,0 +1,21 @@
+{
+  "name": "Wicture",
+  "short_name": "Wicture",
+  "description": "Ein Foto pro Woche. Nicht mehr, nicht weniger.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FCFCF9",
+  "theme_color": "#21808D",
+  "icons": [
+    {
+      "src": "https://rkmsomwlhlsxfoqueyza.supabase.co/storage/v1/object/public/assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://rkmsomwlhlsxfoqueyza.supabase.co/storage/v1/object/public/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -8,12 +8,12 @@
   "theme_color": "#21808D",
   "icons": [
     {
-      "src": "https://rkmsomwlhlsxfoqueyza.supabase.co/storage/v1/object/public/assets/icon.png",
+      "src": "./icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://rkmsomwlhlsxfoqueyza.supabase.co/storage/v1/object/public/assets/icon.png",
+      "src": "./icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }

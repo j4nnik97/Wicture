@@ -1878,52 +1878,40 @@ async function toggleLike(postId) {
     const userId = state.currentUser.id;
     const isCurrentlyLiked = post.liked;
 
-    // 1. UI sofort updaten
+    // 1. UI sofort updaten (Das Herz wird rot)
     post.liked = !isCurrentlyLiked;
     post.likes += post.liked ? 1 : -1;
     renderFeed();
 
-if (typeof currentModalPostId !== 'undefined' && currentModalPostId === postId) {
+    if (typeof currentModalPostId !== 'undefined' && currentModalPostId === postId) {
         openPostModal(postId); 
     }
 
     try {
         if (!isCurrentlyLiked) {
             // Like in die Datenbank einfügen
+            // (Die Datenbank rechnet durch unseren SQL-Trigger jetzt automatisch +1 beim Post!)
             const { error: insertError } = await supabaseClient
                 .from('post_likes')
                 .insert([{ post_id: postId, user_id: userId }]);
             if (insertError) throw insertError;
-                
-            // Zähler in posts Tabelle aktualisieren
-            const { error: updateError } = await supabaseClient
-                .from('posts')
-                .update({ likes: post.likes })
-                .eq('id', postId);
-            if (updateError) throw updateError;
             
         } else {
             // Like aus der Datenbank entfernen
+            // (Die Datenbank rechnet durch unseren SQL-Trigger jetzt automatisch -1 beim Post!)
             const { error: deleteError } = await supabaseClient
                 .from('post_likes')
                 .delete()
                 .match({ post_id: postId, user_id: userId });
             if (deleteError) throw deleteError;
-                
-            // Zähler in posts Tabelle aktualisieren
-            const { error: updateError } = await supabaseClient
-                .from('posts')
-                .update({ likes: post.likes })
-                .eq('id', postId);
-            if (updateError) throw updateError;
         }
     } catch (error) {
         console.error("Fehler beim Speichern des Likes:", error);
-        // Bei Fehler: UI wieder zurücksetzen (verhindert das -1 Problem!)
+        // Bei Fehler: UI wieder zurücksetzen
         post.liked = isCurrentlyLiked;
         post.likes += isCurrentlyLiked ? 1 : -1;
         renderFeed();
-        showToast('Blockiert: ' + error.message);
+        showToast('Fehler: Konnte nicht gelikt werden.');
     }
 }
 

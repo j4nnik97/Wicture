@@ -2710,12 +2710,17 @@ async function editPost(postId) {
                 if (error) throw error;
                 
                 showToast('Passwort erfolgreich geändert! 🔐');
-                await supabaseClient.auth.signOut(); // Nutzer sicherheitshalber ausloggen
-                showLogin(); // Zurück zum normalen Login
+                await supabaseClient.auth.signOut(); // Nutzer zur Sicherheit einmal komplett abmelden
+                
+                // NEU: Wir laden die Seite einmal komplett "sauber" neu, 
+                // damit der lange Reset-Code aus der URL verschwindet.
+                setTimeout(() => {
+                    window.location.href = window.location.origin + window.location.pathname;
+                }, 1500);
+
             } catch (error) {
                 console.error('Update password error:', error);
                 showToast('Fehler beim Speichern.');
-            } finally {
                 btn.disabled = false; btn.textContent = 'Passwort speichern';
             }
         }
@@ -2831,6 +2836,9 @@ async function editPost(postId) {
 
         // --- Init & Session Management ---
         async function initApp() {
+            if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
+                return; 
+            }
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {

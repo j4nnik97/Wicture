@@ -1861,12 +1861,12 @@ async function renderProfile() {
                 console.log("📦 Sende Daten an Datenbank:", newNotif);
 
                 // Das .select() am Ende ist wichtig, damit Supabase uns eine Antwort zurückgibt
-                const { data, error } = await supabaseClient.from('notifications').insert([newNotif]).select();
+                const { error } = await supabaseClient.from('notifications').insert([newNotif]);
                 
                 if (error) {
                     console.error("❌ Supabase Schreib-Fehler:", error);
                 } else {
-                    console.log("✅ Benachrichtigung erfolgreich gespeichert!", data);
+                    console.log("✅ Benachrichtigung erfolgreich abgeschickt!");
                 }
             } catch(e) { 
                 console.error("❌ Schwerer Fehler in sendNotification:", e); 

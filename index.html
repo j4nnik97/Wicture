@@ -1143,7 +1143,7 @@
 
     <div class="toast" id="toast"></div>
 
-    <div id="loginModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+<div id="loginModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: 32px; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
             <div style="text-align: center; margin-bottom: 24px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px; color: var(--color-primary); margin: 0 auto 12px;">
@@ -1160,9 +1160,12 @@
                     <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
                     <input type="email" id="loginEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 8px;">
                     <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
                     <input type="password" id="loginPassword" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                </div>
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <span onclick="showForgotPassword()" style="font-size: 12px; color: var(--color-primary); cursor: pointer; font-weight: 500;">Passwort vergessen?</span>
                 </div>
                 <button onclick="handleLogin()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Anmelden</button>
                 <button onclick="showSignup()" class="btn btn-secondary" style="width: 100%;">Registrieren</button>
@@ -1188,6 +1191,26 @@
                 <button onclick="handleSignup()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Konto erstellen</button>
                 <button onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Zurück zur Anmeldung</button>
             </div>
+
+            <div id="forgotPasswordForm" style="display: none;">
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.4;">Gib deine E-Mail-Adresse ein. Wir senden dir einen Link, um dein Passwort zurückzusetzen.</p>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
+                    <input type="email" id="resetEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                </div>
+                <button id="sendResetBtn" onclick="handleSendResetLink()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Link anfordern</button>
+                <button onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Zurück</button>
+            </div>
+
+            <div id="updatePasswordForm" style="display: none;">
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.4;">Erstelle jetzt ein neues Passwort für deinen Account.</p>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Neues Passwort</label>
+                    <input type="password" id="newPasswordInput" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                </div>
+                <button id="saveNewPasswordBtn" onclick="handleUpdatePassword()" class="btn btn-primary" style="width: 100%;">Passwort speichern</button>
+            </div>
+
         </div>
     </div>
 
@@ -2629,14 +2652,72 @@ async function editPost(postId) {
             document.getElementById('loginModal').style.display = 'none';
         }
 
-        function showLogin() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('signupForm').style.display = 'none';
-        }
-
         function showSignup() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('signupForm').style.display = 'block';
+        }
+
+// Fenster-Steuerung für die neuen Menüs
+        function showForgotPassword() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('updatePasswordForm').style.display = 'none';
+            document.getElementById('forgotPasswordForm').style.display = 'block';
+        }
+
+        // Überschreibt showLogin leicht, damit die anderen Fenster ausgeblendet werden
+        function showLogin() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('forgotPasswordForm').style.display = 'none';
+            document.getElementById('updatePasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        // Link senden
+        async function handleSendResetLink() {
+            const email = document.getElementById('resetEmail').value.trim();
+            if (!email) return showToast('Bitte E-Mail eingeben');
+            
+            const btn = document.getElementById('sendResetBtn');
+            btn.disabled = true; btn.textContent = 'Wird gesendet...';
+
+            try {
+                // Das sagt Supabase: Schicke Mail und leite den Nutzer wieder auf die aktuelle Seite zurück!
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + window.location.pathname
+                });
+                if (error) throw error;
+                showToast('Link gesendet! Bitte Mails prüfen. 📧');
+                showLogin();
+            } catch (error) {
+                console.error('Reset error:', error);
+                showToast('Fehler: E-Mail nicht gefunden.');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Link anfordern';
+            }
+        }
+
+        // Neues Passwort speichern
+        async function handleUpdatePassword() {
+            const newPassword = document.getElementById('newPasswordInput').value;
+            if (newPassword.length < 6) return showToast('Mindestens 6 Zeichen!');
+            
+            const btn = document.getElementById('saveNewPasswordBtn');
+            btn.disabled = true; btn.textContent = 'Speichert...';
+
+            try {
+                const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+                if (error) throw error;
+                
+                showToast('Passwort erfolgreich geändert! 🔐');
+                await supabaseClient.auth.signOut(); // Nutzer sicherheitshalber ausloggen
+                showLogin(); // Zurück zum normalen Login
+            } catch (error) {
+                console.error('Update password error:', error);
+                showToast('Fehler beim Speichern.');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Passwort speichern';
+            }
         }
 
         function generateUserColor() {
@@ -3065,7 +3146,20 @@ function openPostModal(postId) {
             currentModalPostId = null;
         }
 	   
-// --- Start ---
+// --- Start & Auth Listener ---
+        
+        // Dieser Listener wartet darauf, ob jemand auf einen E-Mail-Link geklickt hat
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                // Zeige das Fenster "Neues Passwort vergeben" an
+                state.isAuthenticated = false;
+                document.getElementById('loginModal').style.display = 'flex';
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'none';
+                document.getElementById('forgotPasswordForm').style.display = 'none';
+                document.getElementById('updatePasswordForm').style.display = 'block';
+            }
+        });
         initApp();
         
         // --- PWA Service Worker Registrierung ---

@@ -1841,41 +1841,57 @@ async function renderProfile() {
 		
         // --- Actions ---
 
-// --- Notifications Logik ---
+/// --- Notifications Logik (Mit Diagnose) ---
         async function sendNotification(targetUserId, type, postId = null) {
-            // 1. Sich selbst nicht benachrichtigen!
-            if (targetUserId === state.currentUser.id) return;
+            console.log(`🔔 Versuche Benachrichtigung zu senden: Typ=${type}, An=${targetUserId}`);
+            
+            if (targetUserId === state.currentUser.id) {
+                console.log("🛑 Abbruch: Man kann sich nicht selbst benachrichtigen.");
+                return;
+            }
 
             try {
-                // 2. Spam-Schutz: Checken ob wir genau diesen Like/Follow schon geschickt haben
-                if (type === 'like' || type === 'follow') {
-                    const { data } = await supabaseClient.from('notifications')
-                        .select('id').match({ user_id: targetUserId, actor_id: state.currentUser.id, type: type, post_id: postId });
-                    if (data && data.length > 0) return; 
-                }
-
-                // 3. Ab in die Datenbank damit!
-                await supabaseClient.from('notifications').insert([{
+                const newNotif = {
                     user_id: targetUserId,
                     actor_id: state.currentUser.id,
                     type: type,
-                    post_id: postId
-                }]);
-            } catch(e) { console.error("Benachrichtigung fehlgeschlagen:", e); }
+                    post_id: postId || null
+                };
+                
+                console.log("📦 Sende Daten an Datenbank:", newNotif);
+
+                // Das .select() am Ende ist wichtig, damit Supabase uns eine Antwort zurückgibt
+                const { data, error } = await supabaseClient.from('notifications').insert([newNotif]).select();
+                
+                if (error) {
+                    console.error("❌ Supabase Schreib-Fehler:", error);
+                } else {
+                    console.log("✅ Benachrichtigung erfolgreich gespeichert!", data);
+                }
+            } catch(e) { 
+                console.error("❌ Schwerer Fehler in sendNotification:", e); 
+            }
         }
 
         async function loadNotifications() {
+            console.log("📥 Lade Benachrichtigungen für:", state.currentUser.username);
             try {
-                // Holt die Benachrichtigungen UND die Infos von dem, der es ausgelöst hat (actor)
                 const { data, error } = await supabaseClient.from('notifications')
-                    .select('*, actor:users!fk_notif_actor(username, display_name, avatar_url, user_color)')
+                    .select(`
+                        *,
+                        actor:users!fk_notif_actor(username, display_name, avatar_url, user_color)
+                    `)
                     .eq('user_id', state.currentUser.id)
                     .order('created_at', { ascending: false })
                     .limit(30);
                 
-                if (error) throw error;
+                if (error) {
+                    console.error("❌ Supabase Lese-Fehler:", error);
+                    return;
+                }
 
-                // Roten Punkt anzeigen, wenn es ungelesene gibt
+                console.log("✅ Benachrichtigungen gefunden:", data.length);
+
                 const hasUnread = data.some(n => !n.is_read);
                 document.getElementById('notificationDot').style.display = hasUnread ? 'block' : 'none';
 
@@ -1887,7 +1903,10 @@ async function renderProfile() {
 
                 list.innerHTML = data.map(n => {
                     const text = n.type === 'like' ? 'hat dein Foto gelikt ❤️' : n.type === 'comment' ? 'hat kommentiert 💬' : 'folgt dir jetzt 👤';
-                    // Klick: Entweder Foto öffnen oder Profil öffnen
+                    
+                    // Sicherheitscheck: Falls der Nutzer zwischendurch gelöscht wurde
+                    if (!n.actor) return ''; 
+
                     const clickAction = n.post_id ? `openPostModal('${n.post_id}')` : `viewUserProfile('${escapeHTML(n.actor.username)}')`;
                     
                     return `
@@ -1902,20 +1921,27 @@ async function renderProfile() {
                     </div>`;
                 }).join('');
 
-            } catch (error) { console.error("Fehler beim Laden der Notifications:", error); }
+            } catch (error) { 
+                console.error("❌ JavaScript Fehler beim Laden:", error); 
+            }
         }
 
         async function openNotifications() {
             document.getElementById('notificationsModal').classList.add('open');
-            document.getElementById('notificationDot').style.display = 'none'; // Punkt sofort ausblenden
+            document.getElementById('notificationDot').style.display = 'none'; 
             
-            // In der Datenbank alle als "gelesen" markieren (passiert unsichtbar im Hintergrund)
-            supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', state.currentUser.id).eq('is_read', false).then();
+            // Auf 'Gelesen' setzen
+            try {
+                await supabaseClient.from('notifications')
+                    .update({ is_read: true })
+                    .eq('user_id', state.currentUser.id)
+                    .eq('is_read', false);
+            } catch(e) {}
         }
 
         function closeNotifications() {
             document.getElementById('notificationsModal').classList.remove('open');
-            loadNotifications(); // Liste updaten, damit graue Hintergründe verschwinden
+            loadNotifications(); 
         }
 
 // --- Fremdes Profil anzeigen ---

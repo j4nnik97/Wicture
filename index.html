@@ -1330,7 +1330,7 @@ function getWeekLabel(timestamp) {
             const myPosts = state.posts.filter(p =>
                 p.user.username === state.currentUser.username && p.timestamp >= weekStart
             );
-            state.weeklyPostDone = myPosts.length > 1;
+            state.weeklyPostDone = myPosts.length > 0;
             if (state.weeklyPostDone) {
                 state.lastPostTimestamp = myPosts[0].timestamp;
                 state.nextPostAvailable = getEndOfCurrentWeek();

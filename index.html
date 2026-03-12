@@ -2904,6 +2904,11 @@ async function editPost(postId) {
             if (!username || !displayName || !email || !password) return showToast('Bitte alle Felder ausfüllen');
             if (password.length < 6) return showToast('Passwort muss mindestens 6 Zeichen haben');
 
+			const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/;
+            if (!usernameRegex.test(username)) {
+                return showToast('Benutzername: 3-15 Zeichen, nur Buchstaben, Zahlen & Unterstrich erlaubt!');
+            }
+			
             showToast('Konto wird erstellt...');
 
             try {

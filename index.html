@@ -1183,7 +1183,7 @@
                 </div>
                 <div style="margin-bottom: 8px;">
                     <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <div style="text-align: right; margin-bottom: 20px;">
                     <span onclick="showForgotPassword()" style="font-size: 12px; color: var(--color-primary); cursor: pointer; font-weight: 500;">Passwort vergessen?</span>
@@ -1207,7 +1207,7 @@
                 </div>
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
-                    <input type="password" id="signupPassword" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                    <input type="password" id="signupPassword" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <button onclick="handleSignup()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Konto erstellen</button>
                 <button onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Zurück zur Anmeldung</button>
@@ -1227,7 +1227,7 @@
                 <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.4;">Erstelle jetzt ein neues Passwort für deinen Account.</p>
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Neues Passwort</label>
-                    <input type="password" id="newPasswordInput" placeholder="••••••••" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                    <input type="password" id="newPasswordInput" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <button id="saveNewPasswordBtn" onclick="handleUpdatePassword()" class="btn btn-primary" style="width: 100%;">Passwort speichern</button>
             </div>
@@ -1346,13 +1346,6 @@ function getWeekLabel(timestamp) {
     const weekNum = getWeekNumber(date);
     return 'Woche ' + weekNum + ', ' + date.getFullYear();
 }
-		
-        function getISOWeek(date) {
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-        }
 
         function getStartOfCurrentWeek() {
             const now = new Date();
@@ -1366,6 +1359,7 @@ function getWeekLabel(timestamp) {
         }
 
         function checkWeeklyLimit() {
+            if (!state.currentUser) return;
             const weekStart = getStartOfCurrentWeek();
             const myPosts = state.posts.filter(p =>
                 p.user.username === state.currentUser.username && p.timestamp >= weekStart
@@ -1887,7 +1881,6 @@ async function renderProfile() {
             console.log(`🔔 Versuche Benachrichtigung zu senden: Typ=${type}, An=${targetUserId}`);
             
             if (targetUserId === state.currentUser.id) {
-                console.log("🛑 Abbruch: Man kann sich nicht selbst benachrichtigen.");
                 return;
             }
 
@@ -1899,7 +1892,6 @@ async function renderProfile() {
                     post_id: postId || null
                 };
                 
-                console.log("📦 Sende Daten an Datenbank:", newNotif);
 
                 // Das .select() am Ende ist wichtig, damit Supabase uns eine Antwort zurückgibt
                 const { error } = await supabaseClient.from('notifications').insert([newNotif]);
@@ -1907,15 +1899,13 @@ async function renderProfile() {
                 if (error) {
                     console.error("❌ Supabase Schreib-Fehler:", error);
                 } else {
-                    console.log("✅ Benachrichtigung erfolgreich abgeschickt!");
-                }
+                    }
             } catch(e) { 
                 console.error("❌ Schwerer Fehler in sendNotification:", e); 
             }
         }
 
         async function loadNotifications() {
-            console.log("📥 Lade Benachrichtigungen für:", state.currentUser.username);
             try {
                 const { data, error } = await supabaseClient.from('notifications')
                     .select(`
@@ -1931,7 +1921,6 @@ async function renderProfile() {
                     return;
                 }
 
-                console.log("✅ Benachrichtigungen gefunden:", data.length);
 
                 const hasUnread = data.some(n => !n.is_read);
                 document.getElementById('notificationDot').style.display = hasUnread ? 'block' : 'none';
@@ -1948,7 +1937,7 @@ async function renderProfile() {
                     // Sicherheitscheck: Falls der Nutzer zwischendurch gelöscht wurde
                     if (!n.actor) return ''; 
 
-                    const clickAction = n.post_id ? `openPostModal('${n.post_id}')` : `viewUserProfile('${escapeHTML(n.actor.username)}')`;
+                    const clickAction = n.post_id ? `openPostModal('${escapeHTML(String(n.post_id))}')` : `viewUserProfile('${escapeHTML(n.actor.username)}')`;
                     
                     return `
                     <div class="search-result-item" style="${n.is_read ? 'opacity: 0.7;' : 'background: rgba(33, 128, 141, 0.05); padding: 12px 8px; border-radius: 8px;'}" onclick="closeNotifications(); ${clickAction}">
@@ -2132,7 +2121,7 @@ async function viewUserProfile(username) {
 					sendNotification(targetUserId, 'follow', null);
                 }
             } catch (error) {
-                console.error("Follow error:", error);
+                console.error("Fehler beim Folgen:", error);
                 // Bei Fehler alles wieder zurücksetzen
                 if (isFollowing) state.following.add(targetUserId);
                 else state.following.delete(targetUserId);
@@ -2210,6 +2199,7 @@ async function toggleLike(postId) {
                 previewImg.src = selectedImageDataUrl;
                 preview.classList.add('active');
             };
+            reader.onerror = () => showToast('Bild konnte nicht gelesen werden.');
             reader.readAsDataURL(file);
             e.target.value = '';
         }
@@ -2309,7 +2299,14 @@ async function toggleLike(postId) {
                 const finalImageUrl = publicUrlData.publicUrl;
 
                 // 5. Post in der Datenbank speichern
-                const caption = document.getElementById('captionInput').value.trim() || 'Mein Wochenfoto 📸';
+                const rawCaption = document.getElementById('captionInput').value.trim();
+                if (rawCaption.length > 300) {
+                    showToast('Bildunterschrift darf max. 300 Zeichen lang sein.');
+                    postBtn.disabled = false;
+                    postBtn.textContent = 'Posten';
+                    return;
+                }
+                const caption = rawCaption || 'Mein Wochenfoto 📸';
 
                 const newPost = {
                     id: 'post_' + Date.now(), // Temporäre ID für Supabase (wird beim Neuladen durch UUID ersetzt)
@@ -2338,7 +2335,7 @@ async function toggleLike(postId) {
                 showToast('Wochenfoto gepostet! 🎉');
                 switchView('feed');
             } catch (error) {
-                console.error("Upload Fehler:", error);
+                console.error("Fehler beim Upload:", error);
                 showToast('Fehler beim Posten. Versuche es erneut.');
                 postBtn.disabled = false;
                 postBtn.textContent = 'Posten';
@@ -2459,7 +2456,7 @@ async function loadPostsFromSupabase() {
         renderWeeklyBanner();
         renderFeed();
     } catch (error) {
-        console.error('Failed to load posts:', error);
+        console.error('Fehler beim Laden der Posts:', error);
         showToast('Fehler beim Laden der Posts');
     }
 }
@@ -2491,7 +2488,7 @@ async function savePostToSupabase(post) {
 
                 if (error) throw error;
             } catch (error) {
-                console.error('Failed to save post:', error);
+                console.error('Fehler beim Speichern des Posts:', error);
                 throw error;
             }
         }
@@ -2873,7 +2870,7 @@ async function editPost(postId) {
                 showToast('Link gesendet! Bitte Mails prüfen. 📧');
                 showLogin();
             } catch (error) {
-                console.error('Reset error:', error);
+                console.error('Fehler beim Passwort-Reset:', error);
                 showToast('Fehler: E-Mail nicht gefunden.');
             } finally {
                 btn.disabled = false; btn.textContent = 'Link anfordern';
@@ -2902,7 +2899,7 @@ async function editPost(postId) {
                 }, 1500);
 
             } catch (error) {
-                console.error('Update password error:', error);
+                console.error('Fehler beim Passwort-Aktualisieren:', error);
                 showToast('Fehler beim Speichern.');
                 btn.disabled = false; btn.textContent = 'Passwort speichern';
             }
@@ -2945,7 +2942,7 @@ async function editPost(postId) {
                 await loadPostsFromSupabase();
                 showToast('Willkommen zurück! 👋');
             } catch (error) {
-                console.error('Login error:', error);
+                console.error('Fehler beim Login:', error);
                 showToast('Fehler beim Anmelden.');
             }
         }
@@ -3000,7 +2997,7 @@ async function editPost(postId) {
                 await loadPostsFromSupabase();
                 showToast('Konto erfolgreich erstellt! 🎉');
             } catch (error) {
-                console.error('Signup error:', error);
+                console.error('Fehler beim Registrieren:', error);
                 showToast('Fehler beim Registrieren.');
             }
         }
@@ -3369,8 +3366,7 @@ function openPostModal(postId) {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then((reg) => console.log('Service Worker registriert.', reg.scope))
-                    .catch((err) => console.log('Service Worker Fehler:', err));
+                                .catch((err) => console.error('Service Worker Fehler:', err));
             });
         }
     </script>

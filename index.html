@@ -1279,6 +1279,46 @@
 			focusedPostId: null
         };
 
+// --- History API (Android "Zurück" Button) ---
+        window.addEventListener('popstate', function(event) {
+            // Wenn der Nutzer "Zurück" drückt, schauen wir, was offen ist.
+
+            // 1. Sind Modals/Popups offen? Dann schließe diese zuerst!
+            if (document.getElementById('commentsModal').classList.contains('open')) {
+                closeComments();
+                return;
+            }
+            if (document.getElementById('postModal').classList.contains('open')) {
+                closePostModal();
+                return;
+            }
+            if (document.getElementById('usersModal').classList.contains('open')) {
+                closeUsersModal();
+                return;
+            }
+            if (document.getElementById('searchModal').classList.contains('open')) {
+                closeSearch();
+                return;
+            }
+            if (document.getElementById('notificationsModal').classList.contains('open')) {
+                closeNotifications();
+                return;
+            }
+            if (document.getElementById('editProfileModal').style.display === 'flex') {
+                closeEditProfileModal();
+                return;
+            }
+
+            // 2. Wenn keine Modals offen sind, wechsle die Hauptansicht
+            if (event.state && event.state.view) {
+                // Wir springen zu der Ansicht, die im Brotkrümel gespeichert ist
+                switchView(event.state.view, false); 
+            } else {
+                // Wenn wir ganz am Anfang sind, zeige den Feed
+                switchView('feed', false);
+            }
+        });
+
 // Diese Funktion muss ALLEINE stehen
 function getWeekNumber(d) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1938,6 +1978,8 @@ async function renderProfile() {
                     .eq('user_id', state.currentUser.id)
                     .eq('is_read', false);
             } catch(e) {}
+			
+			history.pushState({ modal: 'open' }, '', '');
         }
 
         function closeNotifications() {
@@ -2058,6 +2100,7 @@ async function viewUserProfile(username) {
                 console.error('Fehler beim Laden des Profils:', error);
                 content.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--color-error);">Fehler beim Laden des Profils.</div>';
             }
+			history.pushState({ modal: 'open' }, '', '');
         }
 		
 		// NEU: Funktion zum Folgen / Entfolgen
@@ -2311,8 +2354,17 @@ async function toggleLike(postId) {
 
         // --- Navigation ---
 
-        function switchView(viewName) {
+			function switchView(viewName, pushState = true) {
             state.currentView = viewName;
+
+            // Brotkrümel für die History API legen (falls gewünscht)
+            if (pushState) {
+                // Wenn wir schon auf der Seite sind, keinen neuen Krümel legen (vermeidet doppelte Einträge)
+                const currentUrl = new URL(window.location);
+                if (currentUrl.hash !== `#${viewName}`) {
+                    history.pushState({ view: viewName }, '', `#${viewName}`);
+                }
+            }
 
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
@@ -2466,6 +2518,8 @@ async function savePostToSupabase(post) {
                 console.error("Fehler beim Laden der Kommentare:", error);
                 list.innerHTML = '<div style="text-align: center; color: var(--color-error); padding: 40px 20px;">Fehler beim Laden.</div>';
             }
+			
+			history.pushState({ modal: 'open' }, '', '');
         }
 
         function closeComments() {
@@ -2603,6 +2657,7 @@ function renderComments(comments) {
             }
 
             modal.style.display = 'flex';
+			history.pushState({ modal: 'open' }, '', '');
         }
 
         function closeEditProfileModal() {
@@ -2998,6 +3053,7 @@ async function editPost(postId) {
                     hideLoginModal();
                     await loadPostsFromSupabase();
 					await loadNotifications();
+					history.replaceState({ view: 'feed' }, '', '#feed');
                     return; 
                 } catch (e) {
                     console.error("Profil konnte nicht geladen werden:", e);
@@ -3016,6 +3072,7 @@ async function editPost(postId) {
         function openSearch() {
             document.getElementById('searchModal').classList.add('open');
             setTimeout(() => document.getElementById('searchInput').focus(), 100);
+			history.pushState({ modal: 'open' }, '', '');
         }
 
         function closeSearch() {
@@ -3137,6 +3194,7 @@ async function editPost(postId) {
                 console.error("Fehler beim Laden der Liste:", error);
                 listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-error);">Fehler beim Laden.</div>';
             }
+			history.pushState({ modal: 'open' }, '', '');
         }
        
 	   async function openLikesList(postId) {
@@ -3177,6 +3235,7 @@ async function editPost(postId) {
                 console.error("Fehler beim Laden der Likes:", error);
                 listContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--color-error);">Fehler beim Laden.</div>';
             }
+			history.pushState({ modal: 'open' }, '', '');
         }
 	   
 	   // --- Einzelnen Beitrag als Modal anzeigen ---
@@ -3281,6 +3340,8 @@ function openPostModal(postId) {
     `;
     
     document.getElementById('postModal').classList.add('open');
+	
+	history.pushState({ modal: 'open' }, '', '');
 }
 
         function closePostModal() {

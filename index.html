@@ -1149,12 +1149,11 @@
             </div>
 
             <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
-                <input type="text" id="editDisplayName" style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
+                <label for="editDisplayName" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
             </div>
 
             <div style="margin-bottom: 24px;">
-                <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Biografie</label>
+                <label for="editBio" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Biografie</label>
                 <textarea id="editBio" rows="3" placeholder="Erzähl etwas über dich..." style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text); resize: none;"></textarea>
             </div>
 
@@ -1178,11 +1177,11 @@
             
             <div id="loginForm">
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
+                    <label for="loginEmail" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
                     <input type="email" id="loginEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <div style="margin-bottom: 8px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
+                    <label for="loginPassword" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
                     <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <div style="text-align: right; margin-bottom: 20px;">
@@ -1194,19 +1193,19 @@
 
             <div id="signupForm" style="display: none;">
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Benutzername</label>
+                    <label for="signupUsername" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Benutzername</label>
                     <input type="text" id="signupUsername" placeholder="deinname" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
+                    <label for="signupDisplayName" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
                     <input type="text" id="signupDisplayName" placeholder="Dein Name" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
+                    <label for="signupEmail" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
                     <input type="email" id="signupEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
+                    <label for="signupPassword" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Passwort</label>
                     <input type="password" id="signupPassword" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <button onclick="handleSignup()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Konto erstellen</button>
@@ -1216,7 +1215,7 @@
             <div id="forgotPasswordForm" style="display: none;">
                 <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.4;">Gib deine E-Mail-Adresse ein. Wir senden dir einen Link, um dein Passwort zurückzusetzen.</p>
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
+                    <label for="resetEmail" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">E-Mail</label>
                     <input type="email" id="resetEmail" placeholder="deine@email.de" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <button id="sendResetBtn" onclick="handleSendResetLink()" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Link anfordern</button>
@@ -1226,7 +1225,7 @@
             <div id="updatePasswordForm" style="display: none;">
                 <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 16px; line-height: 1.4;">Erstelle jetzt ein neues Passwort für deinen Account.</p>
                 <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Neues Passwort</label>
+                    <label for="newPasswordInput" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Neues Passwort</label>
                     <input type="password" id="newPasswordInput" placeholder="••••••••" autocomplete="new-password" style="width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-size: 14px; font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
                 </div>
                 <button id="saveNewPasswordBtn" onclick="handleUpdatePassword()" class="btn btn-primary" style="width: 100%;">Passwort speichern</button>
@@ -2515,7 +2514,7 @@ async function savePostToSupabase(post) {
                 // Hole alle Kommentare für diesen Post aus Supabase
                 const { data, error } = await supabaseClient
                     .from('comments')
-                    .select('*')
+                    .select('id, username, display_name, user_color, avatar_url, content, created_at, user_id')
                     .eq('post_id', postId)
                     .order('created_at', { ascending: true }); // Älteste oben, Neueste unten
                 
@@ -2678,7 +2677,7 @@ function renderComments(comments) {
             
             const reader = new FileReader();
             reader.onload = e => {
-                document.getElementById('editAvatarPreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                document.getElementById('editAvatarPreview').innerHTML = `<img src="${e.target.result}" alt="Profilbild Vorschau" style="width: 100%; height: 100%; object-fit: cover;">`;
             };
             reader.readAsDataURL(file);
         }
@@ -2741,13 +2740,14 @@ function renderComments(comments) {
                 if (postUpdateError) console.error('Fehler beim Aktualisieren der alten Posts', postUpdateError);
 
 				// Aktualisiert das Bild und den Namen auch auf all deinen alten Kommentaren!
-                await supabaseClient
+                const { error: commentUpdateError } = await supabaseClient
                     .from('comments')
                     .update({ 
                         display_name: newName,
                         avatar_url: avatarUrl 
                     })
                     .eq('user_id', state.currentUser.id);
+                if (commentUpdateError) console.error('Fehler beim Aktualisieren der Kommentare:', commentUpdateError);
 
                 // 4. Lokalen State aktualisieren
                 state.currentUser.displayName = newName;
@@ -2935,7 +2935,7 @@ async function editPost(postId) {
 
                 const { data: userProfile, error: userError } = await supabaseClient
                     .from('users')
-                    .select('*')
+                    .select('id, username, display_name, user_color, avatar_url, bio')
                     .eq('user_id', authData.user.id)
                     .single();
                 if (userError) throw userError;
@@ -3045,7 +3045,7 @@ async function editPost(postId) {
                 try {
                     const { data: userProfile, error: profileError } = await supabaseClient
                         .from('users')
-                        .select('*')
+                        .select('id, username, display_name, user_color, avatar_url, bio')
                         .eq('user_id', session.user.id)
                         .single();
                         
@@ -3184,7 +3184,7 @@ async function editPost(postId) {
                 }
 
                 // Hole die Profil-Infos der gefundenen Nutzer
-                const { data: users, error } = await supabaseClient.from('users').select('*').in('id', targetUserIds);
+                const { data: users, error } = await supabaseClient.from('users').select('id, username, display_name, user_color, avatar_url').in('id', targetUserIds);
                 if (error) throw error;
 
                 // Rendere die Liste (mit Klick aufs Profil!)
@@ -3227,7 +3227,7 @@ async function editPost(postId) {
 
                 // Hole die Profil-Infos
                 const userIds = likes.map(l => l.user_id);
-                const { data: users, error: usersError } = await supabaseClient.from('users').select('*').in('id', userIds);
+                const { data: users, error: usersError } = await supabaseClient.from('users').select('id, username, display_name, user_color, avatar_url').in('id', userIds);
                 if (usersError) throw usersError;
 
                 // Liste rendern

@@ -1279,6 +1279,16 @@
 			focusedPostId: null
         };
 
+        // === Konstanten ===
+        const MS_PER_MINUTE = 60000;
+        const MS_PER_HOUR   = 3600000;
+        const MS_PER_DAY    = 86400000;
+        const MS_PER_WEEK   = 7 * MS_PER_DAY;
+        const IMG_MAX_PX    = 2160;
+        const IMG_QUALITY   = 0.95;
+        const CAPTION_MAX   = 300;
+        const DISPLAY_NAME_MAX = 40;
+
 // --- History API (Android "Zurück" Button) ---
         window.addEventListener('popstate', function(event) {
             // Wenn der Nutzer "Zurück" drückt, schauen wir, was offen ist.
@@ -1324,7 +1334,7 @@ function getWeekNumber(d) {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    var weekNo = Math.ceil((((d - yearStart) / MS_PER_DAY) + 1) / 7);
     return weekNo;
 }
 
@@ -1341,7 +1351,7 @@ function getWeekLabel(timestamp) {
     const postWeekStart = startOfWeek(date).getTime();
 
     if (postWeekStart === currentWeekStart) return 'Diese Woche';
-    if (postWeekStart === currentWeekStart - 7 * 24 * 60 * 60 * 1000) return 'Letzte Woche';
+    if (postWeekStart === currentWeekStart - MS_PER_WEEK) return 'Letzte Woche';
 
     const weekNum = getWeekNumber(date);
     return 'Woche ' + weekNum + ', ' + date.getFullYear();
@@ -1355,7 +1365,7 @@ function getWeekLabel(timestamp) {
         }
 
         function getEndOfCurrentWeek() {
-            return getStartOfCurrentWeek() + 7 * 24 * 60 * 60 * 1000;
+            return getStartOfCurrentWeek() + MS_PER_WEEK;
         }
 
         function checkWeeklyLimit() {
@@ -1373,9 +1383,9 @@ function getWeekLabel(timestamp) {
 
         function timeAgo(ts) {
             const diff = Date.now() - ts;
-            const mins = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            const days = Math.floor(diff / 86400000);
+            const mins = Math.floor(diff / MS_PER_MINUTE);
+            const hours = Math.floor(diff / MS_PER_HOUR);
+            const days = Math.floor(diff / MS_PER_DAY);
             if (mins < 1) return 'Gerade eben';
             if (mins < 60) return mins + ' Min.';
             if (hours < 24) return hours + ' Std.';
@@ -1386,10 +1396,10 @@ function getWeekLabel(timestamp) {
         function formatCountdown(targetTs) {
             const diff = targetTs - Date.now();
             if (diff <= 0) return 'Jetzt verfügbar!';
-            const days = Math.floor(diff / 86400000);
-            const hours = Math.floor((diff % 86400000) / 3600000);
+            const days = Math.floor(diff / MS_PER_DAY);
+            const hours = Math.floor((diff % MS_PER_DAY) / 3600000);
             if (days > 0) return days + 'T ' + hours + 'Std';
-            const mins = Math.floor((diff % 3600000) / 60000);
+            const mins = Math.floor((diff % MS_PER_HOUR) / 60000);
             return hours + 'Std ' + mins + 'Min';
         }
 
@@ -1538,7 +1548,7 @@ function renderFeed() {
                             <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" onclick="viewUserProfile('${escapeHTML(post.user.username)}')">
                                 <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color}; overflow: hidden;">
                                     ${post.user.avatarUrl 
-                                        ? `<img src="${escapeHTML(post.user.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                        ? `<img src="${escapeHTML(post.user.avatarUrl)}" alt="Avatar von ${escapeHTML(post.user.username)}" style="width: 100%; height: 100%; object-fit: cover;">` 
                                         : escapeHTML(post.user.displayName).charAt(0).toUpperCase()}
                                 </div>
                                 <div class="post-user-info">
@@ -1692,7 +1702,7 @@ function openPostModal(postId) {
                 <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" onclick="closePostModal(); viewUserProfile('${escapeHTML(post.user.username)}')">
                     <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color}; overflow: hidden;">
                         ${post.user.avatarUrl 
-                            ? `<img src="${escapeHTML(post.user.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                            ? `<img src="${escapeHTML(post.user.avatarUrl)}" alt="Avatar von ${escapeHTML(post.user.username)}" style="width: 100%; height: 100%; object-fit: cover;">` 
                             : escapeHTML(post.user.displayName).charAt(0).toUpperCase()}
                     </div>
                     <div class="post-user-info">
@@ -1797,7 +1807,7 @@ async function renderProfile() {
                     <div class="profile-header">
                         <div class="profile-avatar" style="background: ${state.currentUser.color}22; color: ${state.currentUser.color}; overflow: hidden;">
                             ${state.currentUser.avatarUrl 
-                                ? `<img src="${escapeHTML(state.currentUser.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                ? `<img src="${escapeHTML(state.currentUser.avatarUrl)}" alt="Dein Profilbild" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(state.currentUser.displayName).charAt(0).toUpperCase()}
                         </div>
                         <div class="profile-stats">
@@ -1942,7 +1952,7 @@ async function renderProfile() {
                     return `
                     <div class="search-result-item" style="${n.is_read ? 'opacity: 0.7;' : 'background: rgba(33, 128, 141, 0.05); padding: 12px 8px; border-radius: 8px;'}" onclick="closeNotifications(); ${clickAction}">
                         <div class="avatar" style="background: ${n.actor.user_color}22; color: ${n.actor.user_color}; overflow: hidden;">
-                            ${n.actor.avatar_url ? `<img src="${escapeHTML(n.actor.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` : escapeHTML(n.actor.display_name).charAt(0).toUpperCase()}
+                            ${n.actor.avatar_url ? `<img src="${escapeHTML(n.actor.avatar_url)}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">` : escapeHTML(n.actor.display_name).charAt(0).toUpperCase()}
                         </div>
                         <div style="flex: 1; font-size: 13px; line-height: 1.4;">
                             <strong>${escapeHTML(n.actor.username)}</strong> ${text}
@@ -1995,7 +2005,7 @@ async function viewUserProfile(username) {
             try {
                 const { data: userProfile, error } = await supabaseClient
                     .from('users')
-                    .select('*')
+                    .select('id, username, display_name, user_color, avatar_url, bio')
                     .eq('username', username)
                     .single();
 
@@ -2023,7 +2033,7 @@ async function viewUserProfile(username) {
                     <div class="profile-header">
                         <div class="profile-avatar" style="background: ${userProfile.user_color}22; color: ${userProfile.user_color}; overflow: hidden;">
                             ${userProfile.avatar_url 
-                                ? `<img src="${escapeHTML(userProfile.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                ? `<img src="${escapeHTML(userProfile.avatar_url)}" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(userProfile.display_name).charAt(0).toUpperCase()}
                         </div>
                         <div class="profile-stats">
@@ -2276,7 +2286,7 @@ async function toggleLike(postId) {
 
             try {
                 // 1. NEU: Bild in voller Pracht, aber komprimiert (2160px, 95% Qualität)
-                const compressedFile = await compressImage(selectedFile, 2160, 2160, 0.95);
+                const compressedFile = await compressImage(selectedFile, IMG_MAX_PX, IMG_MAX_PX, IMG_QUALITY);
 
                 // 2. Eindeutigen Dateinamen generieren (jetzt immer .jpg)
                 const fileName = `${state.currentUser.username}_${Date.now()}.jpg`;
@@ -2300,8 +2310,8 @@ async function toggleLike(postId) {
 
                 // 5. Post in der Datenbank speichern
                 const rawCaption = document.getElementById('captionInput').value.trim();
-                if (rawCaption.length > 300) {
-                    showToast('Bildunterschrift darf max. 300 Zeichen lang sein.');
+                if (rawCaption.length > CAPTION_MAX) {
+                    showToast(`Bildunterschrift darf max. ${CAPTION_MAX} Zeichen lang sein.`);
                     postBtn.disabled = false;
                     postBtn.textContent = 'Posten';
                     return;
@@ -2535,7 +2545,7 @@ function renderComments(comments) {
                 <div class="comment-item" style="position: relative; padding-right: 30px;">
                     <div class="comment-avatar" style="background: ${c.user_color}22; color: ${c.user_color}; overflow: hidden;">
                         ${c.avatar_url 
-                            ? `<img src="${escapeHTML(c.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                            ? `<img src="${escapeHTML(c.avatar_url)}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">` 
                             : escapeHTML(c.display_name).charAt(0).toUpperCase()}
                     </div>
                     <div class="comment-content">
@@ -2648,7 +2658,7 @@ function renderComments(comments) {
             preview.style.background = `${state.currentUser.color}22`;
             preview.style.color = state.currentUser.color;
             if (state.currentUser.avatarUrl) {
-                preview.innerHTML = `<img src="${state.currentUser.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                preview.innerHTML = `<img src="${escapeHTML(state.currentUser.avatarUrl)}" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;">`;
             } else {
                 preview.innerHTML = state.currentUser.displayName.charAt(0).toUpperCase();
             }
@@ -2676,6 +2686,9 @@ function renderComments(comments) {
         async function saveProfile() {
             const btn = document.getElementById('saveProfileBtn');
             const newName = document.getElementById('editDisplayName').value.trim();
+            if (newName.length < 2 || newName.length > DISPLAY_NAME_MAX) {
+                return showToast(`Anzeigename: 2–${DISPLAY_NAME_MAX} Zeichen.`);
+            }
             const newBio = document.getElementById('editBio').value.trim();
 
             if (!newName) return showToast('Anzeigename darf nicht leer sein');
@@ -3007,7 +3020,9 @@ async function editPost(postId) {
                 await supabaseClient.auth.signOut();
                 state.currentUser = null;
                 state.isAuthenticated = false;
-                state.posts = []; 
+                state.posts = [];
+                state.following = new Set();
+                state.focusedPostId = null;
                 state.weeklyPostDone = false;
                 document.getElementById('feedContainer').innerHTML = '';
                 document.getElementById('profileContent').innerHTML = '';
@@ -3123,7 +3138,7 @@ async function editPost(postId) {
                     <div class="search-result-item" onclick="closeSearch(); viewUserProfile('${escapeHTML(user.username)}')">
                         <div class="avatar" style="background: ${user.user_color}22; color: ${user.user_color}; overflow: hidden;">
                             ${user.avatar_url 
-                                ? `<img src="${escapeHTML(user.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                ? `<img src="${escapeHTML(user.avatar_url)}" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(user.display_name).charAt(0).toUpperCase()}
                         </div>
                         <div style="flex: 1;">
@@ -3177,7 +3192,7 @@ async function editPost(postId) {
                     <div class="search-result-item" onclick="closeUsersModal(); viewUserProfile('${escapeHTML(user.username)}')">
                         <div class="avatar" style="background: ${user.user_color}22; color: ${user.user_color}; overflow: hidden;">
                             ${user.avatar_url 
-                                ? `<img src="${escapeHTML(user.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                                ? `<img src="${escapeHTML(user.avatar_url)}" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;">` 
                                 : escapeHTML(user.display_name).charAt(0).toUpperCase()}
                         </div>
                         <div style="flex: 1;">
@@ -3219,7 +3234,7 @@ async function editPost(postId) {
                 listContainer.innerHTML = users.map(user => `
                     <div class="search-result-item" onclick="closeUsersModal(); viewUserProfile('${escapeHTML(user.username)}')">
                         <div class="avatar" style="background: ${user.user_color}22; color: ${user.user_color}; overflow: hidden;">
-                            ${user.avatar_url ? `<img src="${escapeHTML(user.avatar_url)}" style="width: 100%; height: 100%; object-fit: cover;">` : escapeHTML(user.display_name).charAt(0).toUpperCase()}
+                            ${user.avatar_url ? `<img src="${escapeHTML(user.avatar_url)}" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;">` : escapeHTML(user.display_name).charAt(0).toUpperCase()}
                         </div>
                         <div style="flex: 1;">
                             <div style="font-weight: 600; font-size: 14px;">${escapeHTML(user.display_name)}</div>
@@ -3251,7 +3266,7 @@ function openPostModal(postId) {
                 <div style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1;" onclick="closePostModal(); viewUserProfile('${escapeHTML(post.user.username)}')">
                     <div class="avatar" style="background: ${post.user.color}22; color: ${post.user.color}; overflow: hidden;">
                         ${post.user.avatarUrl 
-                            ? `<img src="${escapeHTML(post.user.avatarUrl)}" style="width: 100%; height: 100%; object-fit: cover;">` 
+                            ? `<img src="${escapeHTML(post.user.avatarUrl)}" alt="Avatar von ${escapeHTML(post.user.username)}" style="width: 100%; height: 100%; object-fit: cover;">` 
                             : escapeHTML(post.user.displayName).charAt(0).toUpperCase()}
                     </div>
                     <div class="post-user-info">

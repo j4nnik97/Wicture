@@ -1150,6 +1150,7 @@
 
             <div style="margin-bottom: 16px;">
                 <label for="editDisplayName" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;">Anzeigename</label>
+                <input type="text" id="editDisplayName" style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-family: var(--font-family-base); background: var(--color-background); color: var(--color-text);">
             </div>
 
             <div style="margin-bottom: 24px;">
@@ -1161,6 +1162,26 @@
         </div>
     </div>
 
+
+    <!-- Edit Caption Modal -->
+    <div id="editCaptionModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: 24px; max-width: 400px; width: 100%; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 18px; font-weight: 600;">Text bearbeiten</h2>
+                <button class="btn-icon" onclick="closeEditCaptionModal()" aria-label="Schließen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <textarea id="editCaptionInput" rows="4" maxlength="300" placeholder="Bildunterschrift..." style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-base); font-family: var(--font-family-base); font-size: 14px; background: var(--color-background); color: var(--color-text); resize: none; margin-bottom: 8px;"></textarea>
+            <div style="text-align: right; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 16px;">
+                <span id="editCaptionCounter">0</span>/300
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="closeEditCaptionModal()" class="btn btn-secondary" style="flex: 1;">Abbrechen</button>
+                <button id="saveEditCaptionBtn" onclick="saveEditCaption()" class="btn btn-primary" style="flex: 1;">Speichern</button>
+            </div>
+        </div>
+    </div>
     <div class="toast" id="toast"></div>
 
 <div id="loginModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
@@ -2770,40 +2791,56 @@ function renderComments(comments) {
             }
         }
 
-async function editPost(postId) {
-            // 1. Finde den aktuellen Post im lokalen State
+        let currentEditPostId = null;
+
+        function openEditCaptionModal(postId) {
             const post = state.posts.find(p => p.id === postId);
             if (!post) return;
+            currentEditPostId = postId;
+            const textarea = document.getElementById('editCaptionInput');
+            textarea.value = post.caption || '';
+            document.getElementById('editCaptionCounter').textContent = textarea.value.length;
+            textarea.oninput = () => {
+                document.getElementById('editCaptionCounter').textContent = textarea.value.length;
+            };
+            document.getElementById('editCaptionModal').style.display = 'flex';
+            setTimeout(() => textarea.focus(), 100);
+        }
 
-            // 2. Öffne ein Eingabefenster mit dem aktuellen Text
-            const newCaption = prompt('Bildunterschrift bearbeiten:', post.caption);
-            
-            // Wenn der Nutzer auf "Abbrechen" klickt oder den Text nicht ändert, mach nichts
-            if (newCaption === null || newCaption.trim() === post.caption) return;
+        function closeEditCaptionModal() {
+            document.getElementById('editCaptionModal').style.display = 'none';
+            currentEditPostId = null;
+        }
 
+        async function saveEditCaption() {
+            if (!currentEditPostId) return;
+            const newCaption = document.getElementById('editCaptionInput').value.trim();
+            const post = state.posts.find(p => p.id === currentEditPostId);
+            if (!post || newCaption === post.caption) { closeEditCaptionModal(); return; }
+            const btn = document.getElementById('saveEditCaptionBtn');
+            btn.disabled = true;
+            btn.textContent = 'Speichert...';
             try {
-                // 3. Neuen Text in Supabase speichern
                 const { error } = await supabaseClient
                     .from('posts')
-                    .update({ caption: newCaption.trim() })
-                    .eq('id', postId);
-
+                    .update({ caption: newCaption })
+                    .eq('id', currentEditPostId);
                 if (error) throw error;
-
                 showToast('Text erfolgreich geändert! ✏️');
-
-                // 4. Feed neu laden, damit die Änderung sofort sichtbar ist
+                closeEditCaptionModal();
                 await loadPostsFromSupabase();
-                
-                // Falls wir im Profil sind, auch das Profil neu zeichnen
-                if (state.currentView === 'profile') {
-                    renderProfile();
-                }
-
+                if (state.currentView === 'profile') renderProfile();
             } catch (error) {
                 console.error('Fehler beim Bearbeiten:', error);
                 showToast('Fehler beim Ändern des Textes.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Speichern';
             }
+        }
+
+        async function editPost(postId) {
+            openEditCaptionModal(postId);
         }
 		
 		async function deletePost(postId, imageUrl) {

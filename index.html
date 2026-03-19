@@ -1474,7 +1474,13 @@
                     ? `<img src="${escapeHTML(other.avatar_url)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
                     : escapeHTML(other.display_name || other.username).charAt(0).toUpperCase();
                 const timeStr = conv.last_message_at ? formatTime(new Date(conv.last_message_at)) : '';
-                return `<div class="conversation-item" onclick="openChat('${escapeHTML(conv.id)}', ${JSON.stringify({id: other.id, username: other.username, displayName: other.display_name, color: other.user_color, avatarUrl: other.avatar_url}).replace(/'/g, '&#39;')})">
+                return `<div class="conversation-item" data-chat-conv="${escapeHTML(conv.id)}"
+                    data-chat-uid="${other.id}"
+                    data-chat-user="${escapeHTML(other.username)}"
+                    data-chat-name="${escapeHTML(other.display_name || other.username)}"
+                    data-chat-color="${other.user_color}"
+                    data-chat-avatar="${escapeHTML(other.avatar_url || '')}"
+                    onclick="openChatFromBtn(this)">
                     <div class="conversation-avatar" style="background:${other.user_color}22; color:${other.user_color};">${avatarHtml}</div>
                     <div class="conversation-info">
                         <div class="conversation-name">${escapeHTML(other.display_name || other.username)}</div>
@@ -2051,7 +2057,13 @@ function renderFeed() {
                                 </svg>
                             </button>
                 ${post.user.id !== state.currentUser.id ? `
-                <button class="action-btn" onclick="startChat('${post.user.id}', '${escapeHTML(post.user.username)}', '${escapeHTML(post.user.displayName)}', '${post.user.color}', '${post.user.avatarUrl ? escapeHTML(post.user.avatarUrl) : ''}')">
+                <button class="action-btn"
+                    data-chat-uid="${post.user.id}"
+                    data-chat-user="${escapeHTML(post.user.username)}"
+                    data-chat-name="${escapeHTML(post.user.displayName)}"
+                    data-chat-color="${post.user.color}"
+                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
+                    onclick="startChatFromBtn(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
@@ -2213,7 +2225,13 @@ function openPostModal(postId) {
                     </svg>
                 </button>
                 ${post.user.id !== state.currentUser.id ? `
-                <button class="action-btn" onclick="startChat('${post.user.id}', '${escapeHTML(post.user.username)}', '${escapeHTML(post.user.displayName)}', '${post.user.color}', '${post.user.avatarUrl ? escapeHTML(post.user.avatarUrl) : ''}')">
+                <button class="action-btn"
+                    data-chat-uid="${post.user.id}"
+                    data-chat-user="${escapeHTML(post.user.username)}"
+                    data-chat-name="${escapeHTML(post.user.displayName)}"
+                    data-chat-color="${post.user.color}"
+                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
+                    onclick="startChatFromBtn(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
@@ -2521,7 +2539,12 @@ async function viewUserProfile(username) {
                             ${isFollowing ? 'Entfolgen' : 'Folgen'}
                         </button>
                 <button class="btn btn-secondary" style="width:100%; margin-top:8px; padding:6px 12px; font-size:13px;"
-                    onclick="startChat('${userProfile.id}', '${escapeHTML(userProfile.username)}', '${escapeHTML(userProfile.display_name)}', '${userProfile.user_color}', '${userProfile.avatar_url ? escapeHTML(userProfile.avatar_url) : \'\'}')">
+                    data-chat-uid="${userProfile.id}"
+                    data-chat-user="${escapeHTML(userProfile.username)}"
+                    data-chat-name="${escapeHTML(userProfile.display_name)}"
+                    data-chat-color="${userProfile.user_color}"
+                    data-chat-avatar="${escapeHTML(userProfile.avatar_url || '')}"
+                    onclick="startChatFromBtn(this)">
                     💬 Nachricht senden
                 </button>
                     </div>
@@ -3805,7 +3828,13 @@ function openPostModal(postId) {
                     </svg>
                 </button>
                 ${post.user.id !== state.currentUser.id ? `
-                <button class="action-btn" onclick="startChat('${post.user.id}', '${escapeHTML(post.user.username)}', '${escapeHTML(post.user.displayName)}', '${post.user.color}', '${post.user.avatarUrl ? escapeHTML(post.user.avatarUrl) : ''}')">
+                <button class="action-btn"
+                    data-chat-uid="${post.user.id}"
+                    data-chat-user="${escapeHTML(post.user.username)}"
+                    data-chat-name="${escapeHTML(post.user.displayName)}"
+                    data-chat-color="${post.user.color}"
+                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
+                    onclick="startChatFromBtn(this)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>

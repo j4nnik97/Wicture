@@ -1791,25 +1791,19 @@ function renderFeed() {
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                                 </svg>
                             </button>
-                \${post.user.id !== state.currentUser.id ? \`
+                ${post.user.id !== state.currentUser.id ? `
                 <button class="action-btn"
-                    data-chat-uid="\${post.user.id}"
-                    data-chat-user="\${escapeHTML(post.user.username)}"
-                    data-chat-name="\${escapeHTML(post.user.displayName)}"
-                    data-chat-color="\${post.user.color}"
-                    data-chat-avatar="\${escapeHTML(post.user.avatarUrl || '')}"
+                    data-chat-uid="${post.user.id}"
+                    data-chat-user="${escapeHTML(post.user.username)}"
+                    data-chat-name="${escapeHTML(post.user.displayName)}"
+                    data-chat-color="${post.user.color}"
+                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
                     onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"/>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
                 </button>\` : ''}
-                            <button class="action-btn" onclick="showToast('Link kopiert!')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="22" y1="2" x2="11" y2="13"/>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                                </svg>
-                            </button>
                         </div>
                         
                         <div class="like-count" onclick="openLikesList('${post.id}')" style="cursor: pointer;">${post.likes} Gefällt mir</div>
@@ -1960,13 +1954,13 @@ function openPostModal(postId) {
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
                 </button>
-                \${post.user.id !== state.currentUser.id ? \`
+                ${post.user.id !== state.currentUser.id ? `
                 <button class="action-btn"
-                    data-chat-uid="\${post.user.id}"
-                    data-chat-user="\${escapeHTML(post.user.username)}"
-                    data-chat-name="\${escapeHTML(post.user.displayName)}"
-                    data-chat-color="\${post.user.color}"
-                    data-chat-avatar="\${escapeHTML(post.user.avatarUrl || '')}"
+                    data-chat-uid="${post.user.id}"
+                    data-chat-user="${escapeHTML(post.user.username)}"
+                    data-chat-name="${escapeHTML(post.user.displayName)}"
+                    data-chat-color="${post.user.color}"
+                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
                     onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"/>
@@ -3563,13 +3557,13 @@ function openPostModal(postId) {
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
                 </button>
-                \${post.user.id !== state.currentUser.id ? \`
+                ${post.user.id !== state.currentUser.id ? `
                 <button class="action-btn"
-                    data-chat-uid="\${post.user.id}"
-                    data-chat-user="\${escapeHTML(post.user.username)}"
-                    data-chat-name="\${escapeHTML(post.user.displayName)}"
-                    data-chat-color="\${post.user.color}"
-                    data-chat-avatar="\${escapeHTML(post.user.avatarUrl || '')}"
+                    data-chat-uid="${post.user.id}"
+                    data-chat-user="${escapeHTML(post.user.username)}"
+                    data-chat-name="${escapeHTML(post.user.displayName)}"
+                    data-chat-color="${post.user.color}"
+                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
                     onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"/>
@@ -3688,7 +3682,15 @@ function openPostModal(postId) {
                 const avatarHtml = other.avatar_url
                     ? `<img src="${escapeHTML(other.avatar_url)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
                     : escapeHTML(other.display_name || other.username).charAt(0).toUpperCase();
-                const timeStr = conv.last_message_at ? formatTime(new Date(conv.last_message_at)) : '';
+                const timeStr = conv.last_message_at ? (() => {
+                    const d = new Date(conv.last_message_at);
+                    const now = new Date();
+                    const diffMs = now - d;
+                    if (diffMs < 3600000) return Math.max(1, Math.floor(diffMs/60000)) + ' Min.';
+                    if (diffMs < 86400000) return Math.floor(diffMs/3600000) + ' Std.';
+                    if (diffMs < 604800000) return Math.floor(diffMs/86400000) + ' T.';
+                    return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' });
+                })() : '';
                 return `<div class="conversation-item"
                     data-chat-conv="${escapeHTML(conv.id)}"
                     data-chat-uid="${other.id}"

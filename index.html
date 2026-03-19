@@ -1419,260 +1419,7 @@
     <input type="file" id="fileInput" accept="image/*" hidden>
     <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">        const MSG_MAX_LENGTH = 1000;
-
-        // ============================================================
-        // NACHRICHTEN
-        // ============================================================
-
-        async function loadConversations() {
-            const list = document.getElementById('conversationsList');
-            list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Lade Nachrichten...</div>';
-            try {
-                const uid = state.currentUser.id;
-                const { data, error } = await supabaseClient
-                    .from('conversations')
-                    .select(`id, last_message, last_message_at,
-                        participant_1:users!conversations_participant_1_fkey(id,username,display_name,user_color,avatar_url),
-                        participant_2:users!conversations_participant_2_fkey(id,username,display_name,user_color,avatar_url)`)
-                    .or(`participant_1.eq.${uid},participant_2.eq.${uid}`)
-                    .order('last_message_at', { ascending: false });
-                if (error) throw error;
-
-                // Ungelesene Nachrichten pro Konversation laden
-                const { data: unreadData } = await supabaseClient
-                    .from('messages')
-                    .select('conversation_id')
-                    .eq('is_read', false)
-                    .neq('sender_id', uid);
-
-                const unreadMap = {};
-                (unreadData || []).forEach(m => {
-                    unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
-                });
-
-                state.conversations = data || [];
-                renderConversations(unreadMap);
-                updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
-            } catch(e) {
-                console.error('Fehler beim Laden der Konversationen:', e);
-                list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">Fehler beim Laden.</div>';
-            }
-        }
-
-        function renderConversations(unreadMap = {}) {
-            const list = document.getElementById('conversationsList');
-            const uid = state.currentUser.id;
-            if (!state.conversations.length) {
-                list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Noch keine Nachrichten.<br><span style="font-size:12px;">Schreib jemandem aus dem Feed!</span></div>';
-                return;
-            }
-            list.innerHTML = state.conversations.map(conv => {
-                const other = conv.participant_1.id === uid ? conv.participant_2 : conv.participant_1;
-                const unread = unreadMap[conv.id] || 0;
-                const avatarHtml = other.avatar_url
-                    ? `<img src="${escapeHTML(other.avatar_url)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
-                    : escapeHTML(other.display_name || other.username).charAt(0).toUpperCase();
-                const timeStr = conv.last_message_at ? formatTime(new Date(conv.last_message_at)) : '';
-                return `<div class="conversation-item" data-chat-conv="${escapeHTML(conv.id)}"
-                    data-chat-uid="${other.id}"
-                    data-chat-user="${escapeHTML(other.username)}"
-                    data-chat-name="${escapeHTML(other.display_name || other.username)}"
-                    data-chat-color="${other.user_color}"
-                    data-chat-avatar="${escapeHTML(other.avatar_url || '')}"
-                    onclick="openChatFromBtn(this)">
-                    <div class="conversation-avatar" style="background:${other.user_color}22; color:${other.user_color};">${avatarHtml}</div>
-                    <div class="conversation-info">
-                        <div class="conversation-name">${escapeHTML(other.display_name || other.username)}</div>
-                        <div class="conversation-preview ${unread ? 'unread' : ''}">${escapeHTML(conv.last_message || 'Konversation beginnen')}</div>
-                    </div>
-                    <div class="conversation-meta">
-                        <span class="conversation-time">${timeStr}</span>
-                        ${unread ? `<span class="unread-badge">${unread > 9 ? '9+' : unread}</span>` : ''}
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function updateMessageBadge(count) {
-            const badge = document.getElementById('messageNavBadge');
-            if (!badge) return;
-            if (count > 0) {
-                badge.style.display = 'flex';
-                badge.textContent = count > 9 ? '9+' : count;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        async function startChat(otherUserId, otherUsername, otherDisplayName, otherColor, otherAvatarUrl) {
-            if (!state.currentUser) return showToast('Bitte einloggen');
-            if (otherUserId === state.currentUser.id) return showToast('Du kannst dir nicht selbst schreiben 😄');
-            try {
-                const uid = state.currentUser.id;
-                // Prüfe ob Konversation schon existiert
-                const { data: existing } = await supabaseClient
-                    .from('conversations')
-                    .select('id')
-                    .or(`and(participant_1.eq.${uid},participant_2.eq.${otherUserId}),and(participant_1.eq.${otherUserId},participant_2.eq.${uid})`)
-                    .maybeSingle();
-
-                let convId;
-                if (existing) {
-                    convId = existing.id;
-                } else {
-                    const { data: newConv, error } = await supabaseClient
-                        .from('conversations')
-                        .insert([{ participant_1: uid, participant_2: otherUserId }])
-                        .select('id')
-                        .single();
-                    if (error) throw error;
-                    convId = newConv.id;
-                }
-                openChat(convId, { id: otherUserId, username: otherUsername, displayName: otherDisplayName, color: otherColor, avatarUrl: otherAvatarUrl });
-            } catch(e) {
-                console.error('Fehler beim Starten des Chats:', e);
-                showToast('Fehler beim Öffnen des Chats.');
-            }
-        }
-
-        async function openChat(convId, otherUser) {
-            if (typeof otherUser === 'string') {
-                try { otherUser = JSON.parse(otherUser.replace(/&#39;/g, "'")); } catch(e) { return; }
-            }
-            state.currentConversationId = convId;
-
-            // Header setzen
-            const avatarEl = document.getElementById('chatHeaderAvatar');
-            avatarEl.style.background = `${otherUser.color}22`;
-            avatarEl.style.color = otherUser.color;
-            avatarEl.innerHTML = otherUser.avatarUrl
-                ? `<img src="${escapeHTML(otherUser.avatarUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
-                : escapeHTML(otherUser.displayName || otherUser.username).charAt(0).toUpperCase();
-            document.getElementById('chatHeaderName').textContent = otherUser.displayName || otherUser.username;
-
-            document.getElementById('chatModal').classList.add('open');
-            history.pushState({ modal: 'chat' }, '', window.location.href);
-            document.getElementById('chatInput').value = '';
-            await loadMessages(convId);
-            subscribeToMessages(convId);
-        }
-
-        function closeChatModal() {
-            document.getElementById('chatModal').classList.remove('open');
-            if (state.messageSubscription) {
-                state.messageSubscription.unsubscribe();
-                state.messageSubscription = null;
-            }
-            state.currentConversationId = null;
-            if (state.currentView === 'messages') loadConversations();
-        }
-
-        async function loadMessages(convId) {
-            const container = document.getElementById('chatMessages');
-            container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--color-text-secondary);font-size:13px;">Lade Nachrichten...</div>';
-            try {
-                const { data, error } = await supabaseClient
-                    .from('messages')
-                    .select('id, sender_id, content, is_read, created_at')
-                    .eq('conversation_id', convId)
-                    .order('created_at', { ascending: true });
-                if (error) throw error;
-
-                // Als gelesen markieren
-                await supabaseClient.from('messages')
-                    .update({ is_read: true })
-                    .eq('conversation_id', convId)
-                    .eq('is_read', false)
-                    .neq('sender_id', state.currentUser.id);
-
-                renderChatMessages(data || []);
-            } catch(e) {
-                console.error('Fehler beim Laden der Nachrichten:', e);
-            }
-        }
-
-        function renderChatMessages(messages) {
-            const container = document.getElementById('chatMessages');
-            if (!messages.length) {
-                container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:13px;">Noch keine Nachrichten.<br>Schreib die erste!</div>';
-                return;
-            }
-            const uid = state.currentUser.id;
-            let lastDate = '';
-            container.innerHTML = messages.map(msg => {
-                const isSent = msg.sender_id === uid;
-                const msgDate = new Date(msg.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                const divider = msgDate !== lastDate ? `<div class="msg-date-divider">${msgDate}</div>` : '';
-                lastDate = msgDate;
-                const timeStr = new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                return `${divider}
-                <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHTML(msg.content)}</div>
-                <span class="msg-time ${isSent ? 'sent' : 'received'}">${timeStr}</span>`;
-            }).join('');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const content = input.value.trim();
-            if (!content || !state.currentConversationId) return;
-            if (content.length > MSG_MAX_LENGTH) return showToast(`Max. ${MSG_MAX_LENGTH} Zeichen.`);
-
-            const btn = document.getElementById('chatSendBtn');
-            btn.disabled = true;
-            try {
-                const { error } = await supabaseClient.from('messages').insert([{
-                    conversation_id: state.currentConversationId,
-                    sender_id: state.currentUser.id,
-                    content: content
-                }]);
-                if (error) throw error;
-                input.value = '';
-                input.style.height = 'auto';
-                // last_message in conversation updaten
-                await supabaseClient.from('conversations')
-                    .update({ last_message: content.length > 40 ? content.substring(0,40)+'...' : content, last_message_at: new Date().toISOString() })
-                    .eq('id', state.currentConversationId);
-            } catch(e) {
-                console.error('Fehler beim Senden:', e);
-                showToast('Nachricht konnte nicht gesendet werden.');
-            } finally {
-                btn.disabled = false;
-                input.focus();
-            }
-        }
-
-        function handleChatKeydown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-        }
-
-        function subscribeToMessages(convId) {
-            if (state.messageSubscription) state.messageSubscription.unsubscribe();
-            state.messageSubscription = supabaseClient
-                .channel(`messages:${convId}`)
-                .on('postgres_changes', {
-                    event: 'INSERT', schema: 'public', table: 'messages',
-                    filter: `conversation_id=eq.${convId}`
-                }, async (payload) => {
-                    const container = document.getElementById('chatMessages');
-                    if (!container) return;
-                    const msg = payload.new;
-                    const isSent = msg.sender_id === state.currentUser.id;
-                    const timeStr = new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                    const bubble = `<div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHTML(msg.content)}</div>
-                        <span class="msg-time ${isSent ? 'sent' : 'received'}">${timeStr}</span>`;
-                    container.insertAdjacentHTML('beforeend', bubble);
-                    container.scrollTop = container.scrollHeight;
-                    // Als gelesen markieren wenn empfangen
-                    if (!isSent) {
-                        await supabaseClient.from('messages').update({ is_read: true }).eq('id', msg.id);
-                    }
-                })
-                .subscribe();
-        }
-
-        </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // --- Supabase Configuration ---
         const SUPABASE_URL = 'https://rkmsomwlhlsxfoqueyza.supabase.co';
@@ -1750,18 +1497,6 @@
             }
             if (document.getElementById('editProfileModal').style.display === 'flex') {
                 closeEditProfileModal();
-                return;
-            }
-            if (document.getElementById('editCaptionModal').style.display === 'flex') {
-                closeEditCaptionModal();
-                return;
-            }
-            if (document.getElementById('chatModal').classList.contains('open')) {
-                closeChatModal();
-                return;
-            }
-            if (document.getElementById('loginModal').style.display === 'flex') {
-                history.pushState(null, '', window.location.href);
                 return;
             }
 
@@ -2056,18 +1791,19 @@ function renderFeed() {
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                                 </svg>
                             </button>
-                ${post.user.id !== state.currentUser.id ? `
+                \${post.user.id !== state.currentUser.id ? \`
                 <button class="action-btn"
-                    data-chat-uid="${post.user.id}"
-                    data-chat-user="${escapeHTML(post.user.username)}"
-                    data-chat-name="${escapeHTML(post.user.displayName)}"
-                    data-chat-color="${post.user.color}"
-                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
-                    onclick="startChatFromBtn(this)">
+                    data-chat-uid="\${post.user.id}"
+                    data-chat-user="\${escapeHTML(post.user.username)}"
+                    data-chat-name="\${escapeHTML(post.user.displayName)}"
+                    data-chat-color="\${post.user.color}"
+                    data-chat-avatar="\${escapeHTML(post.user.avatarUrl || '')}"
+                    onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
-                </button>` : ''}
+                </button>\` : ''}
                             <button class="action-btn" onclick="showToast('Link kopiert!')">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="22" y1="2" x2="11" y2="13"/>
@@ -2224,18 +1960,19 @@ function openPostModal(postId) {
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
                 </button>
-                ${post.user.id !== state.currentUser.id ? `
+                \${post.user.id !== state.currentUser.id ? \`
                 <button class="action-btn"
-                    data-chat-uid="${post.user.id}"
-                    data-chat-user="${escapeHTML(post.user.username)}"
-                    data-chat-name="${escapeHTML(post.user.displayName)}"
-                    data-chat-color="${post.user.color}"
-                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
-                    onclick="startChatFromBtn(this)">
+                    data-chat-uid="\${post.user.id}"
+                    data-chat-user="\${escapeHTML(post.user.username)}"
+                    data-chat-name="\${escapeHTML(post.user.displayName)}"
+                    data-chat-color="\${post.user.color}"
+                    data-chat-avatar="\${escapeHTML(post.user.avatarUrl || '')}"
+                    onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
-                </button>` : ''}
+                </button>\` : ''}
             </div>
             
             <div class="like-count" onclick="openLikesList('${post.id}')" style="cursor: pointer;">${post.likes} Gefällt mir</div>
@@ -3264,7 +3001,6 @@ function renderComments(comments) {
                 document.getElementById('editCaptionCounter').textContent = textarea.value.length;
             };
             document.getElementById('editCaptionModal').style.display = 'flex';
-            history.pushState({ modal: 'editCaption' }, '', window.location.href);
             setTimeout(() => textarea.focus(), 100);
         }
 
@@ -3827,18 +3563,19 @@ function openPostModal(postId) {
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
                 </button>
-                ${post.user.id !== state.currentUser.id ? `
+                \${post.user.id !== state.currentUser.id ? \`
                 <button class="action-btn"
-                    data-chat-uid="${post.user.id}"
-                    data-chat-user="${escapeHTML(post.user.username)}"
-                    data-chat-name="${escapeHTML(post.user.displayName)}"
-                    data-chat-color="${post.user.color}"
-                    data-chat-avatar="${escapeHTML(post.user.avatarUrl || '')}"
-                    onclick="startChatFromBtn(this)">
+                    data-chat-uid="\${post.user.id}"
+                    data-chat-user="\${escapeHTML(post.user.username)}"
+                    data-chat-name="\${escapeHTML(post.user.displayName)}"
+                    data-chat-color="\${post.user.color}"
+                    data-chat-avatar="\${escapeHTML(post.user.avatarUrl || '')}"
+                    onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
-                </button>` : ''}
+                </button>\` : ''}
             </div>
             
             <div class="like-count" onclick="openLikesList('${post.id}')" style="cursor: pointer;">${post.likes} Gefällt mir</div>
@@ -3895,6 +3632,271 @@ function openPostModal(postId) {
                                 .catch((err) => console.error('Service Worker Fehler:', err));
             });
         }
-    </script>
-</body>
-</html>
+    
+        const MSG_MAX_LENGTH = 1000;
+
+
+        // ============================================================
+        // NACHRICHTEN
+        // ============================================================
+
+        async function loadConversations() {
+            const list = document.getElementById('conversationsList');
+            list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Lade Nachrichten...</div>';
+            try {
+                const uid = state.currentUser.id;
+                const { data, error } = await supabaseClient
+                    .from('conversations')
+                    .select(`id, last_message, last_message_at,
+                        participant_1:users!conversations_participant_1_fkey(id,username,display_name,user_color,avatar_url),
+                        participant_2:users!conversations_participant_2_fkey(id,username,display_name,user_color,avatar_url)`)
+                    .or(`participant_1.eq.${uid},participant_2.eq.${uid}`)
+                    .order('last_message_at', { ascending: false });
+                if (error) throw error;
+
+                // Ungelesene Nachrichten pro Konversation laden
+                const { data: unreadData } = await supabaseClient
+                    .from('messages')
+                    .select('conversation_id')
+                    .eq('is_read', false)
+                    .neq('sender_id', uid);
+
+                const unreadMap = {};
+                (unreadData || []).forEach(m => {
+                    unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
+                });
+
+                state.conversations = data || [];
+                renderConversations(unreadMap);
+                updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
+            } catch(e) {
+                console.error('Fehler beim Laden der Konversationen:', e);
+                list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">Fehler beim Laden.</div>';
+            }
+        }
+
+        function renderConversations(unreadMap = {}) {
+            const list = document.getElementById('conversationsList');
+            const uid = state.currentUser.id;
+            if (!state.conversations.length) {
+                list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Noch keine Nachrichten.<br><span style="font-size:12px;">Schreib jemandem aus dem Feed!</span></div>';
+                return;
+            }
+            list.innerHTML = state.conversations.map(conv => {
+                const other = conv.participant_1.id === uid ? conv.participant_2 : conv.participant_1;
+                const unread = unreadMap[conv.id] || 0;
+                const avatarHtml = other.avatar_url
+                    ? `<img src="${escapeHTML(other.avatar_url)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
+                    : escapeHTML(other.display_name || other.username).charAt(0).toUpperCase();
+                const timeStr = conv.last_message_at ? formatTime(new Date(conv.last_message_at)) : '';
+                return `<div class="conversation-item"
+                    data-chat-conv="${escapeHTML(conv.id)}"
+                    data-chat-uid="${other.id}"
+                    data-chat-user="${escapeHTML(other.username)}"
+                    data-chat-name="${escapeHTML(other.display_name || other.username)}"
+                    data-chat-color="${other.user_color}"
+                    data-chat-avatar="${escapeHTML(other.avatar_url || '')}"
+                    onclick="openChatFromBtn(this)">
+                    <div class="conversation-avatar" style="background:${other.user_color}22; color:${other.user_color};">${avatarHtml}</div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">${escapeHTML(other.display_name || other.username)}</div>
+                        <div class="conversation-preview ${unread ? 'unread' : ''}">${escapeHTML(conv.last_message || 'Konversation beginnen')}</div>
+                    </div>
+                    <div class="conversation-meta">
+                        <span class="conversation-time">${timeStr}</span>
+                        ${unread ? `<span class="unread-badge">${unread > 9 ? '9+' : unread}</span>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateMessageBadge(count) {
+            const badge = document.getElementById('messageNavBadge');
+            if (!badge) return;
+            if (count > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = count > 9 ? '9+' : count;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        async function startChat(otherUserId, otherUsername, otherDisplayName, otherColor, otherAvatarUrl) {
+            if (!state.currentUser) return showToast('Bitte einloggen');
+            if (otherUserId === state.currentUser.id) return showToast('Du kannst dir nicht selbst schreiben 😄');
+            try {
+                const uid = state.currentUser.id;
+                // Prüfe ob Konversation schon existiert
+                const { data: existing } = await supabaseClient
+                    .from('conversations')
+                    .select('id')
+                    .or(`and(participant_1.eq.${uid},participant_2.eq.${otherUserId}),and(participant_1.eq.${otherUserId},participant_2.eq.${uid})`)
+                    .maybeSingle();
+
+                let convId;
+                if (existing) {
+                    convId = existing.id;
+                } else {
+                    const { data: newConv, error } = await supabaseClient
+                        .from('conversations')
+                        .insert([{ participant_1: uid, participant_2: otherUserId }])
+                        .select('id')
+                        .single();
+                    if (error) throw error;
+                    convId = newConv.id;
+                }
+                openChat(convId, { id: otherUserId, username: otherUsername, displayName: otherDisplayName, color: otherColor, avatarUrl: otherAvatarUrl });
+            } catch(e) {
+                console.error('Fehler beim Starten des Chats:', e);
+                showToast('Fehler beim Öffnen des Chats.');
+            }
+        }
+
+        async function openChat(convId, otherUser) {
+            if (typeof otherUser === 'string') {
+                try { otherUser = JSON.parse(otherUser.replace(/&#39;/g, "'")); } catch(e) { return; }
+            }
+            state.currentConversationId = convId;
+
+            // Header setzen
+            const avatarEl = document.getElementById('chatHeaderAvatar');
+            avatarEl.style.background = `${otherUser.color}22`;
+            avatarEl.style.color = otherUser.color;
+            avatarEl.innerHTML = otherUser.avatarUrl
+                ? `<img src="${escapeHTML(otherUser.avatarUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
+                : escapeHTML(otherUser.displayName || otherUser.username).charAt(0).toUpperCase();
+            document.getElementById('chatHeaderName').textContent = otherUser.displayName || otherUser.username;
+
+            document.getElementById('chatModal').classList.add('open');
+            document.getElementById('chatInput').value = '';
+            await loadMessages(convId);
+            subscribeToMessages(convId);
+        }
+
+        function closeChatModal() {
+            document.getElementById('chatModal').classList.remove('open');
+            if (state.messageSubscription) {
+                state.messageSubscription.unsubscribe();
+                state.messageSubscription = null;
+            }
+            state.currentConversationId = null;
+            if (state.currentView === 'messages') loadConversations();
+        }
+
+        async function loadMessages(convId) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--color-text-secondary);font-size:13px;">Lade Nachrichten...</div>';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('messages')
+                    .select('id, sender_id, content, is_read, created_at')
+                    .eq('conversation_id', convId)
+                    .order('created_at', { ascending: true });
+                if (error) throw error;
+
+                // Als gelesen markieren
+                await supabaseClient.from('messages')
+                    .update({ is_read: true })
+                    .eq('conversation_id', convId)
+                    .eq('is_read', false)
+                    .neq('sender_id', state.currentUser.id);
+
+                renderChatMessages(data || []);
+            } catch(e) {
+                console.error('Fehler beim Laden der Nachrichten:', e);
+            }
+        }
+
+        function renderChatMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            if (!messages.length) {
+                container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:13px;">Noch keine Nachrichten.<br>Schreib die erste!</div>';
+                return;
+            }
+            const uid = state.currentUser.id;
+            let lastDate = '';
+            container.innerHTML = messages.map(msg => {
+                const isSent = msg.sender_id === uid;
+                const msgDate = new Date(msg.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const divider = msgDate !== lastDate ? `<div class="msg-date-divider">${msgDate}</div>` : '';
+                lastDate = msgDate;
+                const timeStr = new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                return `${divider}
+                <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHTML(msg.content)}</div>
+                <span class="msg-time ${isSent ? 'sent' : 'received'}">${timeStr}</span>`;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const content = input.value.trim();
+            if (!content || !state.currentConversationId) return;
+            if (content.length > MSG_MAX_LENGTH) return showToast(`Max. ${MSG_MAX_LENGTH} Zeichen.`);
+
+            const btn = document.getElementById('chatSendBtn');
+            btn.disabled = true;
+            try {
+                const { error } = await supabaseClient.from('messages').insert([{
+                    conversation_id: state.currentConversationId,
+                    sender_id: state.currentUser.id,
+                    content: content
+                }]);
+                if (error) throw error;
+                input.value = '';
+                input.style.height = 'auto';
+                // last_message in conversation updaten
+                await supabaseClient.from('conversations')
+                    .update({ last_message: content.length > 40 ? content.substring(0,40)+'...' : content, last_message_at: new Date().toISOString() })
+                    .eq('id', state.currentConversationId);
+            } catch(e) {
+                console.error('Fehler beim Senden:', e);
+                showToast('Nachricht konnte nicht gesendet werden.');
+            } finally {
+                btn.disabled = false;
+                input.focus();
+            }
+        }
+
+        function handleChatKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        }
+
+        function subscribeToMessages(convId) {
+            if (state.messageSubscription) state.messageSubscription.unsubscribe();
+            state.messageSubscription = supabaseClient
+                .channel(`messages:${convId}`)
+                .on('postgres_changes', {
+                    event: 'INSERT', schema: 'public', table: 'messages',
+                    filter: `conversation_id=eq.${convId}`
+                }, async (payload) => {
+                    const container = document.getElementById('chatMessages');
+                    if (!container) return;
+                    const msg = payload.new;
+                    const isSent = msg.sender_id === state.currentUser.id;
+                    const timeStr = new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                    const bubble = `<div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHTML(msg.content)}</div>
+                        <span class="msg-time ${isSent ? 'sent' : 'received'}">${timeStr}</span>`;
+                    container.insertAdjacentHTML('beforeend', bubble);
+                    container.scrollTop = container.scrollHeight;
+                    // Als gelesen markieren wenn empfangen
+                    if (!isSent) {
+                        await supabaseClient.from('messages').update({ is_read: true }).eq('id', msg.id);
+                    }
+                })
+                .subscribe();
+        }
+
+
+        function startChatFromBtn(btn) {
+            startChat(btn.dataset.chatUid, btn.dataset.chatUser, btn.dataset.chatName, btn.dataset.chatColor, btn.dataset.chatAvatar || '');
+        }
+        function openChatFromBtn(btn) {
+            openChat(btn.dataset.chatConv, {
+                id: btn.dataset.chatUid, username: btn.dataset.chatUser,
+                displayName: btn.dataset.chatName, color: btn.dataset.chatColor,
+                avatarUrl: btn.dataset.chatAvatar || ''
+            });
+        }
+
+        </script>

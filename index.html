@@ -1463,7 +1463,8 @@
             conversations: [],
             currentConversationId: null,
             messageSubscription: null,
-            badgeSubscription: null
+            badgeSubscription: null,
+            pendingPartner: null  // Konversation wird erst bei erster Nachricht angelegt
         };
 
         // === Konstanten ===
@@ -3806,10 +3807,25 @@ function openPostModal(postId) {
             }
         }
 
+        function openChatModal(otherUser) {
+            const avatarEl = document.getElementById('chatHeaderAvatar');
+            avatarEl.style.background = `${otherUser.color}22`;
+            avatarEl.style.color = otherUser.color;
+            avatarEl.innerHTML = otherUser.avatarUrl
+                ? `<img src="${escapeHTML(otherUser.avatarUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
+                : escapeHTML(otherUser.displayName || otherUser.username).charAt(0).toUpperCase();
+            document.getElementById('chatHeaderName').textContent = otherUser.displayName || otherUser.username;
+            document.getElementById('chatMessages').innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--color-text-secondary);font-size:13px;">Schreib die erste Nachricht! 👋</div>';
+            document.getElementById('chatModal').classList.add('open');
+            document.getElementById('chatInput').value = '';
+            history.pushState(null, '', window.location.href);
+        }
+
         async function openChat(convId, otherUser) {
             if (typeof otherUser === 'string') {
                 try { otherUser = JSON.parse(otherUser.replace(/&#39;/g, "'")); } catch(e) { return; }
             }
+            state.pendingPartner = null;
             state.currentConversationId = convId;
 
             // Header setzen
@@ -3885,7 +3901,22 @@ function openPostModal(postId) {
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const msgContent = input.value.trim();
-            if (!msgContent || !state.currentConversationId) return;
+            if (!msgContent) return;
+            // Neue Konversation erst bei erster Nachricht anlegen
+            if (!state.currentConversationId && state.pendingPartner) {
+                try {
+                    const uid = state.currentUser.id;
+                    const { data: newConv, error } = await supabaseClient
+                        .from('conversations')
+                        .insert([{ participant_1: uid, participant_2: state.pendingPartner.id }])
+                        .select('id').single();
+                    if (error) throw error;
+                    state.currentConversationId = newConv.id;
+                    state.pendingPartner = null;
+                    subscribeToMessages(state.currentConversationId);
+                } catch(e) { showToast('Fehler beim Erstellen des Chats.'); return; }
+            }
+            if (!state.currentConversationId) return;
             if (msgContent.length > MSG_MAX_LENGTH) return showToast(`Max. ${MSG_MAX_LENGTH} Zeichen.`);
 
             const btn = document.getElementById('chatSendBtn');

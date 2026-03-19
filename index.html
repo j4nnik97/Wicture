@@ -213,8 +213,8 @@
 
         /* View Containers */
         .view { display: none; }
-        .view.active { display: block; }
-
+        .view { display: none; }
+        .view.active { display: block; background: var(--color-background); min-height: calc(100vh - 120px); }
         /* Weekly Banner */
         .weekly-banner {
             padding: 16px;
@@ -2590,7 +2590,9 @@ async function toggleLike(postId) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
 
-            document.getElementById(viewName + 'View').classList.add('active');
+            const viewEl = document.getElementById(viewName + 'View');
+            if (!viewEl) { console.error('View nicht gefunden:', viewName + 'View'); return; }
+            viewEl.classList.add('active');
             const navItem = document.querySelector(`.bottom-nav-item[data-view="${viewName}"]`);
             if (navItem) navItem.classList.add('active');
 
@@ -3646,6 +3648,7 @@ function openPostModal(postId) {
               list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Lade Nachrichten...</div>';
               try {
                   const uid = state.currentUser.id;
+                    list.innerHTML = `<div style='text-align:center;padding:20px;font-size:12px;color:gray;'>uid: ${uid}</div>`;
                   const { data, error } = await supabaseClient
                       .from('conversations')
                       .select('id, last_message, last_message_at, participant_1, participant_2')
@@ -3679,7 +3682,9 @@ function openPostModal(postId) {
                   updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
               } catch(e) {
                   console.error('Fehler beim Laden der Konversationen:', e);
-                  list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">Fehler beim Laden.</div>';
+                  list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">
+                      Fehler: ${escapeHTML(e.message || String(e))}
+                  </div>`;
               }
           }
 

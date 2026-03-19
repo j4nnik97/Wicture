@@ -3704,28 +3704,6 @@ function openPostModal(postId) {
                     list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">Fehler: ${escapeHTML(e.message || String(e))}</div>`;
                 }
             }
-                  const enrichedData = (data || []).map(c => ({
-                      ...c, other: usersMap[c.participant_1 === uid ? c.participant_2 : c.participant_1] || {}
-                  }));
-
-                  const { data: unreadData } = await supabaseClient
-                      .from('messages').select('conversation_id')
-                      .eq('is_read', false).neq('sender_id', uid);
-                  const unreadMap = {};
-                  (unreadData || []).forEach(m => {
-                      unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
-                  });
-
-                  state.conversations = enrichedData;
-                  renderConversations(unreadMap);
-                  updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
-              } catch(e) {
-                  console.error('Fehler beim Laden der Konversationen:', e);
-                  list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">
-                      Fehler: ${escapeHTML(e.message || String(e))}
-                  </div>`;
-              }
-          }
 
         function renderConversations(unreadMap = {}) {
             const list = document.getElementById('conversationsList');

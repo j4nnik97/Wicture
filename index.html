@@ -1507,6 +1507,17 @@
                 return;
             }
 
+            // Chat-Fenster schließen
+            if (document.getElementById('chatModal') && document.getElementById('chatModal').classList.contains('open')) {
+                closeChatModal();
+                return;
+            }
+            // Text-Bearbeiten-Fenster schließen
+            if (document.getElementById('editCaptionModal') && document.getElementById('editCaptionModal').style.display === 'flex') {
+                closeEditCaptionModal();
+                return;
+            }
+
             // 2. Wenn keine Modals offen sind, wechsle die Hauptansicht
             if (event.state && event.state.view) {
                 // Wir springen zu der Ansicht, die im Brotkrümel gespeichert ist
@@ -3004,6 +3015,7 @@ function renderComments(comments) {
                 document.getElementById('editCaptionCounter').textContent = textarea.value.length;
             };
             document.getElementById('editCaptionModal').style.display = 'flex';
+          history.pushState({ modal: 'open' }, '', '');
             setTimeout(() => textarea.focus(), 100);
         }
 
@@ -3838,6 +3850,7 @@ function openPostModal(postId) {
             document.getElementById('chatHeaderName').textContent = otherUser.displayName || otherUser.username;
 
             document.getElementById('chatModal').classList.add('open');
+              history.pushState({ modal: 'open' }, '', '');
             document.getElementById('chatInput').value = '';
             await loadMessages(convId);
             subscribeToMessages(convId);

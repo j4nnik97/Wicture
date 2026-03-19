@@ -1133,15 +1133,16 @@
 
         <div class="view" id="uploadView">
 
-    <div class="view" id="messagesView">
-        <div class="messages-list" id="conversationsList">
-            <div style="text-align:center; color:var(--color-text-secondary); padding:60px 20px; font-size:14px;">
-                Noch keine Nachrichten
-            </div>
-        </div>
-    </div>
 
             <div class="upload-area" id="uploadArea"></div>
+        </div>
+
+        <div class="view" id="messagesView">
+            <div class="messages-list" id="conversationsList">
+                <div style="text-align:center; color:var(--color-text-secondary); padding:60px 20px; font-size:14px;">
+                    Noch keine Nachrichten
+                </div>
+            </div>
         </div>
 
         <div class="view" id="profileView">
@@ -3673,7 +3674,7 @@ function openPostModal(postId) {
                     // Zusammenführen + sortieren
                     const allConvs = [...(r1.data || []), ...(r2.data || [])];
                     allConvs.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
-                    showToast(`${allConvs.length} Chat(s) geladen`);
+
 
                     // User-Daten für Gesprächspartner laden
                     const otherIds = allConvs.map(c => c.participant_1 === uid ? c.participant_2 : c.participant_1);
@@ -3758,9 +3759,9 @@ function openPostModal(postId) {
                     + '</div>'
                     + '</div>';
             }
-            list.style.cssText = 'display:block !important; min-height:300px; background:var(--color-background); color:var(--color-text);';
+            list.style.cssText = '';
             list.innerHTML = html;
-            showToast('✅ ' + state.conversations.length + ' Chats gerendert');
+
         }
 
         function updateMessageBadge(count) {

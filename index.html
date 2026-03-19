@@ -1452,12 +1452,16 @@
             currentUser: null,
             isAuthenticated: false,
             posts: [],
-			following: new Set(),
+            following: new Set(),
             weeklyPostDone: false,
             lastPostTimestamp: null,
             nextPostAvailable: null,
             supabase: null,
-			focusedPostId: null
+            focusedPostId: null,
+            conversations: [],
+            currentConversationId: null,
+            messageSubscription: null,
+            badgeSubscription: null
         };
 
         // === Konstanten ===
@@ -3251,6 +3255,8 @@ function renderComments(comments) {
                 state.posts = [];
                 state.following = new Set();
                   if (state.messageSubscription) { state.messageSubscription.unsubscribe(); state.messageSubscription = null; }
+                  if (state.badgeSubscription) { state.badgeSubscription.unsubscribe(); state.badgeSubscription = null; }
+                  if (state.badgeSubscription) { state.badgeSubscription.unsubscribe(); state.badgeSubscription = null; }
                 state.focusedPostId = null;
                 state.weeklyPostDone = false;
                 document.getElementById('feedContainer').innerHTML = '';
@@ -3294,6 +3300,7 @@ function renderComments(comments) {
                     hideLoginModal();
                     await loadPostsFromSupabase();
 					await loadNotifications();
+                  subscribeToConversationsBadge();
 					history.replaceState({ view: 'feed' }, '', '#feed');
                     return; 
                 } catch (e) {
@@ -3660,7 +3667,7 @@ function openPostModal(postId) {
                     unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
                 });
 
-                state.conversations = data || [];
+                state.conversations = enrichedData;
                 renderConversations(unreadMap);
                 updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
             } catch(e) {
@@ -3671,37 +3678,36 @@ function openPostModal(postId) {
 
         function renderConversations(unreadMap = {}) {
             const list = document.getElementById('conversationsList');
-            const uid = state.currentUser.id;
             if (!state.conversations.length) {
                 list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Noch keine Nachrichten.<br><span style="font-size:12px;">Schreib jemandem aus dem Feed!</span></div>';
                 return;
             }
             list.innerHTML = state.conversations.map(conv => {
-                const other = conv.participant_1.id === uid ? conv.participant_2 : conv.participant_1;
+                const other = conv.other || {};
                 const unread = unreadMap[conv.id] || 0;
                 const avatarHtml = other.avatar_url
                     ? `<img src="${escapeHTML(other.avatar_url)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
-                    : escapeHTML(other.display_name || other.username).charAt(0).toUpperCase();
+                    : escapeHTML(other.display_name || other.username || '?').charAt(0).toUpperCase();
+                const color = other.user_color || '#21808D';
                 const timeStr = conv.last_message_at ? (() => {
                     const d = new Date(conv.last_message_at);
-                    const now = new Date();
-                    const diffMs = now - d;
+                    const diffMs = Date.now() - d;
                     if (diffMs < 3600000) return Math.max(1, Math.floor(diffMs/60000)) + ' Min.';
                     if (diffMs < 86400000) return Math.floor(diffMs/3600000) + ' Std.';
                     if (diffMs < 604800000) return Math.floor(diffMs/86400000) + ' T.';
                     return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' });
                 })() : '';
                 return `<div class="conversation-item"
-                    data-chat-conv="${escapeHTML(conv.id)}"
-                    data-chat-uid="${other.id}"
-                    data-chat-user="${escapeHTML(other.username)}"
-                    data-chat-name="${escapeHTML(other.display_name || other.username)}"
-                    data-chat-color="${other.user_color}"
+                    data-chat-conv="${conv.id}"
+                    data-chat-uid="${other.id || ''}"
+                    data-chat-user="${escapeHTML(other.username || '')}"
+                    data-chat-name="${escapeHTML(other.display_name || other.username || '')}"
+                    data-chat-color="${color}"
                     data-chat-avatar="${escapeHTML(other.avatar_url || '')}"
                     onclick="openChatFromBtn(this)">
-                    <div class="conversation-avatar" style="background:${other.user_color}22; color:${other.user_color};">${avatarHtml}</div>
+                    <div class="conversation-avatar" style="background:${color}22; color:${color};">${avatarHtml}</div>
                     <div class="conversation-info">
-                        <div class="conversation-name">${escapeHTML(other.display_name || other.username)}</div>
+                        <div class="conversation-name">${escapeHTML(other.display_name || other.username || '?')}</div>
                         <div class="conversation-preview ${unread ? 'unread' : ''}">${escapeHTML(conv.last_message || 'Konversation beginnen')}</div>
                     </div>
                     <div class="conversation-meta">
@@ -3832,24 +3838,33 @@ function openPostModal(postId) {
 
         async function sendMessage() {
             const input = document.getElementById('chatInput');
-            const content = input.value.trim();
-            if (!content || !state.currentConversationId) return;
-            if (content.length > MSG_MAX_LENGTH) return showToast(`Max. ${MSG_MAX_LENGTH} Zeichen.`);
+            const msgContent = input.value.trim();
+            if (!msgContent || !state.currentConversationId) return;
+            if (msgContent.length > MSG_MAX_LENGTH) return showToast(`Max. ${MSG_MAX_LENGTH} Zeichen.`);
 
             const btn = document.getElementById('chatSendBtn');
             btn.disabled = true;
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Optimistic: Nachricht sofort anzeigen
+            const container = document.getElementById('chatMessages');
+            const timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            container.insertAdjacentHTML('beforeend',
+                `<div class="msg-bubble sent">${escapeHTML(msgContent)}</div>
+                <span class="msg-time sent">${timeStr}</span>`);
+            container.scrollTop = container.scrollHeight;
+
             try {
                 const { error } = await supabaseClient.from('messages').insert([{
                     conversation_id: state.currentConversationId,
                     sender_id: state.currentUser.id,
-                    content: content
+                    content: msgContent
                 }]);
                 if (error) throw error;
-                input.value = '';
-                input.style.height = 'auto';
-                // last_message in conversation updaten
+                const preview = msgContent.length > 40 ? msgContent.substring(0,40)+'...' : msgContent;
                 await supabaseClient.from('conversations')
-                    .update({ last_message: content.length > 40 ? content.substring(0,40)+'...' : content, last_message_at: new Date().toISOString() })
+                    .update({ last_message: preview, last_message_at: new Date().toISOString() })
                     .eq('id', state.currentConversationId);
             } catch(e) {
                 console.error('Fehler beim Senden:', e);
@@ -3864,6 +3879,25 @@ function openPostModal(postId) {
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         }
 
+        function subscribeToConversationsBadge() {
+            if (state.badgeSubscription) state.badgeSubscription.unsubscribe();
+            const uid = state.currentUser.id;
+            state.badgeSubscription = supabaseClient
+                .channel('conv-badge')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' },
+                    async (payload) => {
+                        if (payload.new.sender_id !== uid) {
+                            const { data } = await supabaseClient.from('messages')
+                                .select('conversation_id').eq('is_read', false).neq('sender_id', uid);
+                            updateMessageBadge((data || []).length);
+                            if (state.currentView === 'messages' && !state.currentConversationId) {
+                                loadConversations();
+                            }
+                        }
+                    })
+                .subscribe();
+        }
+
         function subscribeToMessages(convId) {
             if (state.messageSubscription) state.messageSubscription.unsubscribe();
             state.messageSubscription = supabaseClient
@@ -3876,13 +3910,13 @@ function openPostModal(postId) {
                     if (!container) return;
                     const msg = payload.new;
                     const isSent = msg.sender_id === state.currentUser.id;
-                    const timeStr = new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                    const bubble = `<div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHTML(msg.content)}</div>
-                        <span class="msg-time ${isSent ? 'sent' : 'received'}">${timeStr}</span>`;
-                    container.insertAdjacentHTML('beforeend', bubble);
-                    container.scrollTop = container.scrollHeight;
-                    // Als gelesen markieren wenn empfangen
+                    // Eigene Nachrichten werden per optimistic UI schon angezeigt
                     if (!isSent) {
+                        const timeStr = new Date(msg.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                        const bubble = `<div class="msg-bubble received">${escapeHTML(msg.content)}</div>
+                            <span class="msg-time received">${timeStr}</span>`;
+                        container.insertAdjacentHTML('beforeend', bubble);
+                        container.scrollTop = container.scrollHeight;
                         await supabaseClient.from('messages').update({ is_read: true }).eq('id', msg.id);
                     }
                 })

@@ -3654,8 +3654,8 @@ function openPostModal(postId) {
                 try {
                     const uid = state.currentUser.id;
 
-                    // Zwei separate Queries statt or() — umgeht RLS-Probleme
-                    const [{ data: asP1 }, { data: asP2 }] = await Promise.all([
+                    // Zwei separate Queries statt or()
+                    const [r1, r2] = await Promise.all([
                         supabaseClient.from('conversations')
                             .select('id, last_message, last_message_at, participant_1, participant_2')
                             .eq('participant_1', uid)
@@ -3666,9 +3666,13 @@ function openPostModal(postId) {
                             .order('last_message_at', { ascending: false })
                     ]);
 
+                    if (r1.error) throw new Error('Q1: ' + r1.error.message);
+                    if (r2.error) throw new Error('Q2: ' + r2.error.message);
+
                     // Zusammenführen + sortieren
-                    const allConvs = [...(asP1 || []), ...(asP2 || [])];
+                    const allConvs = [...(r1.data || []), ...(r2.data || [])];
                     allConvs.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
+                    showToast(`${allConvs.length} Chat(s) geladen`);
 
                     // User-Daten für Gesprächspartner laden
                     const otherIds = allConvs.map(c => c.participant_1 === uid ? c.participant_2 : c.participant_1);
@@ -3697,6 +3701,10 @@ function openPostModal(postId) {
                     });
 
                     state.conversations = enrichedData;
+                    if (enrichedData.length === 0) {
+                        list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Noch keine Nachrichten.<br><span style="font-size:12px;">Schreib jemandem aus dem Feed!</span></div>';
+                        return;
+                    }
                     renderConversations(unreadMap);
                     updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
                 } catch(e) {

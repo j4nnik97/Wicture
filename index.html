@@ -3261,7 +3261,9 @@ function renderComments(comments) {
                 state.following = new Set();
                   if (state.messageSubscription) { state.messageSubscription.unsubscribe(); state.messageSubscription = null; }
                   if (state.badgeSubscription) { state.badgeSubscription.unsubscribe(); state.badgeSubscription = null; }
-                  if (state.badgeSubscription) { state.badgeSubscription.unsubscribe(); state.badgeSubscription = null; }
+                  state.pendingPartner = null;
+                  state.conversations = [];
+                  state.currentConversationId = null;
                 state.focusedPostId = null;
                 state.weeklyPostDone = false;
                 document.getElementById('feedContainer').innerHTML = '';

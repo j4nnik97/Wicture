@@ -963,7 +963,8 @@
 		
 
         /* ===== NACHRICHTEN ===== */
-        .messages-list { padding: 0; }
+          .messages-list { padding: 0; overflow-y: auto; background: var(--color-background); min-height: 200px; }
+          #conversationsList { min-height: 300px; width: 100%; }
         .conversation-item {
             display: flex; align-items: center; gap: 12px;
             padding: 14px 16px; border-bottom: 1px solid var(--color-border);
@@ -3715,17 +3716,21 @@ function openPostModal(postId) {
 
         function renderConversations(unreadMap = {}) {
             const list = document.getElementById('conversationsList');
-            if (!state.conversations.length) {
-                list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Noch keine Nachrichten.<br><span style="font-size:12px;">Schreib jemandem aus dem Feed!</span></div>';
+            if (!list) return;
+            if (!state.conversations || !state.conversations.length) {
+                list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary);">Noch keine Nachrichten</div>';
                 return;
             }
-            list.innerHTML = state.conversations.map(conv => {
+            let html = '';
+            for (const conv of state.conversations) {
                 const other = conv.other || {};
-                const unread = unreadMap[conv.id] || 0;
-                const avatarHtml = other.avatar_url
-                    ? `<img src="${escapeHTML(other.avatar_url)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`
-                    : escapeHTML(other.display_name || other.username || '?').charAt(0).toUpperCase();
+                const name = other.display_name || other.username || '?';
                 const color = other.user_color || '#21808D';
+                const unread = unreadMap[conv.id] || 0;
+                const preview = conv.last_message || 'Konversation beginnen';
+                const avatarHtml = other.avatar_url
+                    ? '<img src="' + (other.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;">'
+                    : name.charAt(0).toUpperCase();
                 const timeStr = conv.last_message_at ? (() => {
                     const d = new Date(conv.last_message_at);
                     const diffMs = Date.now() - d;
@@ -3734,25 +3739,26 @@ function openPostModal(postId) {
                     if (diffMs < 604800000) return Math.floor(diffMs/86400000) + ' T.';
                     return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit' });
                 })() : '';
-                return `<div class="conversation-item"
-                    data-chat-conv="${conv.id}"
-                    data-chat-uid="${other.id || ''}"
-                    data-chat-user="${escapeHTML(other.username || '')}"
-                    data-chat-name="${escapeHTML(other.display_name || other.username || '')}"
-                    data-chat-color="${color}"
-                    data-chat-avatar="${escapeHTML(other.avatar_url || '')}"
-                    onclick="openChatFromBtn(this)">
-                    <div class="conversation-avatar" style="background:${color}22; color:${color};">${avatarHtml}</div>
-                    <div class="conversation-info">
-                        <div class="conversation-name">${escapeHTML(other.display_name || other.username || '?')}</div>
-                        <div class="conversation-preview ${unread ? 'unread' : ''}">${escapeHTML(conv.last_message || 'Konversation beginnen')}</div>
-                    </div>
-                    <div class="conversation-meta">
-                        <span class="conversation-time">${timeStr}</span>
-                        ${unread ? `<span class="unread-badge">${unread > 9 ? '9+' : unread}</span>` : ''}
-                    </div>
-                </div>`;
-            }).join('');
+                html += '<div class="conversation-item" '
+                    + 'data-chat-conv="' + conv.id + '" '
+                    + 'data-chat-uid="' + (other.id || '') + '" '
+                    + 'data-chat-user="' + (other.username || '') + '" '
+                    + 'data-chat-name="' + name + '" '
+                    + 'data-chat-color="' + color + '" '
+                    + 'data-chat-avatar="' + (other.avatar_url || '') + '" '
+                    + 'onclick="openChatFromBtn(this)">'
+                    + '<div class="conversation-avatar" style="background:' + color + '22;color:' + color + ';">' + avatarHtml + '</div>'
+                    + '<div class="conversation-info">'
+                    + '<div class="conversation-name">' + name + '</div>'
+                    + '<div class="conversation-preview' + (unread ? ' unread' : '') + '">' + preview + '</div>'
+                    + '</div>'
+                    + '<div class="conversation-meta">'
+                    + '<span class="conversation-time">' + timeStr + '</span>'
+                    + (unread ? '<span class="unread-badge">' + (unread > 9 ? '9+' : unread) + '</span>' : '')
+                    + '</div>'
+                    + '</div>';
+            }
+            list.innerHTML = html;
         }
 
         function updateMessageBadge(count) {

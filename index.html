@@ -3969,9 +3969,18 @@ function openPostModal(postId) {
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         }
 
-        function subscribeToConversationsBadge() {
+        async function subscribeToConversationsBadge() {
             if (state.badgeSubscription) state.badgeSubscription.unsubscribe();
             const uid = state.currentUser.id;
+
+              // Sofort beim Start: aktuelle ungelesene Nachrichten zählen
+              const { data: initialUnread } = await supabaseClient
+                  .from('messages')
+                  .select('conversation_id')
+                  .eq('is_read', false)
+                  .neq('sender_id', uid);
+              updateMessageBadge((initialUnread || []).length);
+
             state.badgeSubscription = supabaseClient
                 .channel('conv-badge')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' },

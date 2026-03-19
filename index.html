@@ -213,7 +213,7 @@
 
         /* View Containers */
         .view { display: none; }
-        .view { display: none; }
+
         .view.active { display: block; background: var(--color-background); min-height: calc(100vh - 120px); }
         /* Weekly Banner */
         .weekly-banner {
@@ -3758,7 +3758,9 @@ function openPostModal(postId) {
                     + '</div>'
                     + '</div>';
             }
+            list.style.cssText = 'display:block !important; min-height:300px; background:var(--color-background); color:var(--color-text);';
             list.innerHTML = html;
+            showToast('✅ ' + state.conversations.length + ' Chats gerendert');
         }
 
         function updateMessageBadge(count) {

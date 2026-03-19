@@ -3643,28 +3643,67 @@ function openPostModal(postId) {
         // NACHRICHTEN
         // ============================================================
 
-          async function loadConversations() {
-              const list = document.getElementById('conversationsList');
-              list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Lade Nachrichten...</div>';
-              try {
-                  const uid = state.currentUser.id;
-                    list.innerHTML = `<div style='text-align:center;padding:20px;font-size:12px;color:gray;'>uid: ${uid}</div>`;
-                  const { data, error } = await supabaseClient
-                      .from('conversations')
-                      .select('id, last_message, last_message_at, participant_1, participant_2')
-                      .or(`participant_1.eq.${uid},participant_2.eq.${uid}`)
-                      .order('last_message_at', { ascending: false, nullsFirst: false });
-                  if (error) throw error;
+            async function loadConversations() {
+                const list = document.getElementById('conversationsList');
+                if (!list) return;
+                if (!state.currentUser) {
+                    list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Bitte einloggen.</div>';
+                    return;
+                }
+                list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);font-size:14px;">Lade Nachrichten...</div>';
+                try {
+                    const uid = state.currentUser.id;
 
-                  const otherIds = (data || []).map(c => c.participant_1 === uid ? c.participant_2 : c.participant_1);
-                  const uniqueIds = [...new Set(otherIds)];
-                  let usersMap = {};
-                  if (uniqueIds.length > 0) {
-                      const { data: usersData } = await supabaseClient
-                          .from('users').select('id, username, display_name, user_color, avatar_url')
-                          .in('id', uniqueIds);
-                      (usersData || []).forEach(u => { usersMap[u.id] = u; });
-                  }
+                    // Zwei separate Queries statt or() — umgeht RLS-Probleme
+                    const [{ data: asP1 }, { data: asP2 }] = await Promise.all([
+                        supabaseClient.from('conversations')
+                            .select('id, last_message, last_message_at, participant_1, participant_2')
+                            .eq('participant_1', uid)
+                            .order('last_message_at', { ascending: false }),
+                        supabaseClient.from('conversations')
+                            .select('id, last_message, last_message_at, participant_1, participant_2')
+                            .eq('participant_2', uid)
+                            .order('last_message_at', { ascending: false })
+                    ]);
+
+                    // Zusammenführen + sortieren
+                    const allConvs = [...(asP1 || []), ...(asP2 || [])];
+                    allConvs.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
+
+                    // User-Daten für Gesprächspartner laden
+                    const otherIds = allConvs.map(c => c.participant_1 === uid ? c.participant_2 : c.participant_1);
+                    const uniqueIds = [...new Set(otherIds)];
+                    let usersMap = {};
+                    if (uniqueIds.length > 0) {
+                        const { data: usersData } = await supabaseClient
+                            .from('users')
+                            .select('id, username, display_name, user_color, avatar_url')
+                            .in('id', uniqueIds);
+                        (usersData || []).forEach(u => { usersMap[u.id] = u; });
+                    }
+
+                    const enrichedData = allConvs.map(c => ({
+                        ...c,
+                        other: usersMap[c.participant_1 === uid ? c.participant_2 : c.participant_1] || {}
+                    }));
+
+                    // Ungelesene Nachrichten laden
+                    const { data: unreadData } = await supabaseClient
+                        .from('messages').select('conversation_id')
+                        .eq('is_read', false).neq('sender_id', uid);
+                    const unreadMap = {};
+                    (unreadData || []).forEach(m => {
+                        unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
+                    });
+
+                    state.conversations = enrichedData;
+                    renderConversations(unreadMap);
+                    updateMessageBadge(Object.values(unreadMap).reduce((a, b) => a + b, 0));
+                } catch(e) {
+                    console.error('Fehler beim Laden der Konversationen:', e);
+                    list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--color-text-secondary);">Fehler: ${escapeHTML(e.message || String(e))}</div>`;
+                }
+            }
                   const enrichedData = (data || []).map(c => ({
                       ...c, other: usersMap[c.participant_1 === uid ? c.participant_2 : c.participant_1] || {}
                   }));

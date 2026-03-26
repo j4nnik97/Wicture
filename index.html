@@ -4129,7 +4129,7 @@ function openPostModal(postId) {
               updateMessageBadge((initialUnread || []).length);
 
             state.badgeSubscription = supabaseClient
-                .channel('conv-badge')
+                .channel('conv-badge-' + uid)
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' },
                     async (payload) => {
                         if (payload.new.sender_id !== uid) {
@@ -4149,14 +4149,17 @@ function openPostModal(postId) {
               if (state.notificationSubscription) state.notificationSubscription.unsubscribe();
               const uid = state.currentUser.id;
               state.notificationSubscription = supabaseClient
-                  .channel('notif-badge')
+                  .channel('notif-badge-' + uid)
                   .on('postgres_changes', {
-                      event: 'INSERT', schema: 'public', table: 'notifications',
-                      filter: `user_id=eq.${uid}`
-                  }, () => {
-                      document.getElementById('notificationDot').style.display = 'block';
+                      event: 'INSERT', schema: 'public', table: 'notifications'
+                  }, (payload) => {
+                      if (payload.new && payload.new.user_id === uid) {
+                          document.getElementById('notificationDot').style.display = 'block';
+                      }
                   })
-                  .subscribe();
+                  .subscribe((status) => {
+                      console.log('🔔 Notification-Sub Status:', status);
+                  });
           }
 
 

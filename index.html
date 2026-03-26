@@ -1495,7 +1495,8 @@
             currentConversationId: null,
             messageSubscription: null,
             badgeSubscription: null,
-            pendingPartner: null  // Konversation wird erst bei erster Nachricht angelegt
+            pendingPartner: null,  // Konversation wird erst bei erster Nachricht angelegt
+            notificationSubscription: null
         };
 
         // === Konstanten ===
@@ -3345,6 +3346,7 @@ function renderComments(comments) {
                 await loadPostsFromSupabase();
                 await loadNotifications();
                 subscribeToConversationsBadge();
+                subscribeToNotificationsBadge();
                 showToast('Willkommen zurück! 👋');
             } catch (error) {
                 console.error('Fehler beim Login:', error);
@@ -3416,6 +3418,7 @@ function renderComments(comments) {
                 state.following = new Set();
                   if (state.messageSubscription) { state.messageSubscription.unsubscribe(); state.messageSubscription = null; }
                   if (state.badgeSubscription) { state.badgeSubscription.unsubscribe(); state.badgeSubscription = null; }
+                  if (state.notificationSubscription) { state.notificationSubscription.unsubscribe(); state.notificationSubscription = null; }
                   state.pendingPartner = null;
                   state.conversations = [];
                   state.currentConversationId = null;
@@ -3463,6 +3466,7 @@ function renderComments(comments) {
                     await loadPostsFromSupabase();
 					await loadNotifications();
                   subscribeToConversationsBadge();
+                  subscribeToNotificationsBadge();
 					history.replaceState({ view: 'feed' }, '', '#feed');
                     return; 
                 } catch (e) {
@@ -4139,6 +4143,22 @@ function openPostModal(postId) {
                     })
                 .subscribe();
         }
+
+
+          function subscribeToNotificationsBadge() {
+              if (state.notificationSubscription) state.notificationSubscription.unsubscribe();
+              const uid = state.currentUser.id;
+              state.notificationSubscription = supabaseClient
+                  .channel('notif-badge')
+                  .on('postgres_changes', {
+                      event: 'INSERT', schema: 'public', table: 'notifications',
+                      filter: `user_id=eq.${uid}`
+                  }, () => {
+                      document.getElementById('notificationDot').style.display = 'block';
+                  })
+                  .subscribe();
+          }
+
 
         function subscribeToMessages(convId) {
             if (state.messageSubscription) state.messageSubscription.unsubscribe();

@@ -3326,8 +3326,9 @@ function renderComments(comments) {
                     .from('users')
                     .select('id, username, display_name, user_color, avatar_url, bio')
                     .eq('user_id', authData.user.id)
-                    .single();
+                    .maybeSingle();
                 if (userError) throw userError;
+                if (!userProfile) throw new Error('Kein Benutzerprofil gefunden.');
 
                 state.currentUser = {
                     id: userProfile.id, // WICHTIG: Hier speichern wir jetzt die Profil-ID!
@@ -3342,6 +3343,8 @@ function renderComments(comments) {
                 state.isAuthenticated = true;
                 hideLoginModal();
                 await loadPostsFromSupabase();
+                await loadNotifications();
+                subscribeToConversationsBadge();
                 showToast('Willkommen zurück! 👋');
             } catch (error) {
                 console.error('Fehler beim Login:', error);

@@ -2953,25 +2953,31 @@ function renderComments(comments) {
                 // Ansicht neu laden, damit der eigene Kommentar sofort sichtbar ist
                 await openComments(currentCommentPostId);
 				
+                // Feed lokal updaten falls Post vorhanden
                 const feedPost = state.posts.find(p => p.id === currentCommentPostId);
                 if (feedPost) {
                     feedPost.commentCount = (feedPost.commentCount || 0) + 1;
                     feedPost.recentComments.push({ username: state.currentUser.username, content: content });
-                    if (feedPost.recentComments.length > 2) feedPost.recentComments.shift(); // Max 2 behalten
-					sendNotification(feedPost.user.id, 'comment', currentCommentPostId);
+                    if (feedPost.recentComments.length > 2) feedPost.recentComments.shift();
                     renderFeed();
-            // @Mentions → Benachrichtigungen senden
-            const commentMentionRegex = /@(\w+)/g;
-            const uniqueMentions = [...new Set([...content.matchAll(commentMentionRegex)].map(m => m[1]))];
-            for (const uname of uniqueMentions) {
-                const { data: mentionedUser } = await supabaseClient
-                    .from('users').select('id').eq('username', uname).maybeSingle();
-                if (mentionedUser && mentionedUser.id !== state.currentUser.id) {
-                    sendNotification(mentionedUser.id, 'mention', currentCommentPostId);
                 }
-            }
-            hideMentionDropdown();
+
+                // Kommentar-Benachrichtigung: immer aus DB holen (unabhängig vom lokalen Feed)
+                const { data: postOwner } = await supabaseClient
+                    .from('posts').select('user_id').eq('id', currentCommentPostId).maybeSingle();
+                if (postOwner) sendNotification(postOwner.user_id, 'comment', currentCommentPostId);
+
+                // @Mentions → Benachrichtigungen senden
+                const commentMentionRegex = /@(\w+)/g;
+                const uniqueMentions = [...new Set([...content.matchAll(commentMentionRegex)].map(m => m[1]))];
+                for (const uname of uniqueMentions) {
+                    const { data: mentionedUser } = await supabaseClient
+                        .from('users').select('id').eq('username', uname).maybeSingle();
+                    if (mentionedUser && mentionedUser.id !== state.currentUser.id) {
+                        sendNotification(mentionedUser.id, 'mention', currentCommentPostId);
+                    }
                 }
+                hideMentionDropdown();
             } catch (error) {
                 console.error("Fehler beim Posten:", error);
                 showToast("Kommentar konnte nicht gepostet werden.");

@@ -853,6 +853,12 @@
             outline: none;
             font-family: var(--font-family-base);
         }
+          .comments-input {
+              font-family: inherit;
+              line-height: 1.4;
+              max-height: 100px;
+              display: block;
+          }
         .comments-input:focus {
             border-color: var(--color-primary);
         }
@@ -1288,7 +1294,7 @@
             </div>
         <div class="comments-input-area" style="position:relative;">
       <div id="mentionDropdown" class="mention-dropdown" style="display:none;"></div>
-            <input type="text" class="comments-input" id="newCommentInput" placeholder="Kommentar... @Name taggen" autocomplete="off" autocorrect="off" autocapitalize="sentences" autocomplete="nope" data-lpignore="true" data-form-type="other" spellcheck="false" oninput="handleCommentInput(event)" onkeydown="handleCommentKeydown(event)" onfocus="this.removeAttribute('readonly')" readonly>
+            <textarea class="comments-input" id="newCommentInput" placeholder="Kommentar... @Name taggen" autocomplete="off" autocorrect="off" autocapitalize="sentences" data-lpignore="true" data-form-type="other" spellcheck="false" oninput="handleCommentInput(event)" onkeydown="handleCommentKeydown(event)" rows="1" style="resize:none;overflow:hidden;"></textarea>
             <button class="comments-submit-btn" id="submitCommentBtn" onclick="postComment()">Posten</button>
         </div>
    </div>
@@ -2870,12 +2876,12 @@ async function savePostToSupabase(post) {
           async function viewUserByUsername(username) {
               const { data } = await supabaseClient
                   .from('users')
-                  .select('id, username, display_name, user_color, avatar_url, bio')
+                  .select('username')
                   .eq('username', username)
                   .maybeSingle();
               if (data) {
                   closeComments();
-                  viewUserProfile(data.id, data.username, data.display_name, data.user_color, data.avatar_url, data.bio);
+                  viewUserProfile(data.username);
               } else {
                   showToast('Nutzer nicht gefunden.');
               }

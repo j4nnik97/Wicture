@@ -1080,6 +1080,30 @@
             display: flex; align-items: center; justify-content: center;
         }
 
+
+        /* ── Mention Dropdown ── */
+        .mention-dropdown {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 0; right: 0;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.18);
+            z-index: 1100;
+            overflow: hidden;
+        }
+        .mention-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .mention-item:hover, .mention-item:active { background: var(--color-bg); }
+        .mention-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 13px; flex-shrink: 0; overflow: hidden;
+        }
     </style>
     
     <meta name="mobile-web-app-capable" content="yes">
@@ -1262,8 +1286,9 @@
         </div>
         <div class="comments-list" id="commentsList">
             </div>
-        <div class="comments-input-area">
-            <input type="text" class="comments-input" id="newCommentInput" placeholder="Kommentar hinzufügen..." autocomplete="off">
+        <div class="comments-input-area" style="position:relative;">
+      <div id="mentionDropdown" class="mention-dropdown" style="display:none;"></div>
+            <input type="text" class="comments-input" id="newCommentInput" placeholder="Kommentar... @Name taggen" autocomplete="new-password" autocorrect="off" autocapitalize="sentences" oninput="handleCommentInput(event)" onkeydown="handleCommentKeydown(event)">
             <button class="comments-submit-btn" id="submitCommentBtn" onclick="postComment()">Posten</button>
         </div>
    </div>
@@ -1837,7 +1862,7 @@ function renderFeed() {
                             <div style="padding: 0 16px 12px; font-size: 13px; line-height: 1.4;">
                                 ${post.recentComments.map(c => `
                                     <div style="margin-bottom: 2px;">
-                                        <strong>${escapeHTML(c.username)}</strong> ${escapeHTML(c.content)}
+                                        <strong>${escapeHTML(c.username)}</strong> ${highlightMentions(c.content)}
                                     </div>
                                 `).join('')}
                             </div>
@@ -2000,7 +2025,7 @@ function openPostModal(postId) {
                 <div style="padding: 0 16px 12px; font-size: 13px; line-height: 1.4;">
                     ${post.recentComments.map(c => `
                         <div style="margin-bottom: 2px;">
-                            <strong>${escapeHTML(c.username)}</strong> ${escapeHTML(c.content)}
+                            <strong>${escapeHTML(c.username)}</strong> ${highlightMentions(c.content)}
                         </div>
                     `).join('')}
                 </div>
@@ -2161,7 +2186,7 @@ async function renderProfile() {
                 }
 
                 list.innerHTML = data.map(n => {
-                    const text = n.type === 'like' ? 'hat dein Foto gelikt ❤️' : n.type === 'comment' ? 'hat kommentiert 💬' : 'folgt dir jetzt 👤';
+                    const text = n.type === 'like' ? 'hat dein Foto gelikt ❤️' : n.type === 'comment' ? 'hat kommentiert 💬' : n.type === 'mention' ? 'hat dich in einem Kommentar erwähnt 🔔' : 'folgt dir jetzt 👤';
                     
                     // Sicherheitscheck: Falls der Nutzer zwischendurch gelöscht wurde
                     if (!n.actor) return ''; 
@@ -2765,6 +2790,84 @@ async function savePostToSupabase(post) {
             currentCommentPostId = null;
         }
 
+
+          // ── @Mention System ──
+          let mentionDropdownActive = false;
+
+          function handleCommentInput(e) {
+              const input = e.target;
+              const cursorPos = input.selectionStart;
+              const textBefore = input.value.substring(0, cursorPos);
+              const mentionMatch = textBefore.match(/@(\w*)$/);
+              if (mentionMatch && mentionMatch[1].length > 0) {
+                  searchMentionUsers(mentionMatch[1]);
+              } else {
+                  hideMentionDropdown();
+              }
+          }
+
+          function handleCommentKeydown(e) {
+              if (e.key === 'Escape') hideMentionDropdown();
+          }
+
+          async function searchMentionUsers(query) {
+              const { data } = await supabaseClient
+                  .from('users')
+                  .select('id, username, display_name, user_color, avatar_url')
+                  .ilike('username', query + '%')
+                  .neq('id', state.currentUser.id)
+                  .limit(5);
+              if (data && data.length > 0) showMentionDropdown(data);
+              else hideMentionDropdown();
+          }
+
+          function showMentionDropdown(users) {
+              const dropdown = document.getElementById('mentionDropdown');
+              if (!dropdown) return;
+              dropdown.innerHTML = users.map(u => `
+                  <div class="mention-item" onclick="insertMention('${escapeHTML(u.username)}')">
+                      <div class="mention-avatar" style="background:${u.user_color}22;color:${u.user_color};">
+                          ${u.avatar_url
+                              ? `<img src="${escapeHTML(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                              : escapeHTML(u.display_name || u.username).charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                          <div style="font-weight:600;font-size:13px;">${escapeHTML(u.display_name || u.username)}</div>
+                          <div style="font-size:12px;color:var(--color-text-secondary);">@${escapeHTML(u.username)}</div>
+                      </div>
+                  </div>`).join('');
+              dropdown.style.display = 'block';
+              mentionDropdownActive = true;
+          }
+
+          function hideMentionDropdown() {
+              const dropdown = document.getElementById('mentionDropdown');
+              if (dropdown) dropdown.style.display = 'none';
+              mentionDropdownActive = false;
+          }
+
+          function insertMention(username) {
+              const input = document.getElementById('newCommentInput');
+              const cursorPos = input.selectionStart;
+              const textBefore = input.value.substring(0, cursorPos);
+              const mentionMatch = textBefore.match(/@(\w*)$/);
+              if (mentionMatch) {
+                  const before = input.value.substring(0, cursorPos - mentionMatch[0].length);
+                  const after = input.value.substring(cursorPos);
+                  input.value = before + '@' + username + ' ' + after;
+                  const newPos = before.length + username.length + 2;
+                  input.focus();
+                  input.setSelectionRange(newPos, newPos);
+              }
+              hideMentionDropdown();
+          }
+
+          function highlightMentions(text) {
+              return escapeHTML(text).replace(/@(\w+)/g,
+                  '<span style="color:var(--color-primary);font-weight:600;">@$1</span>');
+          }
+
+
 function renderComments(comments) {
             const list = document.getElementById('commentsList');
             if (comments.length === 0) {
@@ -2780,7 +2883,7 @@ function renderComments(comments) {
                             : escapeHTML(c.display_name).charAt(0).toUpperCase()}
                     </div>
                     <div class="comment-content">
-                        <strong>${escapeHTML(c.username)}</strong> ${escapeHTML(c.content)}
+                        <strong>${escapeHTML(c.username)}</strong> ${highlightMentions(c.content)}
                         <div class="comment-meta">${timeAgo(new Date(c.created_at).getTime())}</div>
                     </div>
                     ${c.user_id === state.currentUser.id ? `
@@ -2837,6 +2940,17 @@ function renderComments(comments) {
                     if (feedPost.recentComments.length > 2) feedPost.recentComments.shift(); // Max 2 behalten
 					sendNotification(feedPost.user.id, 'comment', currentCommentPostId);
                     renderFeed();
+            // @Mentions → Benachrichtigungen senden
+            const commentMentionRegex = /@(\w+)/g;
+            const uniqueMentions = [...new Set([...content.matchAll(commentMentionRegex)].map(m => m[1]))];
+            for (const uname of uniqueMentions) {
+                const { data: mentionedUser } = await supabaseClient
+                    .from('users').select('id').eq('username', uname).maybeSingle();
+                if (mentionedUser && mentionedUser.id !== state.currentUser.id) {
+                    sendNotification(mentionedUser.id, 'mention', currentCommentPostId);
+                }
+            }
+            hideMentionDropdown();
                 }
             } catch (error) {
                 console.error("Fehler beim Posten:", error);
@@ -3611,7 +3725,7 @@ function openPostModal(postId) {
                 <div style="padding: 0 16px 12px; font-size: 13px; line-height: 1.4;">
                     ${post.recentComments.map(c => `
                         <div style="margin-bottom: 2px;">
-                            <strong>${escapeHTML(c.username)}</strong> ${escapeHTML(c.content)}
+                            <strong>${escapeHTML(c.username)}</strong> ${highlightMentions(c.content)}
                         </div>
                     `).join('')}
                 </div>

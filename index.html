@@ -4031,6 +4031,12 @@ function openPostModal(postId) {
                     .eq('is_read', false)
                     .neq('sender_id', state.currentUser.id);
 
+                // Badge sofort aktualisieren nach Lesen
+                const { data: stillUnread } = await supabaseClient
+                    .from('messages').select('id')
+                    .eq('is_read', false).neq('sender_id', state.currentUser.id);
+                updateMessageBadge((stillUnread || []).length);
+
                 renderChatMessages(data || []);
             } catch(e) {
                 console.error('Fehler beim Laden der Nachrichten:', e);

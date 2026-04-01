@@ -2226,7 +2226,7 @@ async function renderProfile() {
                 await supabaseClient.from('notifications')
                     .update({ is_read: true })
                     .eq('user_id', state.currentUser.id)
-                    .eq('is_read', false);
+                    .or('is_read.eq.false,is_read.is.null');
             } catch(e) {}
 			
 			history.pushState({ modal: 'open' }, '', '');
@@ -3858,7 +3858,7 @@ function openPostModal(postId) {
                     // Ungelesene Nachrichten laden
                     const { data: unreadData } = await supabaseClient
                         .from('messages').select('conversation_id')
-                        .eq('is_read', false).neq('sender_id', uid);
+                        .or('is_read.eq.false,is_read.is.null').neq('sender_id', uid);
                     const unreadMap = {};
                     (unreadData || []).forEach(m => {
                         unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
@@ -4015,7 +4015,7 @@ function openPostModal(postId) {
             if (state.currentUser) {
                 const { data: unread } = await supabaseClient
                     .from('messages').select('id')
-                    .eq('is_read', false).neq('sender_id', state.currentUser.id);
+                    .or('is_read.eq.false,is_read.is.null').neq('sender_id', state.currentUser.id);
                 updateMessageBadge((unread || []).length);
             }
         }
@@ -4032,16 +4032,17 @@ function openPostModal(postId) {
                 if (error) throw error;
 
                 // Als gelesen markieren
-                await supabaseClient.from('messages')
+                const { error: markError } = await supabaseClient.from('messages')
                     .update({ is_read: true })
                     .eq('conversation_id', convId)
-                    .eq('is_read', false)
+                    .or('is_read.eq.false,is_read.is.null')
                     .neq('sender_id', state.currentUser.id);
+                if (markError) console.error('❌ Mark-as-read Fehler:', markError);
 
                 // Badge sofort aktualisieren nach Lesen
                 const { data: stillUnread } = await supabaseClient
                     .from('messages').select('id')
-                    .eq('is_read', false).neq('sender_id', state.currentUser.id);
+                    .or('is_read.eq.false,is_read.is.null').neq('sender_id', state.currentUser.id);
                 updateMessageBadge((stillUnread || []).length);
 
                 renderChatMessages(data || []);
@@ -4109,7 +4110,8 @@ function openPostModal(postId) {
                 const { error } = await supabaseClient.from('messages').insert([{
                     conversation_id: state.currentConversationId,
                     sender_id: state.currentUser.id,
-                    content: msgContent
+                    content: msgContent,
+                    is_read: false
                 }]);
                 if (error) throw error;
                 const preview = msgContent.length > 40 ? msgContent.substring(0,40)+'...' : msgContent;
@@ -4137,7 +4139,7 @@ function openPostModal(postId) {
               const { data: initialUnread } = await supabaseClient
                   .from('messages')
                   .select('conversation_id')
-                  .eq('is_read', false)
+                  .or('is_read.eq.false,is_read.is.null')
                   .neq('sender_id', uid);
               updateMessageBadge((initialUnread || []).length);
 
@@ -4147,7 +4149,7 @@ function openPostModal(postId) {
                     async (payload) => {
                         if (payload.new.sender_id !== uid) {
                             const { data } = await supabaseClient.from('messages')
-                                .select('conversation_id').eq('is_read', false).neq('sender_id', uid);
+                                .select('conversation_id').or('is_read.eq.false,is_read.is.null').neq('sender_id', uid);
                             updateMessageBadge((data || []).length);
                             if (state.currentView === 'messages' && !state.currentConversationId) {
                                 loadConversations();

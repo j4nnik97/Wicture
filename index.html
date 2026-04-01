@@ -2898,13 +2898,13 @@ function renderComments(comments) {
             
             list.innerHTML = comments.map(c => `
                 <div class="comment-item" style="position: relative; padding-right: 30px;">
-                    <div class="comment-avatar" style="background: ${c.user_color}22; color: ${c.user_color}; overflow: hidden;">
+                    <div class="comment-avatar" onclick="viewUserByUsername('${escapeHTML(c.username)}')" style="cursor:pointer;background: ${c.user_color}22; color: ${c.user_color}; overflow: hidden;">
                         ${c.avatar_url 
-                            ? `<img src="${escapeHTML(c.avatar_url)}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">` 
+                            ? `<img src="${escapeHTML(c.avatar_url)}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;">` 
                             : escapeHTML(c.display_name).charAt(0).toUpperCase()}
                     </div>
                     <div class="comment-content">
-                        <strong>${escapeHTML(c.username)}</strong> ${highlightMentions(c.content)}
+                        <strong onclick="viewUserByUsername('${escapeHTML(c.username)}')" style="cursor:pointer;">${escapeHTML(c.username)}</strong> ${highlightMentions(c.content)}
                         <div class="comment-meta">${timeAgo(new Date(c.created_at).getTime())}</div>
                     </div>
                     ${c.user_id === state.currentUser.id ? `

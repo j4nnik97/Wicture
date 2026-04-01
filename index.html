@@ -4003,7 +4003,7 @@ function openPostModal(postId) {
             subscribeToMessages(convId);
         }
 
-        function closeChatModal() {
+        async function closeChatModal() {
             document.getElementById('chatModal').classList.remove('open');
             if (state.messageSubscription) {
                 state.messageSubscription.unsubscribe();
@@ -4011,6 +4011,13 @@ function openPostModal(postId) {
             }
             state.currentConversationId = null;
             if (state.currentView === 'messages') loadConversations();
+            // Badge nach Schließen neu berechnen
+            if (state.currentUser) {
+                const { data: unread } = await supabaseClient
+                    .from('messages').select('id')
+                    .eq('is_read', false).neq('sender_id', state.currentUser.id);
+                updateMessageBadge((unread || []).length);
+            }
         }
 
         async function loadMessages(convId) {

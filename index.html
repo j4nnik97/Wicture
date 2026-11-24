@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Wicture</title>
+    <title>Wicture – Ein Foto pro Woche</title>
+    <meta name="description" content="Ein Foto pro Woche. Nicht mehr, nicht weniger. Das entschleunigte Foto-Tagebuch für dich und deine Freunde.">
 
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="./icon.png">
     <link rel="apple-touch-icon" href="./icon.png">
 
-    <meta name="theme-color" content="#FCFCF9" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#1F2121" media="(prefers-color-scheme: dark)">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <meta name="theme-color" content="#F4F2EC" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#141616" media="(prefers-color-scheme: dark)">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,54 +24,63 @@
     <style>
         :root {
             --color-white: #ffffff;
-            --color-cream-50: #fcfcf9;
-            --color-cream-100: #fffffd;
-            --color-gray-200: #f5f5f5;
+            --color-cream-50: #f4f2ec;
+            --color-cream-100: #ffffff;
+            --color-warm-subtle: #faf9f5;
+            --color-gray-200: #ecebe6;
             --color-gray-300: #a7a9a9;
             --color-gray-400: #777c7c;
-            --color-slate-500: #626c71;
+            --color-slate-500: #606a6f;
             --color-brown-600: #5e5240;
-            --color-charcoal-700: #1f2121;
-            --color-charcoal-800: #262828;
-            --color-slate-900: #13343b;
-            --color-teal-300: #32b8c6;
+            --color-charcoal-700: #141616;
+            --color-charcoal-800: #1e2121;
+            --color-charcoal-850: #252929;
+            --color-slate-900: #132d33;
+            --color-teal-300: #3cc1cf;
             --color-teal-400: #2da6b2;
-            --color-teal-500: #21808d;
-            --color-teal-600: #1d7480;
-            --color-teal-700: #1a6873;
-            --color-red-400: #ff5459;
+            --color-teal-500: #1e7b88;
+            --color-teal-600: #196873;
+            --color-teal-700: #145660;
+            --color-amber-500: #d97706;
+            --color-red-400: #ef4444;
 
             --color-brown-600-rgb: 94, 82, 64;
-            --color-teal-500-rgb: 33, 128, 141;
-            --color-slate-900-rgb: 19, 52, 59;
+            --color-teal-500-rgb: 30, 123, 136;
+            --color-slate-900-rgb: 19, 45, 51;
             --color-gray-400-rgb: 119, 124, 124;
-            --color-teal-300-rgb: 50, 184, 198;
+            --color-teal-300-rgb: 60, 193, 207;
             --color-gray-300-rgb: 167, 169, 169;
-            --color-gray-200-rgb: 245, 245, 245;
+            --color-gray-200-rgb: 236, 235, 230;
 
             --color-background: var(--color-cream-50);
             --color-surface: var(--color-cream-100);
+            --color-surface-subtle: var(--color-warm-subtle);
+            --color-header-bg: rgba(244, 242, 236, 0.84);
+            --color-nav-bg: rgba(255, 255, 255, 0.88);
             --color-text: var(--color-slate-900);
             --color-text-secondary: var(--color-slate-500);
             --color-primary: var(--color-teal-500);
             --color-primary-hover: var(--color-teal-600);
             --color-primary-active: var(--color-teal-700);
-            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
-            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
-            --color-btn-primary-text: var(--color-cream-50);
-            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.14);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.1);
+            --color-btn-primary-text: #fcfcf9;
+            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.38);
             --color-error: var(--color-red-400);
 
-            --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-            --radius-sm: 6px;
-            --radius-base: 8px;
-            --radius-md: 10px;
-            --radius-lg: 12px;
+            --font-family-base: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-family-editorial: "Fraunces", Georgia, "Times New Roman", serif;
+            --shadow-sm: 0 1px 2px rgba(19, 45, 51, 0.04), 0 1px 3px rgba(19, 45, 51, 0.03);
+            --shadow-md: 0 4px 16px rgba(19, 45, 51, 0.06), 0 1px 3px rgba(19, 45, 51, 0.04);
+            --shadow-lg: 0 12px 32px rgba(19, 45, 51, 0.12), 0 2px 8px rgba(19, 45, 51, 0.05);
+            --shadow-nav: 0 8px 28px rgba(19, 45, 51, 0.12), 0 1px 3px rgba(19, 45, 51, 0.06);
+            --radius-sm: 8px;
+            --radius-base: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
             --radius-full: 9999px;
-            --duration-normal: 250ms;
+            --duration-normal: 220ms;
             --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -74,20 +88,27 @@
             :root {
                 --color-background: var(--color-charcoal-700);
                 --color-surface: var(--color-charcoal-800);
-                --color-text: var(--color-gray-200);
-                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.75);
+                --color-surface-subtle: var(--color-charcoal-850);
+                --color-header-bg: rgba(20, 22, 22, 0.84);
+                --color-nav-bg: rgba(30, 33, 33, 0.9);
+                --color-text: #eef0ee;
+                --color-text-secondary: rgba(210, 215, 215, 0.7);
                 --color-primary: var(--color-teal-300);
                 --color-primary-hover: var(--color-teal-400);
-                --color-primary-active: #2996a1;
-                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
-                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
-                --color-btn-primary-text: var(--color-slate-900);
+                --color-primary-active: #26929e;
+                --color-border: rgba(255, 255, 255, 0.1);
+                --color-card-border: rgba(255, 255, 255, 0.07);
+                --color-btn-primary-text: #0f2529;
                 --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
-                --color-error: var(--color-red-400);
+                --color-error: #f87171;
+                --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+                --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.32);
+                --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.48);
+                --shadow-nav: 0 10px 30px rgba(0, 0, 0, 0.45);
             }
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         html {
             font-family: var(--font-family-base);
@@ -103,14 +124,16 @@
             flex-direction: column;
         }
 
-        /* Header */
+        /* Header (Frosted Editorial Bar) */
         .header {
             position: sticky;
             top: 0;
             z-index: 100;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
-            padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
+            background: var(--color-header-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--color-card-border);
+            padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -119,32 +142,51 @@
         .header-logo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
+            cursor: pointer;
         }
 
         .header-logo svg {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             color: var(--color-primary);
+            flex-shrink: 0;
         }
 
         .header-logo h1 {
-            font-size: 20px;
+            font-family: var(--font-family-editorial);
+            font-size: 22px;
             font-weight: 600;
             letter-spacing: -0.02em;
             color: var(--color-text);
+            line-height: 1;
+        }
+
+        .header-week-pill {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+            background: rgba(var(--color-teal-500-rgb), 0.1);
+            color: var(--color-primary);
+            margin-left: 2px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .header-week-pill { background: rgba(var(--color-teal-300-rgb), 0.14); }
         }
 
         .header-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
 
         .btn-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-base);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-full);
             border: none;
             background: transparent;
             color: var(--color-text);
@@ -152,36 +194,37 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background var(--duration-normal) var(--ease-standard);
+            transition: background var(--duration-normal) var(--ease-standard), transform 140ms var(--ease-standard);
         }
 
         .btn-icon:hover { background: rgba(var(--color-brown-600-rgb), 0.08); }
+        .btn-icon:active { transform: scale(0.92); }
 
         @media (prefers-color-scheme: dark) {
-            .btn-icon:hover { background: rgba(var(--color-gray-400-rgb), 0.15); }
+            .btn-icon:hover { background: rgba(255, 255, 255, 0.08); }
         }
 
-        .btn-icon svg { width: 22px; height: 22px; }
+        .btn-icon svg { width: 21px; height: 21px; }
 
         .notification-dot {
             display: none;
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 7px;
+            right: 7px;
             width: 8px;
             height: 8px;
             background: var(--color-error);
             border-radius: 50%;
-            border: 2px solid var(--color-surface);
+            border: 2px solid var(--color-background);
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            max-width: 600px;
+            max-width: 560px;
             width: 100%;
             margin: 0 auto;
-            padding: 0 0 80px;
+            padding: 0 0 calc(96px + env(safe-area-inset-bottom, 0px));
         }
 
         .view { display: none; }
@@ -191,20 +234,31 @@
             min-height: calc(100vh - 120px);
         }
 
-        /* Weekly Banner */
+        /* Weekly Status Card (Editorial) */
         .weekly-banner {
-            padding: 16px;
+            margin: 12px 12px 8px;
+            padding: 14px 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .weekly-banner:empty { display: none; }
+
+        .weekly-banner-top {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
         }
 
         .weekly-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-lg);
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -217,27 +271,265 @@
         }
 
         .weekly-icon.posted {
-            background: rgba(var(--color-brown-600-rgb), 0.08);
-            color: var(--color-text-secondary);
+            background: rgba(var(--color-teal-500-rgb), 0.08);
+            color: var(--color-primary);
         }
 
         @media (prefers-color-scheme: dark) {
-            .weekly-icon.can-post { background: rgba(var(--color-teal-300-rgb), 0.15); }
-            .weekly-icon.posted { background: rgba(var(--color-gray-400-rgb), 0.12); }
+            .weekly-icon.can-post { background: rgba(var(--color-teal-300-rgb), 0.16); }
+            .weekly-icon.posted { background: rgba(var(--color-teal-300-rgb), 0.12); }
         }
 
-        .weekly-icon svg { width: 22px; height: 22px; }
-        .weekly-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .weekly-icon svg { width: 20px; height: 20px; }
+        .weekly-info { flex: 1; min-width: 0; }
+        .weekly-info h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; letter-spacing: -0.01em; }
         .weekly-info p { font-size: 12px; color: var(--color-text-secondary); }
 
-        /* Post Card */
+        .weekly-cta-btn {
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-family-base);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 140ms var(--ease-standard), background var(--duration-normal);
+        }
+
+        .weekly-cta-btn:hover { background: var(--color-primary-hover); }
+        .weekly-cta-btn:active { transform: scale(0.95); }
+
+        .weekly-prompt-strip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: var(--radius-base);
+            background: var(--color-surface-subtle);
+            border: 1px solid var(--color-card-border);
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            line-height: 1.35;
+        }
+
+        .weekly-prompt-tag {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        .weekly-prompt-text {
+            font-family: var(--font-family-editorial);
+            font-size: 13px;
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        /* Weekly Check-In Rail (Friends This Week + Nudge) */
+        .weekly-checkin-rail-wrap {
+            margin: 4px 0 6px;
+        }
+
+        .weekly-checkin-rail-wrap:empty { display: none; }
+
+        .checkin-rail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 16px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-text-secondary);
+        }
+
+        .checkin-rail-count {
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--color-primary);
+        }
+
+        .checkin-rail {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 2px 16px 8px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .checkin-rail::-webkit-scrollbar { display: none; }
+
+        .checkin-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            width: 62px;
+            flex-shrink: 0;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            color: var(--color-text);
+            transition: transform 150ms var(--ease-standard);
+        }
+
+        .checkin-item:active { transform: scale(0.93); }
+
+        .checkin-ring {
+            position: relative;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            padding: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkin-ring.posted {
+            background: linear-gradient(135deg, var(--color-primary), #38b2ac);
+        }
+
+        .checkin-ring.pending {
+            border: 1.5px dashed var(--color-border);
+            padding: 3px;
+        }
+
+        .checkin-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--color-background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            overflow: hidden;
+        }
+
+        .checkin-ring.pending .checkin-avatar {
+            opacity: 0.72;
+            filter: saturate(0.55);
+        }
+
+        .checkin-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .checkin-badge {
+            position: absolute;
+            right: -1px;
+            bottom: -1px;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            border: 2px solid var(--color-background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .checkin-badge.done {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .checkin-badge.nudge {
+            background: var(--color-surface);
+            color: var(--color-text);
+            box-shadow: var(--shadow-sm);
+            font-size: 10px;
+        }
+
+        .checkin-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--color-text);
+            max-width: 62px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        .checkin-item.is-pending .checkin-name {
+            color: var(--color-text-secondary);
+        }
+
+        /* Feed Filter Bar */
+        .feed-filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 14px 10px;
+            gap: 8px;
+        }
+
+        .feed-filter-bar:empty { display: none; }
+
+        .segmented-control {
+            display: inline-flex;
+            padding: 3px;
+            border-radius: var(--radius-full);
+            background: rgba(var(--color-brown-600-rgb), 0.08);
+            gap: 2px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .segmented-control { background: rgba(255, 255, 255, 0.07); }
+        }
+
+        .segmented-btn {
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-family: var(--font-family-base);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 13px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 180ms var(--ease-standard);
+        }
+
+        .segmented-btn.active {
+            background: var(--color-surface);
+            color: var(--color-text);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Editorial Post Card */
         .post-card {
             background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            margin: 0 12px 16px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .post-card.in-modal {
+            margin: 12px 12px 40px;
         }
 
         .post-header {
-            padding: 12px 16px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -253,13 +545,13 @@
         }
 
         .avatar {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: var(--radius-full);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
             flex-shrink: 0;
             overflow: hidden;
@@ -277,7 +569,14 @@
         }
 
         .post-user-info { flex: 1; min-width: 0; }
-        .post-username { font-size: 14px; font-weight: 600; }
+        .post-username {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         .post-meta {
             font-size: 11px;
@@ -285,14 +584,22 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            margin-top: 1px;
+            flex-wrap: wrap;
+        }
+
+        .post-kw-stamp {
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            opacity: 0.9;
         }
 
         .source-badge {
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: var(--radius-full);
             font-weight: 700;
             font-size: 9px;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             display: inline-flex;
             align-items: center;
             gap: 3px;
@@ -302,26 +609,38 @@
 
         .source-badge.live {
             color: var(--color-primary);
-            background: rgba(var(--color-teal-500-rgb), 0.1);
+            background: rgba(var(--color-teal-500-rgb), 0.11);
         }
 
         .source-badge.gallery {
             color: var(--color-text-secondary);
-            background: rgba(var(--color-gray-400-rgb), 0.1);
+            background: rgba(var(--color-gray-400-rgb), 0.12);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .source-badge.live { background: rgba(var(--color-teal-300-rgb), 0.16); }
         }
 
         .post-owner-actions {
             margin-left: auto;
             display: flex;
-            gap: 4px;
+            gap: 2px;
+        }
+
+        .post-image-frame {
+            padding: 0 10px;
         }
 
         .post-image-container {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 4 / 4.3;
             background: var(--color-background);
+            border-radius: var(--radius-md);
             overflow: hidden;
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: pointer;
         }
 
         .post-image-container img {
@@ -331,11 +650,33 @@
             display: block;
         }
 
+        .heart-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            pointer-events: none;
+            color: #ffffff;
+            filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.35));
+            opacity: 0;
+        }
+
+        .heart-burst.animate {
+            animation: heartBurst 720ms var(--ease-standard) forwards;
+        }
+
+        @keyframes heartBurst {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+            25% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+            55% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25); }
+        }
+
         .post-actions {
-            padding: 12px 16px;
+            padding: 10px 12px 6px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
         }
 
         .action-btn {
@@ -343,51 +684,61 @@
             background: transparent;
             color: var(--color-text);
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             font-family: var(--font-family-base);
             font-size: 13px;
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            transition: opacity var(--duration-normal) var(--ease-standard), color var(--duration-normal) var(--ease-standard);
+            font-weight: 600;
+            padding: 6px 8px;
+            border-radius: var(--radius-full);
+            transition: background 160ms, transform 140ms var(--ease-standard), color var(--duration-normal);
         }
 
-        .action-btn:hover { opacity: 0.7; }
-        .action-btn svg { width: 22px; height: 22px; }
+        .action-btn:hover { background: rgba(var(--color-brown-600-rgb), 0.06); }
+        .action-btn:active { transform: scale(0.9); }
+
+        @media (prefers-color-scheme: dark) {
+            .action-btn:hover { background: rgba(255, 255, 255, 0.07); }
+        }
+
+        .action-btn svg { width: 21px; height: 21px; }
         .action-btn.liked { color: var(--color-error); }
+        .action-btn.share-btn { margin-left: auto; color: var(--color-text-secondary); }
 
         .like-count {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             padding: 0 16px 4px;
             cursor: pointer;
+            display: inline-block;
         }
 
         .post-caption {
-            padding: 0 16px 12px;
-            font-size: 13px;
+            padding: 0 16px 10px;
+            font-size: 13.5px;
             line-height: 1.5;
             word-break: break-word;
         }
 
-        .post-caption strong { font-weight: 600; margin-right: 4px; }
+        .post-caption strong { font-weight: 700; margin-right: 5px; }
 
         .post-more-comments {
             padding: 0 16px 4px;
-            font-size: 13px;
+            font-size: 12.5px;
+            font-weight: 500;
             color: var(--color-text-secondary);
             cursor: pointer;
         }
 
         .post-recent-comments {
-            padding: 0 16px 12px;
+            padding: 0 16px 14px;
             font-size: 13px;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         .post-recent-comment {
-            margin-bottom: 2px;
+            margin-bottom: 3px;
             word-break: break-word;
         }
 
@@ -397,56 +748,259 @@
             cursor: pointer;
         }
 
-        /* Profile & Explore */
-        .profile-header {
-            padding: 24px 16px;
+        /* Editorial Feed Week Divider & Caught-Up Card */
+        .feed-week-divider {
+            padding: 8px 16px 10px;
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 10px;
+        }
+
+        .feed-week-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--color-card-border);
+        }
+
+        .feed-caught-up {
+            margin: 6px 12px 18px;
+            padding: 18px 16px;
+            text-align: center;
+            border-radius: var(--radius-lg);
+            background: var(--color-surface-subtle);
+            border: 1px dashed var(--color-border);
+        }
+
+        .feed-caught-up-title {
+            font-family: var(--font-family-editorial);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--color-text);
+        }
+
+        .feed-caught-up-sub {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Profile 2.0 */
+        .profile-card {
+            margin: 12px;
             background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            padding: 20px 18px 14px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
         }
 
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 76px;
+            height: 76px;
             border-radius: var(--radius-full);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             flex-shrink: 0;
-            border: 3px solid var(--color-primary);
+            border: 2.5px solid var(--color-primary);
             overflow: hidden;
         }
 
         .profile-stats {
-            display: flex;
-            gap: 24px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             flex: 1;
-            justify-content: center;
         }
 
         .stat { text-align: center; }
-        .stat-number { font-size: 18px; font-weight: 700; }
+        .stat-number { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
         .stat-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
 
         .profile-bio {
-            padding: 16px;
-            background: var(--color-surface);
-            border-bottom: 1px solid var(--color-border);
+            padding: 0 18px 18px;
             position: relative;
         }
 
-        .profile-bio h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-        .profile-bio p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.4; }
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+
+        .profile-bio h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+        .profile-bio p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.45; }
+
+        .streak-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(217, 119, 6, 0.12);
+            color: #b45309;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .streak-pill {
+                background: rgba(251, 191, 36, 0.16);
+                color: #fbbf24;
+            }
+        }
+
+        .profile-action-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        /* 52-Week Year Mosaic Card */
+        .year-mosaic-card {
+            margin: 0 12px 12px;
+            padding: 14px 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .year-mosaic-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .year-mosaic-title {
+            font-family: var(--font-family-editorial);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .year-mosaic-meta {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .year-mosaic-grid {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 4px;
+        }
+
+        .mosaic-cell {
+            aspect-ratio: 1 / 1;
+            border-radius: 4px;
+            border: none;
+            padding: 0;
+            transition: transform 140ms var(--ease-standard);
+            position: relative;
+        }
+
+        .mosaic-cell.posted {
+            background: var(--color-primary);
+            cursor: pointer;
+        }
+
+        .mosaic-cell.posted:hover { transform: scale(1.18); z-index: 2; }
+
+        .mosaic-cell.current-open {
+            background: transparent;
+            border: 1.5px solid var(--color-primary);
+            cursor: pointer;
+        }
+
+        .mosaic-cell.past-empty {
+            background: rgba(var(--color-brown-600-rgb), 0.11);
+        }
+
+        .mosaic-cell.future {
+            background: rgba(var(--color-brown-600-rgb), 0.045);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .mosaic-cell.past-empty { background: rgba(255, 255, 255, 0.1); }
+            .mosaic-cell.future { background: rgba(255, 255, 255, 0.04); }
+        }
+
+        .year-mosaic-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--color-card-border);
+        }
+
+        .mosaic-legend {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .mosaic-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .collage-btn {
+            border: none;
+            background: rgba(var(--color-teal-500-rgb), 0.1);
+            color: var(--color-primary);
+            padding: 6px 11px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+            font-family: var(--font-family-base);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 160ms;
+        }
+
+        .collage-btn:hover { background: rgba(var(--color-teal-500-rgb), 0.18); }
+
+        @media (prefers-color-scheme: dark) {
+            .collage-btn { background: rgba(var(--color-teal-300-rgb), 0.14); }
+        }
+
+        /* Profile Grid / Timeline Switch */
+        .profile-tabs-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 14px 10px;
+        }
 
         .profile-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-            padding: 2px;
+            gap: 4px;
+            padding: 0 12px 16px;
         }
 
         .grid-item {
@@ -455,6 +1009,7 @@
             cursor: pointer;
             position: relative;
             background: var(--color-surface);
+            border-radius: var(--radius-sm);
         }
 
         .grid-item img {
@@ -462,10 +1017,24 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: opacity var(--duration-normal) var(--ease-standard);
+            transition: transform 240ms var(--ease-standard), opacity 200ms;
         }
 
-        .grid-item:hover img { opacity: 0.85; }
+        .grid-item:hover img { transform: scale(1.03); }
+
+        .grid-kw-pill {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.52);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 5px;
+            letter-spacing: 0.03em;
+        }
 
         .grid-item-overlay {
             position: absolute;
@@ -473,24 +1042,121 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.32);
             opacity: 0;
             transition: opacity var(--duration-normal) var(--ease-standard);
             color: white;
             font-weight: 600;
-            font-size: 14px;
-            gap: 6px;
+            font-size: 13px;
+            gap: 5px;
         }
 
         .grid-item:hover .grid-item-overlay { opacity: 1; }
 
+        /* Profile Timeline Journal View */
+        .profile-timeline {
+            padding: 0 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .timeline-month-heading {
+            font-family: var(--font-family-editorial);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 8px 4px 2px;
+            color: var(--color-text);
+        }
+
+        .timeline-card {
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: transform 160ms var(--ease-standard);
+        }
+
+        .timeline-card:active { transform: scale(0.985); }
+
+        .timeline-thumb {
+            width: 84px;
+            height: 84px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--color-background);
+        }
+
+        .timeline-body {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        .timeline-caption {
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--color-text);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .timeline-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Explore 2.0 (Editorial Magazine Grid) */
+        .explore-header {
+            padding: 16px 16px 10px;
+        }
+
+        .explore-header h2 {
+            font-family: var(--font-family-editorial);
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 2px;
+        }
+
+        .explore-header p {
+            font-size: 12.5px;
+            color: var(--color-text-secondary);
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 4px 12px 20px;
+        }
+
         .explore-card {
             position: relative;
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 4 / 4.6;
             overflow: hidden;
-            border-radius: 4px;
+            border-radius: var(--radius-lg);
             cursor: pointer;
             background: var(--color-surface);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .explore-card.hero {
+            grid-column: 1 / -1;
+            aspect-ratio: 16 / 12;
         }
 
         .explore-card img {
@@ -498,44 +1164,111 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            transition: transform 280ms var(--ease-standard);
+        }
+
+        .explore-card:hover img { transform: scale(1.03); }
+
+        .explore-card-gradient {
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 52%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.72), transparent);
+            pointer-events: none;
+        }
+
+        .explore-rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(19, 45, 51, 0.8);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .explore-card-footer {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .explore-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .explore-author-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
         }
 
         .explore-likes-pill {
-            position: absolute;
-            bottom: 6px;
-            left: 6px;
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
             color: #fff;
             padding: 3px 8px;
-            border-radius: 12px;
+            border-radius: var(--radius-full);
             font-size: 11px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 4px;
             font-weight: 700;
+            flex-shrink: 0;
         }
 
         /* Upload View */
-        .upload-area { padding: 16px; }
+        .upload-area { padding: 14px 12px; }
+
+        .upload-prompt-card {
+            margin-bottom: 12px;
+            padding: 14px 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
 
         .upload-dropzone {
-            border: 2px dashed var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: 48px 24px;
+            border: 1.5px dashed var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 38px 22px;
             text-align: center;
             transition: all var(--duration-normal) var(--ease-standard);
             background: var(--color-surface);
+            box-shadow: var(--shadow-sm);
         }
 
         .upload-dropzone svg.dropzone-icon {
-            width: 48px;
-            height: 48px;
-            color: var(--color-text-secondary);
+            width: 44px;
+            height: 44px;
+            color: var(--color-primary);
             margin-bottom: 12px;
         }
 
-        .upload-dropzone h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-        .upload-dropzone p { font-size: 13px; color: var(--color-text-secondary); }
+        .upload-dropzone h3 {
+            font-family: var(--font-family-editorial);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .upload-dropzone p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.45; }
 
         .upload-preview {
             display: none;
@@ -550,7 +1283,8 @@
             aspect-ratio: 1 / 1;
             border-radius: var(--radius-lg);
             overflow: hidden;
-            background: var(--color-background);
+            background: var(--color-surface);
+            box-shadow: var(--shadow-md);
         }
 
         .upload-preview-img img {
@@ -563,14 +1297,14 @@
         .upload-caption-input {
             width: 100%;
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-base);
-            padding: 12px;
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
             font-size: 14px;
             font-family: var(--font-family-base);
             background: var(--color-surface);
             color: var(--color-text);
             resize: vertical;
-            min-height: 80px;
+            min-height: 84px;
             outline: none;
             transition: border-color var(--duration-normal) var(--ease-standard);
         }
@@ -578,20 +1312,33 @@
         .upload-caption-input:focus { border-color: var(--color-primary); }
         .upload-caption-input::placeholder { color: var(--color-text-secondary); }
 
+        .prompt-chip-btn {
+            align-self: flex-start;
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            color: var(--color-primary);
+            border-radius: var(--radius-full);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-family-base);
+            cursor: pointer;
+        }
+
         .char-counter {
             text-align: right;
             font-size: 11px;
             color: var(--color-text-secondary);
         }
 
-        .upload-actions { display: flex; gap: 8px; }
+        .upload-actions { display: flex; gap: 10px; }
 
         /* Buttons & Form Inputs */
         .btn {
-            padding: 10px 20px;
-            border-radius: var(--radius-base);
+            padding: 11px 20px;
+            border-radius: var(--radius-md);
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             font-family: var(--font-family-base);
             cursor: pointer;
             border: none;
@@ -610,32 +1357,32 @@
         }
 
         .btn-primary:hover { background: var(--color-primary-hover); }
-        .btn-primary:active { background: var(--color-primary-active); }
+        .btn-primary:active { transform: scale(0.98); background: var(--color-primary-active); }
         .btn-primary:disabled,
         .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-secondary {
-            background: transparent;
-            color: var(--color-text-secondary);
+            background: var(--color-surface);
+            color: var(--color-text);
             border: 1px solid var(--color-border);
         }
 
         .btn-secondary:hover { background: rgba(var(--color-brown-600-rgb), 0.06); }
 
         @media (prefers-color-scheme: dark) {
-            .btn-secondary:hover { background: rgba(var(--color-gray-400-rgb), 0.12); }
+            .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
         }
 
         .form-group { margin-bottom: 16px; }
         .form-label {
             display: block;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 6px;
         }
         .form-input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 11px 13px;
             border: 1px solid var(--color-border);
             border-radius: var(--radius-base);
             font-size: 14px;
@@ -651,7 +1398,9 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.52);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 1010;
             align-items: center;
             justify-content: center;
@@ -662,7 +1411,8 @@
 
         .dialog-card {
             background: var(--color-surface);
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-xl);
             padding: 24px;
             max-width: 400px;
             width: 100%;
@@ -673,67 +1423,103 @@
 
         /* Disabled Upload */
         .upload-disabled {
-            padding: 48px 24px;
+            padding: 36px 22px;
             text-align: center;
             background: var(--color-surface);
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
         }
 
         .upload-disabled > svg {
-            width: 48px;
-            height: 48px;
-            color: var(--color-text-secondary);
+            width: 44px;
+            height: 44px;
+            color: var(--color-primary);
             margin-bottom: 12px;
         }
 
-        .upload-disabled h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .upload-disabled h3 {
+            font-family: var(--font-family-editorial);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
         .upload-disabled p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+
+        .this-week-mini-post {
+            margin: 18px auto 0;
+            max-width: 240px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--color-card-border);
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+
+        .this-week-mini-post img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+        }
 
         .countdown-timer {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            margin-top: 12px;
+            margin-top: 16px;
             padding: 8px 16px;
-            background: rgba(var(--color-teal-500-rgb), 0.08);
+            background: rgba(var(--color-teal-500-rgb), 0.1);
             border-radius: var(--radius-full);
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12.5px;
+            font-weight: 700;
             color: var(--color-primary);
         }
 
         @media (prefers-color-scheme: dark) {
-            .countdown-timer { background: rgba(var(--color-teal-300-rgb), 0.1); }
+            .countdown-timer { background: rgba(var(--color-teal-300-rgb), 0.14); }
         }
 
         /* Empty State */
         .empty-state {
-            padding: 64px 24px;
+            padding: 56px 24px;
             text-align: center;
         }
 
         .empty-state svg {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             color: var(--color-text-secondary);
-            margin-bottom: 16px;
-            opacity: 0.5;
+            margin-bottom: 14px;
+            opacity: 0.45;
         }
 
-        .empty-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-        .empty-state p { font-size: 13px; color: var(--color-text-secondary); }
+        .empty-state h3 {
+            font-family: var(--font-family-editorial);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .empty-state p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.45; }
 
-        /* Bottom Nav */
+        /* Floating Pill Bottom Nav */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--color-surface);
-            border-top: 1px solid var(--color-border);
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 460px;
+            background: var(--color-nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--color-border);
+            border-radius: 26px;
+            box-shadow: var(--shadow-nav);
             display: flex;
+            align-items: center;
+            padding: 5px 6px;
             z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom, 0);
         }
 
         .bottom-nav-item {
@@ -742,31 +1528,51 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px 0;
+            padding: 7px 0;
             border: none;
             background: transparent;
             color: var(--color-text-secondary);
             font-size: 10px;
+            font-weight: 600;
             font-family: var(--font-family-base);
             cursor: pointer;
-            gap: 3px;
+            gap: 2px;
             position: relative;
-            transition: color var(--duration-normal) var(--ease-standard);
+            border-radius: 20px;
+            transition: color var(--duration-normal) var(--ease-standard), background var(--duration-normal) var(--ease-standard), transform 140ms;
         }
 
-        .bottom-nav-item.active { color: var(--color-primary); }
-        .bottom-nav-item svg { width: 24px; height: 24px; }
-        .bottom-nav-item.upload-btn { color: var(--color-primary); }
+        .bottom-nav-item:active { transform: scale(0.92); }
+
+        .bottom-nav-item.active {
+            color: var(--color-primary);
+            background: rgba(var(--color-teal-500-rgb), 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .bottom-nav-item.active { background: rgba(var(--color-teal-300-rgb), 0.14); }
+        }
+
+        .bottom-nav-item svg { width: 21px; height: 21px; }
+        .bottom-nav-item.upload-btn { color: var(--color-primary); background: transparent !important; }
 
         .upload-plus-circle {
-            width: 36px;
-            height: 36px;
+            width: 42px;
+            height: 42px;
             border-radius: var(--radius-full);
             background: var(--color-primary);
             color: var(--color-btn-primary-text);
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 12px rgba(var(--color-teal-500-rgb), 0.32);
+            transition: transform 160ms var(--ease-standard), background 200ms;
+        }
+
+        .upload-plus-circle.posted-done {
+            background: rgba(var(--color-teal-500-rgb), 0.14);
+            color: var(--color-primary);
+            box-shadow: none;
         }
 
         .upload-plus-circle svg { width: 20px; height: 20px; }
@@ -774,20 +1580,21 @@
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 90px;
+            bottom: calc(86px + env(safe-area-inset-bottom, 0px));
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             background: var(--color-text);
             color: var(--color-background);
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: var(--radius-full);
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             opacity: 0;
-            transition: all 300ms var(--ease-standard);
+            transition: all 280ms var(--ease-standard);
             pointer-events: none;
             max-width: calc(100vw - 32px);
             text-align: center;
+            box-shadow: var(--shadow-lg);
             z-index: 2000;
         }
 
@@ -801,26 +1608,27 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: var(--radius-full);
-            font-size: 10px;
-            font-weight: 600;
+            font-size: 10.5px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             background: rgba(var(--color-teal-500-rgb), 0.1);
             color: var(--color-primary);
+            flex-shrink: 0;
         }
 
         @media (prefers-color-scheme: dark) {
-            .week-badge { background: rgba(var(--color-teal-300-rgb), 0.12); }
+            .week-badge { background: rgba(var(--color-teal-300-rgb), 0.14); }
         }
 
         ::-webkit-scrollbar { width: 0; }
 
         @media (min-width: 600px) {
             .main-content {
-                border-left: 1px solid var(--color-border);
-                border-right: 1px solid var(--color-border);
+                border-left: 1px solid var(--color-card-border);
+                border-right: 1px solid var(--color-card-border);
             }
         }
 
@@ -1263,13 +2071,14 @@
 <body>
 
     <header class="header">
-        <div class="header-logo">
+        <div class="header-logo" onclick="switchView('feed'); window.scrollTo({ top: 0, behavior: 'smooth' });">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                 <circle cx="12" cy="12" r="3.5"/>
                 <circle cx="17.5" cy="6.5" r="1"/>
             </svg>
             <h1>Wicture</h1>
+            <span class="header-week-pill" id="headerWeekPill"></span>
         </div>
         <div class="header-actions">
             <button type="button" class="btn-icon" id="notificationBtn" aria-label="Benachrichtigungen" style="position: relative;" onclick="openNotifications()">
@@ -1291,15 +2100,17 @@
     <main class="main-content">
         <div class="view active" id="feedView">
             <div class="weekly-banner" id="weeklyBanner"></div>
+            <div class="weekly-checkin-rail-wrap" id="weeklyCheckinRail"></div>
+            <div class="feed-filter-bar" id="feedFilterBar"></div>
             <div id="feedContainer"></div>
         </div>
 
         <div class="view" id="exploreView">
-            <div style="padding: 12px 16px;">
-                <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">Entdecken</h2>
-                <p style="font-size: 12px; color: var(--color-text-secondary);">Die besten Fotos dieser Woche</p>
+            <div class="explore-header">
+                <h2>Entdecken</h2>
+                <p id="exploreSubtitle">Die schönsten Wochenmomente der Community</p>
             </div>
-            <div class="profile-grid" id="exploreGrid"></div>
+            <div class="explore-grid" id="exploreGrid"></div>
         </div>
 
         <div class="view" id="uploadView">
@@ -1335,7 +2146,7 @@
             <span>Entdecken</span>
         </button>
         <button type="button" class="bottom-nav-item upload-btn" data-view="upload" aria-label="Hochladen">
-            <div class="upload-plus-circle">
+            <div class="upload-plus-circle" id="uploadNavCircle">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -1492,6 +2303,11 @@
         </div>
     </div>
 
+    <!-- Nudge Friend Modal -->
+    <div id="nudgeModal" class="dialog-backdrop" style="z-index: 1012;" onclick="if (event.target === this) closeNudgeModal()">
+        <div class="dialog-card" id="nudgeModalContent" style="text-align: center;"></div>
+    </div>
+
     <!-- Chat Modal -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-header">
@@ -1616,6 +2432,23 @@
         const MSG_MAX_LENGTH = 1000;
         const FEED_POST_LIMIT = 200;
 
+        // --- Wöchentliche Foto-Impulse (52 kuratierte Themen, deterministisch nach KW) ---
+        const WEEKLY_PROMPTS = [
+            'Ein ruhiger Neuanfang', 'Warmes Licht im Winter', 'Dein Lieblingsgetränk diese Woche', 'Etwas, das dich lächeln ließ',
+            'Ein Blick aus deinem Fenster', 'Unterwegs am Morgen', 'Ein Detail, das sonst niemand sieht', 'Kleine Auszeit',
+            'Farben im Alltag', 'Dein Lieblingsort gerade', 'Ein Moment in Bewegung', 'Licht & Schatten',
+            'Frühlingsboten', 'Was auf deinem Tisch liegt', 'Ein Weg, den du oft gehst', 'Wolken & Himmel',
+            'Etwas Handgemachtes', 'Sonntagsgefühl', 'Ein unerwarteter Moment', 'Grün um dich herum',
+            'Abendstimmung', 'Ein Gespräch oder Treffen', 'Wasser in jeder Form', 'Etwas Altes, etwas Neues',
+            'Sommersonne', 'Lieblingsessen der Woche', 'Draußen unterwegs', 'Ein stiller Augenblick',
+            'Spiegelungen', 'Musik oder Geräuschkulisse', 'Dein Highlight der Woche', 'Goldene Stunde',
+            'Architektur & Linien', 'Natur ganz nah', 'Unterwegs mit Freunden', 'Ein Buch, Film oder Gedanke',
+            'Spätsommerlicht', 'Ein neuer Blickwinkel', 'Herbstfarben', 'Gemütlichkeit drinnen',
+            'Regen oder Nebel', 'Etwas Warmes', 'Kleine Routine', 'Abendlicht in der Stadt',
+            'Dankbarkeit der Woche', 'Kontraste', 'Ein ruhiger Abend', 'Vorfreude',
+            'Lichter in der Dunkelheit', 'Wintermoment', 'Lieblingserinnerung', 'Abschied vom Jahr'
+        ];
+
         // --- App State ---
         const state = {
             currentView: 'feed',
@@ -1624,6 +2457,10 @@
             posts: [],
             profilePosts: [],
             following: new Set(),
+            followingProfiles: [],
+            feedFilter: 'all',
+            profileTab: 'grid',
+            lastProfileContext: null,
             weeklyPostDone: false,
             lastPostTimestamp: null,
             nextPostAvailable: null,
@@ -1648,6 +2485,7 @@
         let toastTimer = null;
         let searchTimeout = null;
         let mentionTimeout = null;
+        const lastTapMap = new Map();
 
         // --- Security & Utility Helpers ---
         function escapeHTML(str) {
@@ -1664,7 +2502,7 @@
         function sanitizeColor(color) {
             return (typeof color === 'string' && /^#[0-9a-fA-F]{6}$/.test(color.trim()))
                 ? color.trim()
-                : '#21808D';
+                : '#1E7B88';
         }
 
         function sanitizeUrl(url) {
@@ -1688,7 +2526,7 @@
             toastTimer = setTimeout(() => {
                 toast.classList.remove('show');
                 toastTimer = null;
-            }, 2500);
+            }, 2600);
         }
 
         function renderAvatarInner(avatarUrl, displayName, username) {
@@ -1716,7 +2554,7 @@
             `;
         }
 
-        // --- ISO Week & Date Helpers (DST- & Jahreswechsel-sicher) ---
+        // --- ISO Week, Prompt & Streak Helpers (DST- & Jahreswechsel-sicher) ---
         function getISOWeekInfo(date) {
             const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
@@ -1726,9 +2564,24 @@
             return { week, year: isoYear };
         }
 
+        function getISOWeekKey(date = new Date()) {
+            const { week, year } = getISOWeekInfo(date);
+            return `${year}-${week}`;
+        }
+
+        function getWeeklyPrompt(date = new Date()) {
+            const { week } = getISOWeekInfo(date);
+            return WEEKLY_PROMPTS[(week - 1) % WEEKLY_PROMPTS.length];
+        }
+
         function getWeekStorageLabel(date = new Date()) {
             const { week, year } = getISOWeekInfo(date);
             return `Woche ${week}, ${year}`;
+        }
+
+        function getShortKWLabel(timestamp) {
+            const { week } = getISOWeekInfo(new Date(timestamp));
+            return `KW ${week}`;
         }
 
         function getStartOfWeekDate(date = new Date()) {
@@ -1759,20 +2612,75 @@
             return getWeekStorageLabel(postDate);
         }
 
+        function calculateWeeklyStreak(posts) {
+            if (!posts || posts.length === 0) return 0;
+            const postedWeeks = new Set(posts.map(p => getISOWeekKey(new Date(p.timestamp))));
+            const cursor = getStartOfWeekDate(new Date());
+            cursor.setHours(12, 0, 0, 0); // Mittagszeit -> immun gegen Zeitumstellung
+
+            if (!postedWeeks.has(getISOWeekKey(cursor))) {
+                cursor.setDate(cursor.getDate() - 7);
+            }
+
+            let streak = 0;
+            while (postedWeeks.has(getISOWeekKey(cursor))) {
+                streak++;
+                cursor.setDate(cursor.getDate() - 7);
+            }
+            return streak;
+        }
+
+        function renderHeaderWeekPill() {
+            const pill = document.getElementById('headerWeekPill');
+            if (!pill) return;
+            const { week } = getISOWeekInfo(new Date());
+            pill.textContent = `KW ${week}`;
+        }
+
+        function updateUploadNavIndicator() {
+            const circle = document.getElementById('uploadNavCircle');
+            if (!circle) return;
+            if (state.weeklyPostDone) {
+                circle.classList.add('posted-done');
+                circle.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                `;
+            } else {
+                circle.classList.remove('posted-done');
+                circle.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                `;
+            }
+        }
+
+        function getMyPostThisWeek() {
+            if (!state.currentUser) return null;
+            const weekStart = getStartOfCurrentWeek();
+            const curKey = getISOWeekKey(new Date());
+            return state.posts.find(p =>
+                String(p.user.id) === String(state.currentUser.id) &&
+                (p.timestamp >= weekStart || getISOWeekKey(new Date(p.timestamp)) === curKey)
+            ) || null;
+        }
+
         function checkWeeklyLimit() {
             if (!state.currentUser) {
                 state.weeklyPostDone = false;
+                updateUploadNavIndicator();
                 return;
             }
-            const weekStart = getStartOfCurrentWeek();
-            const myPosts = state.posts.filter(p =>
-                String(p.user.id) === String(state.currentUser.id) && p.timestamp >= weekStart
-            );
-            state.weeklyPostDone = myPosts.length > 0;
-            if (state.weeklyPostDone) {
-                state.lastPostTimestamp = myPosts[0].timestamp;
+            const myPost = getMyPostThisWeek();
+            state.weeklyPostDone = Boolean(myPost);
+            if (myPost) {
+                state.lastPostTimestamp = myPost.timestamp;
                 state.nextPostAvailable = getEndOfCurrentWeek();
             }
+            updateUploadNavIndicator();
         }
 
         function timeAgo(ts) {
@@ -1839,8 +2747,75 @@
             });
         }
 
+        // --- Share & Invite Helpers ---
+        async function inviteFriends() {
+            const shareData = {
+                title: 'Wicture – Ein Foto pro Woche',
+                text: 'Komm zu Wicture! Ein Foto pro Woche, kein Doomscrolling – nur echte Momente unter Freunden 📸',
+                url: 'https://wicture.app'
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                    showToast('Einladungslink kopiert! 🔗');
+                } else {
+                    showToast('Teile wicture.app mit deinen Freunden!');
+                }
+            } catch (err) {
+                if (err && err.name !== 'AbortError') showToast('Teilen abgebrochen.');
+            }
+        }
+
+        async function sharePost(postId) {
+            const post = getPostById(postId);
+            if (!post) return;
+            const shareData = {
+                title: `Wicture von @${post.user.username}`,
+                text: `Schau dir das Wochenfoto (${getShortKWLabel(post.timestamp)}) von @${post.user.username} auf Wicture an 📸`,
+                url: 'https://wicture.app'
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(`${shareData.text} – ${shareData.url}`);
+                    showToast('Link kopiert! 🔗');
+                }
+            } catch (err) {
+                if (err && err.name !== 'AbortError') showToast('Teilen nicht verfügbar.');
+            }
+        }
+
+        // --- Double-Tap to Like ---
+        function handleImageTap(el, postId) {
+            const now = Date.now();
+            const key = String(postId);
+            const last = lastTapMap.get(key) || 0;
+            lastTapMap.set(key, now);
+
+            if (now - last < 320) {
+                lastTapMap.delete(key);
+                const burst = el.querySelector('.heart-burst');
+                if (burst) {
+                    burst.classList.remove('animate');
+                    void burst.offsetWidth;
+                    burst.classList.add('animate');
+                }
+                const post = getPostById(postId);
+                if (post && !post.liked) {
+                    toggleLike(postId);
+                }
+            }
+        }
+
         // --- History API (Android "Zurück" Button) ---
         window.addEventListener('popstate', (event) => {
+            if (document.getElementById('nudgeModal').classList.contains('open')) {
+                closeNudgeModal();
+                return;
+            }
             if (document.getElementById('chatModal').classList.contains('open')) {
                 closeChatModal();
                 return;
@@ -1883,12 +2858,13 @@
             }
         });
 
-        // --- Shared Post Card Renderer ---
+        // --- Shared Post Card Renderer (Editorial 2.0) ---
         function renderPostCard(post, { inModal = false } = {}) {
             const isOwner = state.currentUser && String(post.user.id) === String(state.currentUser.id);
             const color = sanitizeColor(post.user.color);
             const safeImg = sanitizeUrl(post.image);
             const postIdEsc = escapeHTML(String(post.id));
+            const kwStamp = getShortKWLabel(post.timestamp);
             const userClick = inModal
                 ? `closePostModal(); viewUserProfile(this.dataset.username)`
                 : `viewUserProfile(this.dataset.username)`;
@@ -1900,7 +2876,7 @@
                 : `deletePost(this.dataset.postId, false)`;
 
             return `
-                <div class="post-card" data-post-id="${postIdEsc}" style="${inModal ? 'border-bottom: none; margin-bottom: 40px;' : ''}">
+                <article class="post-card ${inModal ? 'in-modal' : ''}" data-post-id="${postIdEsc}">
                     <div class="post-header">
                         <div class="post-user-trigger" data-username="${escapeHTML(post.user.username)}" onclick="${userClick}">
                             <div class="avatar" style="background: ${color}22; color: ${color};">
@@ -1910,6 +2886,8 @@
                                 <div class="post-username">${escapeHTML(post.user.username)}</div>
                                 <div class="post-meta">
                                     <span>${timeAgo(post.timestamp)}</span>
+                                    <span>·</span>
+                                    <span class="post-kw-stamp">${escapeHTML(kwStamp)}</span>
                                     ${post.isCamera ? `
                                         <span class="source-badge live">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1950,8 +2928,13 @@
                         ` : ''}
                     </div>
 
-                    <div class="post-image-container">
-                        <img src="${escapeHTML(safeImg)}" alt="Foto von ${escapeHTML(post.user.displayName)}" loading="lazy">
+                    <div class="post-image-frame">
+                        <div class="post-image-container" data-post-id="${postIdEsc}" onclick="handleImageTap(this, this.dataset.postId)">
+                            <img src="${escapeHTML(safeImg)}" alt="Foto von ${escapeHTML(post.user.displayName)}" loading="lazy">
+                            <svg class="heart-burst" width="84" height="84" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
                     </div>
 
                     <div class="post-actions">
@@ -1964,6 +2947,7 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
+                            ${post.commentCount > 0 ? `<span>${post.commentCount}</span>` : ''}
                         </button>
                         ${!isOwner ? `
                             <button type="button" class="action-btn"
@@ -1979,6 +2963,13 @@
                                 </svg>
                             </button>
                         ` : ''}
+                        <button type="button" class="action-btn share-btn" data-post-id="${postIdEsc}" onclick="sharePost(this.dataset.postId)" aria-label="Teilen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                <polyline points="16 6 12 2 8 6"/>
+                                <line x1="12" y1="2" x2="12" y2="15"/>
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="like-count" data-post-id="${postIdEsc}" onclick="openLikesList(this.dataset.postId)">${post.likes} Gefällt mir</div>
@@ -1998,32 +2989,51 @@
                                 </div>
                             `).join('')}
                         </div>
-                    ` : '<div style="padding-bottom: 12px;"></div>'}
-                </div>
+                    ` : '<div style="padding-bottom: 10px;"></div>'}
+                </article>
             `;
         }
 
         // --- Rendering Views ---
+        function applyWeeklyPromptToCaption() {
+            const input = document.getElementById('captionInput');
+            const counter = document.getElementById('captionCounter');
+            if (!input) return;
+            const prompt = getWeeklyPrompt();
+            input.value = prompt;
+            if (counter) counter.textContent = String(prompt.length);
+            input.focus();
+        }
+
         function renderUpload() {
             const container = document.getElementById('uploadArea');
             if (!state.currentUser) return;
             checkWeeklyLimit();
+            const { week } = getISOWeekInfo(new Date());
+            const prompt = getWeeklyPrompt();
 
             if (state.weeklyPostDone) {
+                const myPost = getMyPostThisWeek();
+                const safeImg = myPost ? sanitizeUrl(myPost.image) : '';
                 container.innerHTML = `
                     <div class="upload-disabled">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
-                        <h3>Foto bereits hochgeladen</h3>
-                        <p>Du hast dein Foto für diese Woche bereits geteilt.</p>
+                        <h3>KW ${week} ist im Kasten ✨</h3>
+                        <p>Du hast deinen Moment für diese Woche bereits festgehalten.</p>
+                        ${myPost && safeImg ? `
+                            <div class="this-week-mini-post" data-post-id="${escapeHTML(myPost.id)}" onclick="openPostModal(this.dataset.postId)">
+                                <img src="${escapeHTML(safeImg)}" alt="Dein Wochenfoto">
+                            </div>
+                        ` : ''}
                         <div class="countdown-timer">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px;">
                                 <circle cx="12" cy="12" r="10"/>
                                 <polyline points="12 6 12 12 16 14"/>
                             </svg>
-                            Nächstes in ${formatCountdown(state.nextPostAvailable)}
+                            Nächstes Foto in ${formatCountdown(state.nextPostAvailable)}
                         </div>
                     </div>
                 `;
@@ -2032,30 +3042,37 @@
 
             const safePreview = sanitizeUrl(selectedPreviewUrl);
             container.innerHTML = `
+                <div class="upload-prompt-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <span class="weekly-prompt-tag">Impuls für KW ${week} (freiwillig)</span>
+                    </div>
+                    <div class="weekly-prompt-text">„${escapeHTML(prompt)}“</div>
+                </div>
+
                 <div id="dropzoneContainer" class="upload-dropzone" style="${safePreview ? 'display: none;' : ''}">
-                    <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
                         <circle cx="12" cy="12" r="3.5"/>
                         <circle cx="17.5" cy="6.5" r="1"/>
                     </svg>
-                    <h3>Foto auswählen</h3>
-                    <p>Mache jetzt ein neues Foto oder wähle eins aus deiner Galerie</p>
+                    <h3>Dein Foto für KW ${week}</h3>
+                    <p>Ein Bild pro Woche – mach jetzt ein Live-Foto oder wähle deinen Lieblingsmoment aus der Galerie.</p>
 
-                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
-                        <button type="button" class="btn btn-primary" onclick="document.getElementById('cameraInput').click()" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; width: 100%;">
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 22px;">
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('cameraInput').click()" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; width: 100%;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
                                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                                 <circle cx="12" cy="13" r="4"/>
                             </svg>
-                            Kamera
+                            Kamera (Live)
                         </button>
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; width: 100%;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; width: 100%;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
                                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                                 <circle cx="8.5" cy="8.5" r="1.5"/>
                                 <polyline points="21 15 16 10 5 21"/>
                             </svg>
-                            Galerie
+                            Aus Galerie wählen
                         </button>
                     </div>
                 </div>
@@ -2064,7 +3081,8 @@
                     <div class="upload-preview-img">
                         <img id="previewImage" src="${escapeHTML(safePreview)}" alt="Vorschau">
                     </div>
-                    <textarea id="captionInput" class="upload-caption-input" maxlength="${CAPTION_MAX}" placeholder="Schreibe eine Bildunterschrift..." oninput="document.getElementById('captionCounter').textContent = this.value.length"></textarea>
+                    <button type="button" class="prompt-chip-btn" onclick="applyWeeklyPromptToCaption()">✨ Impuls als Text übernehmen</button>
+                    <textarea id="captionInput" class="upload-caption-input" maxlength="${CAPTION_MAX}" placeholder="Erzähl kurz, was dahintersteckt..." oninput="document.getElementById('captionCounter').textContent = this.value.length"></textarea>
                     <div class="char-counter"><span id="captionCounter">0</span>/${CAPTION_MAX}</div>
                     <div class="upload-actions">
                         <button type="button" class="btn btn-secondary" onclick="cancelUpload()">Abbrechen</button>
@@ -2081,50 +3099,288 @@
                 return;
             }
             checkWeeklyLimit();
+            const { week } = getISOWeekInfo(new Date());
+            const prompt = getWeeklyPrompt();
 
             if (state.weeklyPostDone) {
+                const myPost = getMyPostThisWeek();
                 banner.innerHTML = `
-                    <div class="weekly-icon posted">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                    </div>
-                    <div class="weekly-info">
-                        <h3>Wochenfoto gepostet ✓</h3>
-                        <p>Nächster Post in ${formatCountdown(state.nextPostAvailable)}</p>
+                    <div class="weekly-banner-top">
+                        <div class="weekly-icon posted">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <div class="weekly-info">
+                            <h3>KW ${week} erledigt ✓</h3>
+                            <p>Nächstes Foto in ${formatCountdown(state.nextPostAvailable)}</p>
+                        </div>
+                        ${myPost ? `
+                            <button type="button" class="btn btn-secondary" style="padding: 7px 12px; font-size: 12px; border-radius: 999px;" data-post-id="${escapeHTML(myPost.id)}" onclick="openPostModal(this.dataset.postId)">Ansehen</button>
+                        ` : ''}
                     </div>
                 `;
             } else {
                 banner.innerHTML = `
-                    <div class="weekly-icon can-post">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <circle cx="12" cy="12" r="3.5"/>
-                            <circle cx="17.5" cy="6.5" r="1"/>
-                        </svg>
+                    <div class="weekly-banner-top">
+                        <div class="weekly-icon can-post">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="12" cy="12" r="3.5"/>
+                                <circle cx="17.5" cy="6.5" r="1"/>
+                            </svg>
+                        </div>
+                        <div class="weekly-info">
+                            <h3>Dein Foto für KW ${week} wartet</h3>
+                            <p>1 Moment pro Woche – noch offen</p>
+                        </div>
+                        <button type="button" class="weekly-cta-btn" onclick="switchView('upload')">Posten</button>
                     </div>
-                    <div class="weekly-info">
-                        <h3>Dein Wochenfoto wartet!</h3>
-                        <p>Du kannst diese Woche noch 1 Foto teilen</p>
+                    <div class="weekly-prompt-strip">
+                        <span class="weekly-prompt-tag">Impuls</span>
+                        <span class="weekly-prompt-text">„${escapeHTML(prompt)}“</span>
                     </div>
                 `;
             }
         }
 
-        function renderFeed() {
-            const container = document.getElementById('feedContainer');
+        // --- Weekly Check-In Rail & Nudge ---
+        function getNudgeStorageKey(targetUserId) {
+            return `wicture_nudge_${getISOWeekKey(new Date())}_${targetUserId}`;
+        }
+
+        function hasNudgedThisWeek(targetUserId) {
+            try {
+                return localStorage.getItem(getNudgeStorageKey(targetUserId)) === '1';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function renderWeeklyCheckinRail() {
+            const wrap = document.getElementById('weeklyCheckinRail');
+            if (!wrap) return;
             if (!state.currentUser) {
-                container.innerHTML = '';
+                wrap.innerHTML = '';
                 return;
             }
 
-            const feedPosts = state.posts.filter(post =>
+            const weekStart = getStartOfCurrentWeek();
+            const curKey = getISOWeekKey(new Date());
+            const postedMap = new Map();
+
+            for (const p of state.posts) {
+                if (p.timestamp >= weekStart || getISOWeekKey(new Date(p.timestamp)) === curKey) {
+                    const uid = String(p.user.id);
+                    if (!postedMap.has(uid)) postedMap.set(uid, p);
+                }
+            }
+
+            // Eigene Karte + alle gefolgten Freunde sammeln
+            const friendMap = new Map();
+            for (const f of state.followingProfiles) {
+                friendMap.set(String(f.id), f);
+            }
+            for (const p of state.posts) {
+                const uid = String(p.user.id);
+                if (state.following.has(uid) && !friendMap.has(uid)) {
+                    friendMap.set(uid, {
+                        id: uid,
+                        username: p.user.username,
+                        displayName: p.user.displayName,
+                        color: p.user.color,
+                        avatarUrl: p.user.avatarUrl
+                    });
+                }
+            }
+
+            const friends = Array.from(friendMap.values());
+            if (friends.length === 0) {
+                wrap.innerHTML = '';
+                return;
+            }
+
+            const postedFriends = friends.filter(f => postedMap.has(String(f.id)));
+            const pendingFriends = friends.filter(f => !postedMap.has(String(f.id)));
+            const ordered = [...postedFriends, ...pendingFriends];
+
+            const myPost = postedMap.get(String(state.currentUser.id));
+            const postedTotal = postedFriends.length + (myPost ? 1 : 0);
+            const totalCount = friends.length + 1;
+
+            const selfColor = sanitizeColor(state.currentUser.color);
+            const selfHtml = `
+                <button type="button" class="checkin-item ${myPost ? '' : 'is-pending'}"
+                    onclick="${myPost ? `openPostModal('${escapeHTML(myPost.id)}')` : `switchView('upload')`}">
+                    <div class="checkin-ring ${myPost ? 'posted' : 'pending'}">
+                        <div class="checkin-avatar" style="background: ${selfColor}22; color: ${selfColor};">
+                            ${renderAvatarInner(state.currentUser.avatarUrl, state.currentUser.displayName, state.currentUser.username)}
+                        </div>
+                        <span class="checkin-badge ${myPost ? 'done' : 'nudge'}">${myPost ? '✓' : '+'}</span>
+                    </div>
+                    <span class="checkin-name">Du</span>
+                </button>
+            `;
+
+            const friendsHtml = ordered.map(friend => {
+                const fid = String(friend.id);
+                const post = postedMap.get(fid);
+                const color = sanitizeColor(friend.color);
+                const nudged = hasNudgedThisWeek(fid);
+                if (post) {
+                    return `
+                        <button type="button" class="checkin-item" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)">
+                            <div class="checkin-ring posted">
+                                <div class="checkin-avatar" style="background: ${color}22; color: ${color};">
+                                    ${renderAvatarInner(friend.avatarUrl, friend.displayName, friend.username)}
+                                </div>
+                                <span class="checkin-badge done">✓</span>
+                            </div>
+                            <span class="checkin-name">${escapeHTML(friend.username)}</span>
+                        </button>
+                    `;
+                }
+                return `
+                    <button type="button" class="checkin-item is-pending" data-uid="${escapeHTML(fid)}" onclick="openNudgeModal(this.dataset.uid)">
+                        <div class="checkin-ring pending">
+                            <div class="checkin-avatar" style="background: ${color}22; color: ${color};">
+                                ${renderAvatarInner(friend.avatarUrl, friend.displayName, friend.username)}
+                            </div>
+                            <span class="checkin-badge nudge">${nudged ? '✓' : '👋'}</span>
+                        </div>
+                        <span class="checkin-name">${escapeHTML(friend.username)}</span>
+                    </button>
+                `;
+            }).join('');
+
+            wrap.innerHTML = `
+                <div class="checkin-rail-header">
+                    <span>Diese Woche</span>
+                    <span class="checkin-rail-count">${postedTotal} von ${totalCount} geteilt</span>
+                </div>
+                <div class="checkin-rail">
+                    ${selfHtml}
+                    ${friendsHtml}
+                </div>
+            `;
+        }
+
+        function openNudgeModal(userId) {
+            const uidStr = String(userId);
+            let friend = state.followingProfiles.find(f => String(f.id) === uidStr);
+            if (!friend) {
+                const fromPost = state.posts.find(p => String(p.user.id) === uidStr);
+                if (fromPost) friend = fromPost.user;
+            }
+            if (!friend) return;
+            const modal = document.getElementById('nudgeModal');
+            const content = document.getElementById('nudgeModalContent');
+            const color = sanitizeColor(friend.color);
+            const { week } = getISOWeekInfo(new Date());
+            const alreadyNudged = hasNudgedThisWeek(friend.id);
+
+            content.innerHTML = `
+                <div class="profile-avatar" style="width: 68px; height: 68px; margin: 0 auto 14px; background: ${color}22; color: ${color}; border-style: dashed;">
+                    ${renderAvatarInner(friend.avatarUrl, friend.displayName, friend.username)}
+                </div>
+                <h3 style="font-family: var(--font-family-editorial); font-size: 19px; margin-bottom: 6px;">${escapeHTML(friend.displayName)}</h3>
+                <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.45;">
+                    @${escapeHTML(friend.username)} hat für KW ${week} noch kein Wochenfoto geteilt.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button type="button" id="nudgeSendBtn" class="btn btn-primary" ${alreadyNudged ? 'disabled' : ''}
+                        data-uid="${escapeHTML(String(friend.id))}"
+                        data-username="${escapeHTML(friend.username)}"
+                        onclick="sendNudge(this.dataset.uid, this.dataset.username)">
+                        ${alreadyNudged ? 'Diese Woche bereits angestupst ✓' : 'Freundlich anstupsen 👋'}
+                    </button>
+                    <button type="button" class="btn btn-secondary"
+                        data-username="${escapeHTML(friend.username)}"
+                        onclick="closeNudgeModal(); viewUserProfile(this.dataset.username)">
+                        Profil ansehen
+                    </button>
+                    <button type="button" onclick="closeNudgeModal()" style="background: none; border: none; color: var(--color-text-secondary); font-size: 13px; padding: 6px; cursor: pointer; font-family: inherit;">
+                        Schließen
+                    </button>
+                </div>
+            `;
+
+            const wasOpen = modal.classList.contains('open');
+            modal.classList.add('open');
+            if (!wasOpen) history.pushState({ modal: 'nudge' }, '', '');
+        }
+
+        function closeNudgeModal() {
+            const modal = document.getElementById('nudgeModal');
+            if (modal) modal.classList.remove('open');
+        }
+
+        async function sendNudge(targetUserId, targetUsername) {
+            if (!state.currentUser || hasNudgedThisWeek(targetUserId)) return;
+            const btn = document.getElementById('nudgeSendBtn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Wird angestupst...'; }
+
+            try {
+                const { error } = await supabaseClient.from('notifications').insert([{
+                    user_id: targetUserId,
+                    actor_id: state.currentUser.id,
+                    type: 'nudge',
+                    post_id: null
+                }]);
+                if (error) throw error;
+
+                try { localStorage.setItem(getNudgeStorageKey(targetUserId), '1'); } catch (e) {}
+                closeNudgeModal();
+                renderWeeklyCheckinRail();
+                showToast(`@${targetUsername} angestupst 👋`);
+            } catch (err) {
+                console.error('Nudge Fehler:', err);
+                if (btn) { btn.disabled = false; btn.textContent = 'Freundlich anstupsen 👋'; }
+                showToast('Anstupsen derzeit nicht aktiv.');
+            }
+        }
+
+        // --- Feed Filter & Feed Renderer ---
+        function setFeedFilter(filter) {
+            state.feedFilter = filter;
+            renderFeed();
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feedContainer');
+            const filterBar = document.getElementById('feedFilterBar');
+            if (!state.currentUser) {
+                container.innerHTML = '';
+                if (filterBar) filterBar.innerHTML = '';
+                return;
+            }
+
+            const allFeedPosts = state.posts.filter(post =>
                 String(post.user.id) === String(state.currentUser.id) ||
                 state.following.has(String(post.user.id)) ||
                 (state.focusedPostId && String(post.id) === String(state.focusedPostId))
             );
 
-            if (feedPosts.length === 0) {
+            const weekStart = getStartOfCurrentWeek();
+            const curKey = getISOWeekKey(new Date());
+            const thisWeekPosts = allFeedPosts.filter(p => p.timestamp >= weekStart || getISOWeekKey(new Date(p.timestamp)) === curKey);
+
+            if (filterBar) {
+                if (allFeedPosts.length > 0) {
+                    filterBar.innerHTML = `
+                        <div class="segmented-control" role="tablist">
+                            <button type="button" class="segmented-btn ${state.feedFilter === 'all' ? 'active' : ''}" onclick="setFeedFilter('all')">Alle</button>
+                            <button type="button" class="segmented-btn ${state.feedFilter === 'week' ? 'active' : ''}" onclick="setFeedFilter('week')">Diese Woche (${thisWeekPosts.length})</button>
+                        </div>
+                    `;
+                } else {
+                    filterBar.innerHTML = '';
+                }
+            }
+
+            const feedPosts = state.feedFilter === 'week' ? thisWeekPosts : allFeedPosts;
+
+            if (allFeedPosts.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2132,21 +3388,47 @@
                             <circle cx="12" cy="12" r="3.5"/>
                         </svg>
                         <h3>Dein Feed ist noch leer</h3>
-                        <p>Poste ein Foto oder folge anderen Nutzern im Entdecken-Tab!</p>
+                        <p>Teile dein erstes Wochenfoto oder folge Freunden im Entdecken-Tab.</p>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 18px;">
+                            <button type="button" class="btn btn-primary" style="flex: 0 1 auto;" onclick="switchView('explore')">Entdecken</button>
+                            <button type="button" class="btn btn-secondary" onclick="inviteFriends()">Freunde einladen</button>
+                        </div>
                     </div>
                 `;
                 return;
             }
 
+            if (feedPosts.length === 0 && state.feedFilter === 'week') {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Diese Woche noch ganz ruhig</h3>
+                        <p>Sobald du oder deine Freunde ein Foto für diese Woche teilen, erscheint es hier.</p>
+                        <button type="button" class="btn btn-secondary" style="margin-top: 16px;" onclick="setFeedFilter('all')">Archiv ansehen</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const { week } = getISOWeekInfo(new Date());
             let currentGroupLabel = '';
+            let caughtUpInserted = false;
             let html = '';
 
             for (const post of feedPosts) {
                 const groupLabel = getFriendlyWeekLabel(post.timestamp);
                 if (groupLabel !== currentGroupLabel) {
+                    if (currentGroupLabel === 'Diese Woche' && !caughtUpInserted) {
+                        caughtUpInserted = true;
+                        html += `
+                            <div class="feed-caught-up">
+                                <div class="feed-caught-up-title">Du bist für KW ${week} up to date ✨</div>
+                                <div class="feed-caught-up-sub">Alles darunter kommt aus früheren Wochen</div>
+                            </div>
+                        `;
+                    }
                     currentGroupLabel = groupLabel;
                     html += `
-                        <div style="padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
+                        <div class="feed-week-divider">
                             <span class="week-badge">${escapeHTML(currentGroupLabel)}</span>
                         </div>
                     `;
@@ -2154,21 +3436,37 @@
                 html += renderPostCard(post, { inModal: false });
             }
 
+            if (currentGroupLabel === 'Diese Woche' && !caughtUpInserted) {
+                html += `
+                    <div class="feed-caught-up">
+                        <div class="feed-caught-up-title">Du bist für KW ${week} up to date ✨</div>
+                        <div class="feed-caught-up-sub">Kein Endlos-Scrollen – schau nächste Woche wieder rein</div>
+                    </div>
+                `;
+            }
+
             container.innerHTML = html;
         }
 
         function renderExplore() {
             const container = document.getElementById('exploreGrid');
+            const subtitle = document.getElementById('exploreSubtitle');
             if (!state.currentUser) {
                 container.innerHTML = '';
                 return;
             }
 
+            const { week } = getISOWeekInfo(new Date());
             const currentWeekLabel = getWeekStorageLabel(new Date());
             const weekStart = getStartOfCurrentWeek();
+            const curKey = getISOWeekKey(new Date());
+
+            if (subtitle) {
+                subtitle.textContent = `Top-Momente in KW ${week} · „${getWeeklyPrompt()}“`;
+            }
 
             const trendingPosts = state.posts
-                .filter(post => post.weekLabel === currentWeekLabel || post.timestamp >= weekStart)
+                .filter(post => post.weekLabel === currentWeekLabel || post.timestamp >= weekStart || getISOWeekKey(new Date(post.timestamp)) === curKey)
                 .sort((a, b) => b.likes - a.likes);
 
             if (trendingPosts.length === 0) {
@@ -2177,131 +3475,371 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
                         </svg>
-                        <h3>Noch keine Trends</h3>
-                        <p>In dieser Woche (${escapeHTML(currentWeekLabel)}) wurden noch keine Fotos gepostet.</p>
+                        <h3>Noch keine Fotos in KW ${week}</h3>
+                        <p>Sei diese Woche der Erste und teile deinen Moment!</p>
+                        ${!state.weeklyPostDone ? `<button type="button" class="btn btn-primary" style="margin-top: 16px;" onclick="switchView('upload')">Foto posten</button>` : ''}
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = `
-                <div style="grid-column: 1 / -1; padding: 16px; font-weight: 700; color: var(--color-primary);">
-                    🔥 Top-Fotos dieser Woche
-                </div>
-                ${trendingPosts.map(post => `
-                    <div class="explore-card" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)">
+            container.innerHTML = trendingPosts.map((post, idx) => {
+                const isHero = idx === 0 && trendingPosts.length >= 2;
+                return `
+                    <div class="explore-card ${isHero ? 'hero' : ''}" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)">
                         <img src="${escapeHTML(sanitizeUrl(post.image))}" alt="Foto von ${escapeHTML(post.user.username)}" loading="lazy">
-                        <div class="explore-likes-pill">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                            <span>${post.likes}</span>
+                        <div class="explore-card-gradient"></div>
+                        ${isHero ? `<div class="explore-rank-badge">★ Top-Foto KW ${week}</div>` : ''}
+                        <div class="explore-card-footer">
+                            <div class="explore-author">
+                                <span class="explore-author-name">@${escapeHTML(post.user.username)}</span>
+                            </div>
+                            <div class="explore-likes-pill">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                                <span>${post.likes}</span>
+                            </div>
                         </div>
                     </div>
-                `).join('')}
+                `;
+            }).join('');
+        }
+
+        // --- 52-Week Year Mosaic & Collage Export ---
+        function renderYearMosaic(userPosts, isOwnProfile) {
+            const { week: currentWeek, year: currentYear } = getISOWeekInfo(new Date());
+            const totalWeeks = getISOWeekInfo(new Date(currentYear, 11, 28)).week;
+            const weekPostMap = new Map();
+
+            for (const post of userPosts) {
+                const info = getISOWeekInfo(new Date(post.timestamp));
+                if (info.year === currentYear && !weekPostMap.has(info.week)) {
+                    weekPostMap.set(info.week, post);
+                }
+            }
+
+            const postedCount = weekPostMap.size;
+            let cellsHtml = '';
+            for (let w = 1; w <= totalWeeks; w++) {
+                const post = weekPostMap.get(w);
+                if (post) {
+                    cellsHtml += `<button type="button" class="mosaic-cell posted" title="KW ${w}, ${currentYear}" aria-label="Foto aus KW ${w}" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)"></button>`;
+                } else if (w === currentWeek) {
+                    const action = isOwnProfile ? `onclick="switchView('upload')"` : '';
+                    cellsHtml += `<button type="button" class="mosaic-cell current-open" title="KW ${w} (Aktuelle Woche)" aria-label="Aktuelle Woche KW ${w}" ${action}></button>`;
+                } else if (w < currentWeek) {
+                    cellsHtml += `<span class="mosaic-cell past-empty" title="KW ${w}, ${currentYear}"></span>`;
+                } else {
+                    cellsHtml += `<span class="mosaic-cell future" title="KW ${w}, ${currentYear}"></span>`;
+                }
+            }
+
+            return `
+                <div class="year-mosaic-card">
+                    <div class="year-mosaic-header">
+                        <span class="year-mosaic-title">Jahr ${currentYear} in Wochen</span>
+                        <span class="year-mosaic-meta">${postedCount} / ${totalWeeks} Wochen</span>
+                    </div>
+                    <div class="year-mosaic-grid">${cellsHtml}</div>
+                    <div class="year-mosaic-footer">
+                        <div class="mosaic-legend">
+                            <span><i class="mosaic-legend-dot" style="background: var(--color-primary);"></i>Gepostet</span>
+                            <span><i class="mosaic-legend-dot" style="border: 1.5px solid var(--color-primary);"></i>KW ${currentWeek}</span>
+                        </div>
+                        ${isOwnProfile && userPosts.length >= 2 ? `
+                            <button type="button" class="collage-btn" onclick="exportProfileCollage()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                </svg>
+                                Collage teilen
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
             `;
+        }
+
+        function loadCrossOriginImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        async function exportProfileCollage() {
+            const ctxData = state.lastProfileContext;
+            if (!ctxData || !ctxData.userPosts || ctxData.userPosts.length < 2) {
+                showToast('Mindestens 2 Fotos für eine Collage nötig.');
+                return;
+            }
+
+            showToast('Collage wird erstellt...');
+            try {
+                const posts = ctxData.userPosts.slice(0, ctxData.userPosts.length >= 9 ? 9 : 4);
+                const cols = posts.length >= 9 ? 3 : 2;
+                const rows = Math.ceil(posts.length / cols);
+
+                const W = 1080;
+                const pad = 48;
+                const gap = 18;
+                const headerH = 140;
+                const footerH = 110;
+                const cellSize = Math.floor((W - pad * 2 - gap * (cols - 1)) / cols);
+                const H = headerH + rows * cellSize + (rows - 1) * gap + footerH;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = W;
+                canvas.height = H;
+                const ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = '#F4F2EC';
+                ctx.fillRect(0, 0, W, H);
+
+                ctx.fillStyle = '#132D33';
+                ctx.font = '600 44px Georgia, serif';
+                ctx.fillText('Wicture', pad, 76);
+
+                ctx.fillStyle = '#1E7B88';
+                ctx.font = '600 24px -apple-system, sans-serif';
+                const { year } = getISOWeekInfo(new Date());
+                ctx.fillText(`@${ctxData.userProfile.username} · ${posts.length} Wochenmomente ${year}`, pad, 114);
+
+                const images = await Promise.all(posts.map(p => loadCrossOriginImage(sanitizeUrl(p.image)).catch(() => null)));
+
+                images.forEach((img, idx) => {
+                    const col = idx % cols;
+                    const row = Math.floor(idx / cols);
+                    const x = pad + col * (cellSize + gap);
+                    const y = headerH + row * (cellSize + gap);
+
+                    ctx.save();
+                    const r = 18;
+                    ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.arcTo(x + cellSize, y, x + cellSize, y + cellSize, r);
+                    ctx.arcTo(x + cellSize, y + cellSize, x, y + cellSize, r);
+                    ctx.arcTo(x, y + cellSize, x, y, r);
+                    ctx.arcTo(x, y, x + cellSize, y, r);
+                    ctx.closePath();
+                    ctx.clip();
+
+                    ctx.fillStyle = '#E6E3DA';
+                    ctx.fillRect(x, y, cellSize, cellSize);
+
+                    if (img) {
+                        const scale = Math.max(cellSize / img.naturalWidth, cellSize / img.naturalHeight);
+                        const sw = img.naturalWidth * scale;
+                        const sh = img.naturalHeight * scale;
+                        ctx.drawImage(img, x + (cellSize - sw) / 2, y + (cellSize - sh) / 2, sw, sh);
+                    }
+                    ctx.restore();
+                });
+
+                ctx.fillStyle = '#606A6F';
+                ctx.font = '500 24px -apple-system, sans-serif';
+                ctx.fillText('Ein Foto pro Woche · wicture.app', pad, H - 46);
+
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+                if (!blob) throw new Error('Canvas-Export fehlgeschlagen');
+
+                const fileName = `wicture_${ctxData.userProfile.username}_${year}.jpg`;
+                const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: 'Meine Wicture Collage' });
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    showToast('Collage gespeichert! 📸');
+                }
+            } catch (err) {
+                if (err && err.name !== 'AbortError') {
+                    console.error('Collage-Export Fehler:', err);
+                    showToast('Collage konnte nicht erstellt werden.');
+                }
+            }
+        }
+
+        function setProfileTab(tab) {
+            state.profileTab = tab;
+            if (state.lastProfileContext) {
+                const { userProfile, userPosts, followersCount, followingCount, isOwnProfile } = state.lastProfileContext;
+                const content = document.getElementById('profileContent');
+                if (content) {
+                    content.innerHTML = renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile);
+                }
+            }
+        }
+
+        function renderProfileTimeline(userPosts) {
+            let currentMonth = '';
+            let html = '<div class="profile-timeline">';
+
+            for (const post of userPosts) {
+                const d = new Date(post.timestamp);
+                const monthLabel = d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+                if (monthLabel !== currentMonth) {
+                    currentMonth = monthLabel;
+                    html += `<div class="timeline-month-heading">${escapeHTML(monthLabel)}</div>`;
+                }
+                const dateStr = d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+                html += `
+                    <div class="timeline-card" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)">
+                        <img class="timeline-thumb" src="${escapeHTML(sanitizeUrl(post.image))}" alt="Foto aus ${escapeHTML(getShortKWLabel(post.timestamp))}" loading="lazy">
+                        <div class="timeline-body">
+                            <div>
+                                <span class="week-badge" style="margin-bottom: 6px;">${escapeHTML(getShortKWLabel(post.timestamp))} · ${dateStr}</span>
+                                <div class="timeline-caption">${escapeHTML(post.caption)}</div>
+                            </div>
+                            <div class="timeline-meta">
+                                <span>❤️ ${post.likes}</span>
+                                <span>💬 ${post.commentCount}</span>
+                                <span>${post.isCamera ? '📷 Live' : '🖼 Galerie'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            return html;
         }
 
         function renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile) {
             const color = sanitizeColor(userProfile.color);
             const totalLikes = userPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
             const activeWeeks = new Set(userPosts.map(p => p.weekLabel)).size;
+            const streak = calculateWeeklyStreak(userPosts);
             const isFollowing = !isOwnProfile && state.following.has(String(userProfile.id));
 
             return `
                 ${!isOwnProfile ? `
-                    <div style="padding: 12px 16px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; background: var(--color-surface); position: sticky; top: 0; z-index: 10;">
-                        <button type="button" class="btn-icon" onclick="switchView('feed')" aria-label="Zurück" style="width: 32px; height: 32px; margin-left: -8px;">
+                    <div style="padding: 10px 16px; border-bottom: 1px solid var(--color-card-border); display: flex; align-items: center; gap: 10px; background: var(--color-surface); position: sticky; top: 0; z-index: 10;">
+                        <button type="button" class="btn-icon" onclick="switchView('feed')" aria-label="Zurück" style="width: 34px; height: 34px; margin-left: -8px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
                             </svg>
                         </button>
-                        <h2 style="font-size: 16px; font-weight: 600;">${escapeHTML(userProfile.username)}</h2>
+                        <h2 style="font-size: 16px; font-weight: 700;">@${escapeHTML(userProfile.username)}</h2>
                     </div>
                 ` : ''}
 
-                <div class="profile-header">
-                    <div class="profile-avatar" style="background: ${color}22; color: ${color};">
-                        ${renderAvatarInner(userProfile.avatarUrl, userProfile.displayName, userProfile.username)}
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar" style="background: ${color}22; color: ${color};">
+                            ${renderAvatarInner(userProfile.avatarUrl, userProfile.displayName, userProfile.username)}
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <div class="stat-number">${userPosts.length}</div>
+                                <div class="stat-label">Fotos</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${totalLikes}</div>
+                                <div class="stat-label">Likes</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${activeWeeks}</div>
+                                <div class="stat-label">Wochen</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="profile-stats">
-                        <div class="stat">
-                            <div class="stat-number">${userPosts.length}</div>
-                            <div class="stat-label">Fotos</div>
+
+                    <div class="profile-bio">
+                        ${isOwnProfile ? `
+                            <button type="button" onclick="handleLogout()" class="btn-icon" style="position: absolute; right: 12px; top: -6px; color: var(--color-error);" title="Abmelden" aria-label="Abmelden">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                    <polyline points="16 17 21 12 16 7"/>
+                                    <line x1="21" y1="12" x2="9" y2="12"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+
+                        <div class="profile-name-row" style="${isOwnProfile ? 'padding-right: 40px;' : ''}">
+                            <h3>${escapeHTML(userProfile.displayName)}</h3>
+                            ${streak > 0 ? `<span class="streak-pill">🔥 ${streak} ${streak === 1 ? 'Woche' : 'Wochen'}</span>` : ''}
                         </div>
-                        <div class="stat">
-                            <div class="stat-number">${totalLikes}</div>
-                            <div class="stat-label">Likes</div>
+                        <p style="font-size: 12px; margin-bottom: 8px;">@${escapeHTML(userProfile.username)}</p>
+                        <p style="white-space: pre-wrap;">${escapeHTML(userProfile.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.')}</p>
+
+                        <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px;">
+                            <div data-uid="${escapeHTML(String(userProfile.id))}" onclick="openUsersList('followers', this.dataset.uid)" style="cursor: pointer;">
+                                <span style="font-weight: 700;">${followersCount || 0}</span> <span style="color: var(--color-text-secondary);">Follower</span>
+                            </div>
+                            <div data-uid="${escapeHTML(String(userProfile.id))}" onclick="openUsersList('following', this.dataset.uid)" style="cursor: pointer;">
+                                <span style="font-weight: 700;">${followingCount || 0}</span> <span style="color: var(--color-text-secondary);">Folgt</span>
+                            </div>
                         </div>
-                        <div class="stat">
-                            <div class="stat-number">${activeWeeks}</div>
-                            <div class="stat-label">Wochen</div>
-                        </div>
+
+                        ${isOwnProfile ? `
+                            <div class="profile-action-row">
+                                <button type="button" class="btn btn-secondary" style="flex: 1; padding: 9px 12px; font-size: 13px;" onclick="openEditProfileModal()">
+                                    Profil bearbeiten
+                                </button>
+                                <button type="button" class="btn btn-primary" style="flex: 1; padding: 9px 12px; font-size: 13px;" onclick="inviteFriends()">
+                                    Freunde einladen
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="profile-action-row">
+                                <button type="button" class="btn ${isFollowing ? 'btn-secondary' : 'btn-primary'}"
+                                    style="flex: 1; padding: 9px 12px; font-size: 13px;"
+                                    data-uid="${escapeHTML(String(userProfile.id))}"
+                                    data-username="${escapeHTML(userProfile.username)}"
+                                    onclick="toggleFollow(this.dataset.uid, this.dataset.username)">
+                                    ${isFollowing ? 'Entfolgen' : 'Folgen'}
+                                </button>
+                                <button type="button" class="btn btn-secondary" style="flex: 1; padding: 9px 12px; font-size: 13px;"
+                                    data-chat-uid="${escapeHTML(String(userProfile.id))}"
+                                    data-chat-user="${escapeHTML(userProfile.username)}"
+                                    data-chat-name="${escapeHTML(userProfile.displayName)}"
+                                    data-chat-color="${color}"
+                                    data-chat-avatar="${escapeHTML(sanitizeUrl(userProfile.avatarUrl))}"
+                                    onclick="startChatFromBtn(this)">
+                                    💬 Nachricht
+                                </button>
+                            </div>
+                        `}
                     </div>
                 </div>
 
-                <div class="profile-bio">
-                    ${isOwnProfile ? `
-                        <button type="button" onclick="handleLogout()" class="btn-icon" style="position: absolute; right: 16px; top: 16px; color: var(--color-error);" title="Abmelden" aria-label="Abmelden">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                <polyline points="16 17 21 12 16 7"/>
-                                <line x1="21" y1="12" x2="9" y2="12"/>
-                            </svg>
-                        </button>
-                    ` : ''}
-
-                    <h3 style="${isOwnProfile ? 'padding-right: 40px;' : ''}">${escapeHTML(userProfile.displayName)}</h3>
-                    <p style="font-size: 12px; margin-bottom: 8px;">@${escapeHTML(userProfile.username)}</p>
-                    <p style="white-space: pre-wrap;">${escapeHTML(userProfile.bio || '📸 Ein Foto pro Woche. Nicht mehr, nicht weniger.')}</p>
-
-                    <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px;">
-                        <div data-uid="${escapeHTML(String(userProfile.id))}" onclick="openUsersList('followers', this.dataset.uid)" style="cursor: pointer;">
-                            <span style="font-weight: 600;">${followersCount || 0}</span> <span style="color: var(--color-text-secondary);">Follower</span>
-                        </div>
-                        <div data-uid="${escapeHTML(String(userProfile.id))}" onclick="openUsersList('following', this.dataset.uid)" style="cursor: pointer;">
-                            <span style="font-weight: 600;">${followingCount || 0}</span> <span style="color: var(--color-text-secondary);">Folgt</span>
-                        </div>
-                    </div>
-
-                    ${isOwnProfile ? `
-                        <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 16px; padding: 8px 12px; font-size: 13px;" onclick="openEditProfileModal()">
-                            Profil bearbeiten
-                        </button>
-                    ` : `
-                        <button type="button" class="btn ${isFollowing ? 'btn-secondary' : 'btn-primary'}"
-                            style="width: 100%; margin-top: 16px; padding: 8px 12px; font-size: 13px;"
-                            data-uid="${escapeHTML(String(userProfile.id))}"
-                            data-username="${escapeHTML(userProfile.username)}"
-                            onclick="toggleFollow(this.dataset.uid, this.dataset.username)">
-                            ${isFollowing ? 'Entfolgen' : 'Folgen'}
-                        </button>
-                        <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 8px; padding: 8px 12px; font-size: 13px;"
-                            data-chat-uid="${escapeHTML(String(userProfile.id))}"
-                            data-chat-user="${escapeHTML(userProfile.username)}"
-                            data-chat-name="${escapeHTML(userProfile.displayName)}"
-                            data-chat-color="${color}"
-                            data-chat-avatar="${escapeHTML(sanitizeUrl(userProfile.avatarUrl))}"
-                            onclick="startChatFromBtn(this)">
-                            💬 Nachricht senden
-                        </button>
-                    `}
-                </div>
+                ${renderYearMosaic(userPosts, isOwnProfile)}
 
                 ${userPosts.length > 0 ? `
-                    <div class="profile-grid">
-                        ${userPosts.map(post => `
-                            <div class="grid-item" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)">
-                                <img src="${escapeHTML(sanitizeUrl(post.image))}" alt="Foto von ${escapeHTML(userProfile.username)}" loading="lazy">
-                                <div class="grid-item-overlay">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                    </svg>
-                                    ${post.likes}
-                                </div>
-                            </div>
-                        `).join('')}
+                    <div class="profile-tabs-row">
+                        <div class="segmented-control" role="tablist">
+                            <button type="button" class="segmented-btn ${state.profileTab === 'grid' ? 'active' : ''}" onclick="setProfileTab('grid')">Raster</button>
+                            <button type="button" class="segmented-btn ${state.profileTab === 'timeline' ? 'active' : ''}" onclick="setProfileTab('timeline')">Chronik</button>
+                        </div>
+                        <span style="font-size: 12px; color: var(--color-text-secondary);">${userPosts.length} ${userPosts.length === 1 ? 'Foto' : 'Fotos'}</span>
                     </div>
+
+                    ${state.profileTab === 'timeline' ? renderProfileTimeline(userPosts) : `
+                        <div class="profile-grid">
+                            ${userPosts.map(post => `
+                                <div class="grid-item" data-post-id="${escapeHTML(post.id)}" onclick="openPostModal(this.dataset.postId)">
+                                    <img src="${escapeHTML(sanitizeUrl(post.image))}" alt="Foto von ${escapeHTML(userProfile.username)}" loading="lazy">
+                                    <span class="grid-kw-pill">${escapeHTML(getShortKWLabel(post.timestamp))}</span>
+                                    <div class="grid-item-overlay">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none">
+                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                        </svg>
+                                        ${post.likes}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
                 ` : `
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -2348,6 +3886,14 @@
                     supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', state.currentUser.id),
                     supabaseClient.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', state.currentUser.id)
                 ]);
+
+                state.lastProfileContext = {
+                    userProfile: state.currentUser,
+                    userPosts: myPosts,
+                    followersCount: followersRes.count || 0,
+                    followingCount: followingRes.count || 0,
+                    isOwnProfile: true
+                };
 
                 content.innerHTML = renderProfileMarkup(
                     state.currentUser,
@@ -2405,6 +3951,14 @@
                     color: sanitizeColor(userProfile.user_color),
                     avatarUrl: userProfile.avatar_url || '',
                     bio: userProfile.bio || ''
+                };
+
+                state.lastProfileContext = {
+                    userProfile: normalizedUser,
+                    userPosts,
+                    followersCount: followersRes.count || 0,
+                    followingCount: followingRes.count || 0,
+                    isOwnProfile: false
                 };
 
                 content.innerHTML = renderProfileMarkup(
@@ -2472,19 +4026,23 @@
                             ? 'hat kommentiert 💬'
                             : n.type === 'mention'
                                 ? 'hat dich in einem Kommentar erwähnt 🔔'
-                                : 'folgt dir jetzt 👤';
+                                : n.type === 'nudge'
+                                    ? 'hat dich für dein Wochenfoto angestupst 👋'
+                                    : 'folgt dir jetzt 👤';
 
                     const color = sanitizeColor(n.actor.user_color);
                     const hasPost = Boolean(n.post_id);
-                    const clickAction = hasPost
-                        ? 'closeNotifications(); openPostModal(this.dataset.postId)'
-                        : 'closeNotifications(); viewUserProfile(this.dataset.username)';
+                    const clickAction = n.type === 'nudge'
+                        ? `closeNotifications(); switchView('upload')`
+                        : hasPost
+                            ? 'closeNotifications(); openPostModal(this.dataset.postId)'
+                            : 'closeNotifications(); viewUserProfile(this.dataset.username)';
 
                     return `
                         <div class="search-result-item"
                             data-post-id="${hasPost ? escapeHTML(String(n.post_id)) : ''}"
                             data-username="${escapeHTML(n.actor.username || '')}"
-                            style="${n.is_read ? 'opacity: 0.7;' : 'background: rgba(33, 128, 141, 0.05); padding: 12px 8px; border-radius: 8px;'}"
+                            style="${n.is_read ? 'opacity: 0.7;' : 'background: rgba(30, 123, 136, 0.06); padding: 12px 10px; border-radius: 10px;'}"
                             onclick="${clickAction}">
                             <div class="avatar" style="background: ${color}22; color: ${color};">
                                 ${renderAvatarInner(n.actor.avatar_url, n.actor.display_name, n.actor.username)}
@@ -2533,10 +4091,27 @@
             const targetIdStr = String(targetUserId);
             const isFollowing = state.following.has(targetIdStr);
 
-            if (isFollowing) state.following.delete(targetIdStr);
-            else state.following.add(targetIdStr);
+            if (isFollowing) {
+                state.following.delete(targetIdStr);
+                state.followingProfiles = state.followingProfiles.filter(f => String(f.id) !== targetIdStr);
+            } else {
+                state.following.add(targetIdStr);
+                if (state.lastProfileContext && String(state.lastProfileContext.userProfile.id) === targetIdStr) {
+                    const p = state.lastProfileContext.userProfile;
+                    if (!state.followingProfiles.some(f => String(f.id) === targetIdStr)) {
+                        state.followingProfiles.push({
+                            id: targetIdStr,
+                            username: p.username,
+                            displayName: p.displayName,
+                            color: p.color,
+                            avatarUrl: p.avatarUrl
+                        });
+                    }
+                }
+            }
 
             viewUserProfile(targetUsername, false);
+            renderWeeklyCheckinRail();
             renderFeed();
 
             try {
@@ -2558,6 +4133,7 @@
                 if (isFollowing) state.following.add(targetIdStr);
                 else state.following.delete(targetIdStr);
                 viewUserProfile(targetUsername, false);
+                renderWeeklyCheckinRail();
                 renderFeed();
                 showToast('Fehler beim Folgen.');
             }
@@ -2805,7 +4381,7 @@
 
             if (!state.currentUser) return;
 
-            if (viewName === 'feed') { renderWeeklyBanner(); renderFeed(); }
+            if (viewName === 'feed') { renderWeeklyBanner(); renderWeeklyCheckinRail(); renderFeed(); }
             if (viewName === 'explore') renderExplore();
             if (viewName === 'upload') renderUpload();
             if (viewName === 'profile') renderProfile();
@@ -2844,10 +4420,29 @@
                 if (followsRes.error) throw followsRes.error;
 
                 const myLikedPostIds = new Set((likesRes.data || []).map(like => String(like.post_id)));
-                state.following = new Set((followsRes.data || []).map(f => String(f.following_id)));
+                const followingIds = (followsRes.data || []).map(f => String(f.following_id));
+                state.following = new Set(followingIds);
                 state.posts = (postsRes.data || []).map(post => mapDbPost(post, myLikedPostIds));
 
+                if (followingIds.length > 0) {
+                    const { data: profilesData } = await supabaseClient
+                        .from('users')
+                        .select('id, username, display_name, user_color, avatar_url')
+                        .in('id', followingIds);
+                    state.followingProfiles = (profilesData || []).map(u => ({
+                        id: String(u.id),
+                        username: u.username || '',
+                        displayName: u.display_name || u.username || '',
+                        color: sanitizeColor(u.user_color),
+                        avatarUrl: u.avatar_url || ''
+                    }));
+                } else {
+                    state.followingProfiles = [];
+                }
+
+                renderHeaderWeekPill();
                 renderWeeklyBanner();
+                renderWeeklyCheckinRail();
                 renderFeed();
                 if (state.currentView === 'explore') renderExplore();
             } catch (error) {
@@ -3348,6 +4943,7 @@
                 showToast('Foto erfolgreich gelöscht! 🗑️');
 
                 renderWeeklyBanner();
+                renderWeeklyCheckinRail();
                 renderFeed();
                 if (state.currentView === 'explore') renderExplore();
                 if (state.currentView === 'profile') renderProfile();
@@ -3568,19 +5164,29 @@
             state.posts = [];
             state.profilePosts = [];
             state.following = new Set();
+            state.followingProfiles = [];
+            state.feedFilter = 'all';
+            state.profileTab = 'grid';
+            state.lastProfileContext = null;
             state.pendingPartner = null;
             state.conversations = [];
             state.currentConversationId = null;
             state.focusedPostId = null;
             state.viewingUsername = null;
             state.weeklyPostDone = false;
+            updateUploadNavIndicator();
 
             // Alle offenen Modals & Badges zurücksetzen
-            ['notificationsModal', 'searchModal', 'usersModal', 'postModal', 'commentsModal', 'chatModal', 'editProfileModal', 'editCaptionModal']
-                .forEach(id => document.getElementById(id).classList.remove('open'));
+            ['notificationsModal', 'searchModal', 'usersModal', 'postModal', 'commentsModal', 'chatModal', 'editProfileModal', 'editCaptionModal', 'nudgeModal']
+                .forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.remove('open');
+                });
             updateMessageBadge(0);
             document.getElementById('notificationDot').style.display = 'none';
             document.getElementById('weeklyBanner').innerHTML = '';
+            document.getElementById('weeklyCheckinRail').innerHTML = '';
+            document.getElementById('feedFilterBar').innerHTML = '';
             document.getElementById('feedContainer').innerHTML = '';
             document.getElementById('exploreGrid').innerHTML = '';
             document.getElementById('profileContent').innerHTML = '';
@@ -3594,6 +5200,7 @@
         }
 
         async function initApp() {
+            renderHeaderWeekPill();
             if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
                 return;
             }

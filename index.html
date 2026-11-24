@@ -4090,6 +4090,7 @@
             if (!state.currentUser) return;
             const targetIdStr = String(targetUserId);
             const isFollowing = state.following.has(targetIdStr);
+            const prevFollowingProfiles = [...state.followingProfiles];
 
             if (isFollowing) {
                 state.following.delete(targetIdStr);
@@ -4132,11 +4133,30 @@
                 console.error('Fehler beim Folgen:', error);
                 if (isFollowing) state.following.add(targetIdStr);
                 else state.following.delete(targetIdStr);
+                state.followingProfiles = prevFollowingProfiles;
                 viewUserProfile(targetUsername, false);
                 renderWeeklyCheckinRail();
                 renderFeed();
                 showToast('Fehler beim Folgen.');
             }
+        }
+
+        function syncPostLikeUI(postId) {
+            const post = getPostById(postId);
+            if (!post) return;
+            const idStr = String(postId);
+            document.querySelectorAll('.post-card').forEach(card => {
+                if (card.dataset.postId !== idStr) return;
+                const likeBtn = card.querySelector('.action-btn[aria-label="Gefällt mir"]');
+                if (likeBtn) {
+                    likeBtn.classList.toggle('liked', Boolean(post.liked));
+                    const svg = likeBtn.querySelector('svg');
+                    if (svg) svg.setAttribute('fill', post.liked ? 'currentColor' : 'none');
+                }
+                const countEl = card.querySelector('.like-count');
+                if (countEl) countEl.textContent = `${post.likes} Gefällt mir`;
+            });
+            if (state.currentView === 'explore') renderExplore();
         }
 
         async function toggleLike(postId) {
@@ -4153,11 +4173,7 @@
                 p.likes = Math.max(0, (p.likes || 0) + delta);
             });
 
-            renderFeed();
-            if (state.currentView === 'explore') renderExplore();
-            if (currentModalPostId && String(currentModalPostId) === String(postId)) {
-                renderPostModalContent(getPostById(postId));
-            }
+            syncPostLikeUI(postId);
 
             try {
                 if (!isCurrentlyLiked) {
@@ -4179,11 +4195,7 @@
                     p.liked = isCurrentlyLiked;
                     p.likes = Math.max(0, (p.likes || 0) - delta);
                 });
-                renderFeed();
-                if (state.currentView === 'explore') renderExplore();
-                if (currentModalPostId && String(currentModalPostId) === String(postId)) {
-                    renderPostModalContent(getPostById(postId));
-                }
+                syncPostLikeUI(postId);
                 showToast('Fehler: Konnte nicht gelikt werden.');
             }
         }
@@ -4352,9 +4364,16 @@
                 if (uploadedFilePath) {
                     supabaseClient.storage.from('wicture-images').remove([uploadedFilePath]).catch(() => {});
                 }
-                showToast('Fehler beim Posten. Versuche es erneut.');
-                postBtn.disabled = false;
-                postBtn.textContent = 'Posten';
+                const isWeeklyLimit = error && error.message && error.message.toLowerCase().includes('diese woche bereits');
+                if (isWeeklyLimit) {
+                    showToast('Du hast diese Woche bereits ein Foto gepostet.');
+                    await loadPostsFromSupabase();
+                    renderUpload();
+                } else {
+                    showToast('Fehler beim Posten. Versuche es erneut.');
+                    postBtn.disabled = false;
+                    postBtn.textContent = 'Posten';
+                }
             }
         }
 

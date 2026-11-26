@@ -5515,7 +5515,9 @@
                 const usernameEsc = escapeHTML(u.username || '');
                 const displayNameEsc = escapeHTML(u.display_name || u.username || 'Unbekannt');
                 const emailEsc = escapeHTML(u.email || 'Keine E-Mail');
-                const lastLoginText = u.last_sign_in_at ? `Login ${formatTimeAgo(u.last_sign_in_at)}` : 'Kein Login';
+                const lastLoginTs = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : NaN;
+                const agoStr = Number.isFinite(lastLoginTs) ? timeAgo(lastLoginTs) : '';
+                const lastLoginText = agoStr ? (agoStr === 'Gerade eben' ? 'Login gerade eben' : `Login vor ${agoStr}`) : 'Kein Login';
                 const regDate = formatAdminDate(u.created_at);
 
                 return `

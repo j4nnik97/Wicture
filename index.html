@@ -85,7 +85,7 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            :root {
+            :root:not([data-theme="light"]) {
                 --color-background: var(--color-charcoal-700);
                 --color-surface: var(--color-charcoal-800);
                 --color-surface-subtle: var(--color-charcoal-850);
@@ -106,6 +106,28 @@
                 --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.48);
                 --shadow-nav: 0 10px 30px rgba(0, 0, 0, 0.45);
             }
+        }
+
+        :root[data-theme="dark"] {
+            --color-background: var(--color-charcoal-700);
+            --color-surface: var(--color-charcoal-800);
+            --color-surface-subtle: var(--color-charcoal-850);
+            --color-header-bg: rgba(20, 22, 22, 0.84);
+            --color-nav-bg: rgba(30, 33, 33, 0.9);
+            --color-text: #eef0ee;
+            --color-text-secondary: rgba(210, 215, 215, 0.7);
+            --color-primary: var(--color-teal-300);
+            --color-primary-hover: var(--color-teal-400);
+            --color-primary-active: #26929e;
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-card-border: rgba(255, 255, 255, 0.07);
+            --color-btn-primary-text: #0f2529;
+            --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+            --color-error: #f87171;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.32);
+            --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.48);
+            --shadow-nav: 0 10px 30px rgba(0, 0, 0, 0.45);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -2066,6 +2088,383 @@
             flex-shrink: 0;
             overflow: hidden;
         }
+
+        /* --- Wicture 2.1 Components --- */
+        /* Pull-to-Refresh */
+        .pull-refresh-bar {
+            height: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-primary);
+            transition: height 200ms var(--ease-standard), opacity 200ms;
+            opacity: 0;
+        }
+
+        .pull-refresh-bar.visible {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pull-refresh-bar.refreshing svg {
+            animation: spin 750ms linear infinite;
+        }
+
+        /* Weekly Recap Card (Previous Week) */
+        .weekly-recap-card {
+            margin: 10px 12px 6px;
+            padding: 12px 14px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .weekly-recap-card:empty { display: none; }
+
+        .recap-thumb {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-base);
+            object-fit: cover;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 1px solid var(--color-card-border);
+        }
+
+        .recap-body {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .recap-eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-primary);
+            margin-bottom: 2px;
+        }
+
+        .recap-title {
+            font-family: var(--font-family-editorial);
+            font-size: 14.5px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 2px;
+        }
+
+        .recap-meta {
+            font-size: 11.5px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Post Photo Zoom Button & Optional Mood/Location Tag */
+        .post-zoom-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: rgba(15, 23, 26, 0.48);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.85;
+            transition: opacity 160ms, transform 140ms;
+        }
+
+        .post-zoom-btn:hover { opacity: 1; }
+        .post-zoom-btn:active { transform: scale(0.9); }
+
+        .post-tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin: 0 16px 8px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11.5px;
+            font-weight: 600;
+            background: var(--color-surface-subtle);
+            border: 1px solid var(--color-card-border);
+            color: var(--color-text-secondary);
+        }
+
+        /* Emoji Reactions Bar */
+        .reaction-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 2px 14px 8px;
+        }
+
+        .reaction-pill {
+            border: 1px solid var(--color-card-border);
+            background: var(--color-surface-subtle);
+            color: var(--color-text-secondary);
+            border-radius: var(--radius-full);
+            padding: 4px 9px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-family-base);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: transform 140ms var(--ease-standard), background 160ms, border-color 160ms;
+        }
+
+        .reaction-pill:active { transform: scale(0.9); }
+
+        .reaction-pill.active {
+            background: rgba(var(--color-teal-500-rgb), 0.13);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* Upload Optional Mood / Location Tags */
+        .upload-tag-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-tag-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .upload-tag-chip {
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            color: var(--color-text-secondary);
+            border-radius: var(--radius-full);
+            padding: 5px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-family-base);
+            cursor: pointer;
+            transition: all 150ms;
+        }
+
+        .upload-tag-chip.selected {
+            background: rgba(var(--color-teal-500-rgb), 0.14);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* Fullscreen Photo Lightbox */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1500;
+            background: rgba(10, 12, 12, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: calc(18px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px));
+        }
+
+        .lightbox-modal.open {
+            display: flex;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: calc(14px + env(safe-area-inset-top, 0px));
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 78dvh;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .lightbox-caption {
+            margin-top: 14px;
+            max-width: 520px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .lightbox-meta {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.62);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        /* Chat Photo Reply Context & Quote Bubble */
+        .chat-reply-context {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            background: var(--color-surface-subtle);
+            border-top: 1px solid var(--color-card-border);
+            flex-shrink: 0;
+        }
+
+        .chat-reply-context.active {
+            display: flex;
+        }
+
+        .chat-reply-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 7px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .chat-reply-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-reply-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .chat-reply-preview {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .msg-reply-quote {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            background: rgba(0, 0, 0, 0.14);
+            opacity: 0.92;
+        }
+
+        .msg-bubble.received .msg-reply-quote {
+            background: rgba(var(--color-teal-500-rgb), 0.1);
+            color: var(--color-primary);
+        }
+
+        /* Profile Preferences & Close-Friend Toggle */
+        .profile-prefs-card {
+            margin: 0 12px 12px;
+            padding: 12px 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pref-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .pref-row + .pref-row {
+            padding-top: 10px;
+            border-top: 1px solid var(--color-card-border);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 42px;
+            height: 24px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: var(--color-border);
+            cursor: pointer;
+            transition: background 180ms;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: transform 180ms var(--ease-standard);
+        }
+
+        .toggle-switch.on {
+            background: var(--color-primary);
+        }
+
+        .toggle-switch.on::after {
+            transform: translateX(18px);
+        }
+
+        .close-friend-btn {
+            width: 40px;
+            padding: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .close-friend-btn.is-close {
+            background: rgba(217, 119, 6, 0.14);
+            border-color: #d97706;
+            color: #d97706;
+        }
     </style>
 </head>
 <body>
@@ -2099,7 +2498,14 @@
 
     <main class="main-content">
         <div class="view active" id="feedView">
+            <div class="pull-refresh-bar" id="pullToRefresh" aria-live="polite">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                    <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                <span id="pullToRefreshText">Ziehen zum Aktualisieren</span>
+            </div>
             <div class="weekly-banner" id="weeklyBanner"></div>
+            <div id="weeklyRecapCard"></div>
             <div class="weekly-checkin-rail-wrap" id="weeklyCheckinRail"></div>
             <div class="feed-filter-bar" id="feedFilterBar"></div>
             <div id="feedContainer"></div>
@@ -2322,6 +2728,7 @@
             </div>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-reply-context" id="chatReplyContext"></div>
         <div class="chat-input-area">
             <textarea class="chat-input" id="chatInput" placeholder="Nachricht schreiben..." rows="1"
                 maxlength="1000" aria-label="Nachricht" onkeydown="handleChatKeydown(event)"
@@ -2331,6 +2738,20 @@
                     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
             </button>
+        </div>
+    </div>
+
+    <!-- Fullscreen Photo Lightbox -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="if (event.target === this) closeLightbox()" role="dialog" aria-modal="true" aria-label="Vollbildansicht">
+        <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Schließen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <img id="lightboxImg" class="lightbox-img" src="" alt="Vollbildfoto">
+        <div class="lightbox-caption">
+            <div class="lightbox-meta" id="lightboxMeta"></div>
+            <div id="lightboxText"></div>
         </div>
     </div>
 
@@ -2449,6 +2870,9 @@
             'Lichter in der Dunkelheit', 'Wintermoment', 'Lieblingserinnerung', 'Abschied vom Jahr'
         ];
 
+        const REACTION_EMOJIS = ['🔥', '😍', '😂', '🤯'];
+        const MOOD_TAGS = ['☕ Entspannt', '🌿 Draußen', '✨ Highlight', '🎉 Unterwegs', '🍽 Genuss', '🌧 Gemütlich'];
+
         // --- App State ---
         const state = {
             currentView: 'feed',
@@ -2457,10 +2881,16 @@
             posts: [],
             profilePosts: [],
             following: new Set(),
+            closeFriends: new Set(),
             followingProfiles: [],
+            reactionsByPost: {},
             feedFilter: 'all',
             profileTab: 'grid',
             lastProfileContext: null,
+            chatReplyPost: null,
+            weeklyReminderOptIn: true,
+            pendingDeepLink: null,
+            themeMode: 'system',
             weeklyPostDone: false,
             lastPostTimestamp: null,
             nextPostAvailable: null,
@@ -2486,6 +2916,36 @@
         let searchTimeout = null;
         let mentionTimeout = null;
         const lastTapMap = new Map();
+        const singleTapTimerMap = new Map();
+
+        // --- Theme Switcher (System / Hell / Dunkel) ---
+        function applyTheme(mode, persist = true) {
+            const valid = (mode === 'light' || mode === 'dark') ? mode : 'system';
+            state.themeMode = valid;
+            if (valid === 'system') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', valid);
+            }
+            if (persist) {
+                try { localStorage.setItem('wicture_theme', valid); } catch (e) {}
+            }
+            if (state.currentView === 'profile' && state.lastProfileContext && state.lastProfileContext.isOwnProfile) {
+                const { userProfile, userPosts, followersCount, followingCount } = state.lastProfileContext;
+                const el = document.getElementById('profileContent');
+                if (el) el.innerHTML = renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, true);
+            }
+        }
+
+        (function initSavedTheme() {
+            try {
+                const saved = localStorage.getItem('wicture_theme');
+                if (saved === 'light' || saved === 'dark') {
+                    state.themeMode = saved;
+                    document.documentElement.setAttribute('data-theme', saved);
+                }
+            } catch (e) {}
+        })();
 
         // --- Security & Utility Helpers ---
         function escapeHTML(str) {
@@ -2722,6 +3182,7 @@
                 },
                 image: post.image_url || '',
                 caption: post.caption || '',
+                tag: post.tag || '',
                 likes: post.likes || 0,
                 liked: likedIdsSet ? likedIdsSet.has(String(post.id)) : false,
                 timestamp: ts,
@@ -2747,7 +3208,7 @@
             });
         }
 
-        // --- Share & Invite Helpers ---
+        // --- Share, Deep-Links & Invite Helpers ---
         async function inviteFriends() {
             const shareData = {
                 title: 'Wicture – Ein Foto pro Woche',
@@ -2771,32 +3232,72 @@
         async function sharePost(postId) {
             const post = getPostById(postId);
             if (!post) return;
+            const deepUrl = `https://wicture.app/#post-${encodeURIComponent(post.id)}`;
             const shareData = {
                 title: `Wicture von @${post.user.username}`,
                 text: `Schau dir das Wochenfoto (${getShortKWLabel(post.timestamp)}) von @${post.user.username} auf Wicture an 📸`,
-                url: 'https://wicture.app'
+                url: deepUrl
             };
             try {
                 if (navigator.share) {
                     await navigator.share(shareData);
                 } else if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(`${shareData.text} – ${shareData.url}`);
-                    showToast('Link kopiert! 🔗');
+                    await navigator.clipboard.writeText(`${shareData.text} – ${deepUrl}`);
+                    showToast('Direktlink kopiert! 🔗');
                 }
             } catch (err) {
                 if (err && err.name !== 'AbortError') showToast('Teilen nicht verfügbar.');
             }
         }
 
-        // --- Double-Tap to Like ---
+        // --- Fullscreen Photo Lightbox ---
+        function openLightbox(postId) {
+            const post = getPostById(postId);
+            if (!post) return;
+            const modal = document.getElementById('lightboxModal');
+            const img = document.getElementById('lightboxImg');
+            const meta = document.getElementById('lightboxMeta');
+            const text = document.getElementById('lightboxText');
+            if (!modal || !img) return;
+
+            img.src = sanitizeUrl(post.image);
+            img.alt = `Foto von ${post.user.displayName}`;
+            if (meta) {
+                const tagPart = post.tag ? ` · ${post.tag}` : '';
+                meta.textContent = `@${post.user.username} · ${getShortKWLabel(post.timestamp)}${tagPart}`;
+            }
+            if (text) text.textContent = post.caption || '';
+
+            const wasOpen = modal.classList.contains('open');
+            modal.classList.add('open');
+            if (!wasOpen) history.pushState({ modal: 'lightbox' }, '', '');
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightboxModal');
+            if (modal) modal.classList.remove('open');
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('lightboxModal').classList.contains('open')) {
+                closeLightbox();
+            }
+        });
+
+        // --- Double-Tap to Like / Single-Tap to Lightbox ---
         function handleImageTap(el, postId) {
             const now = Date.now();
             const key = String(postId);
             const last = lastTapMap.get(key) || 0;
             lastTapMap.set(key, now);
 
-            if (now - last < 320) {
+            if (now - last < 310) {
                 lastTapMap.delete(key);
+                const prevTimer = singleTapTimerMap.get(key);
+                if (prevTimer) {
+                    clearTimeout(prevTimer);
+                    singleTapTimerMap.delete(key);
+                }
                 const burst = el.querySelector('.heart-burst');
                 if (burst) {
                     burst.classList.remove('animate');
@@ -2807,11 +3308,93 @@
                 if (post && !post.liked) {
                     toggleLike(postId);
                 }
+            } else {
+                const prevTimer = singleTapTimerMap.get(key);
+                if (prevTimer) clearTimeout(prevTimer);
+                const timer = setTimeout(() => {
+                    singleTapTimerMap.delete(key);
+                    openLightbox(postId);
+                }, 320);
+                singleTapTimerMap.set(key, timer);
+            }
+        }
+
+        // --- Emoji Reactions ---
+        function getPostReactionState(postId, emoji) {
+            const map = state.reactionsByPost[String(postId)];
+            if (!map || !map[emoji]) return { count: 0, reacted: false };
+            return map[emoji];
+        }
+
+        function renderReactionBarHtml(postId) {
+            const postIdEsc = escapeHTML(String(postId));
+            return `
+                <div class="reaction-bar" data-reaction-post="${postIdEsc}">
+                    ${REACTION_EMOJIS.map(emoji => {
+                        const r = getPostReactionState(postId, emoji);
+                        return `
+                            <button type="button" class="reaction-pill ${r.reacted ? 'active' : ''}"
+                                data-post-id="${postIdEsc}" data-emoji="${emoji}"
+                                onclick="toggleReaction(this.dataset.postId, this.dataset.emoji)"
+                                aria-label="Reaktion ${emoji}">
+                                <span>${emoji}</span>${r.count > 0 ? `<span>${r.count}</span>` : ''}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function syncPostReactionsUI(postId) {
+            const idStr = String(postId);
+            document.querySelectorAll('.reaction-bar').forEach(bar => {
+                if (bar.dataset.reactionPost !== idStr) return;
+                bar.outerHTML = renderReactionBarHtml(idStr);
+            });
+        }
+
+        async function toggleReaction(postId, emoji) {
+            if (!state.currentUser || !REACTION_EMOJIS.includes(emoji)) return;
+            const idStr = String(postId);
+            if (!state.reactionsByPost[idStr]) state.reactionsByPost[idStr] = {};
+            const current = state.reactionsByPost[idStr][emoji] || { count: 0, reacted: false };
+            const wasReacted = current.reacted;
+
+            state.reactionsByPost[idStr][emoji] = {
+                count: Math.max(0, current.count + (wasReacted ? -1 : 1)),
+                reacted: !wasReacted
+            };
+            syncPostReactionsUI(idStr);
+
+            try {
+                if (!wasReacted) {
+                    const { error } = await supabaseClient
+                        .from('post_reactions')
+                        .insert([{ post_id: postId, user_id: state.currentUser.id, emoji }]);
+                    if (error) throw error;
+                    const post = getPostById(postId);
+                    if (post) sendNotification(post.user.id, 'reaction', postId);
+                } else {
+                    const { error } = await supabaseClient
+                        .from('post_reactions')
+                        .delete()
+                        .match({ post_id: postId, user_id: state.currentUser.id, emoji });
+                    if (error) throw error;
+                }
+            } catch (err) {
+                console.error('Reaktion Fehler:', err);
+                state.reactionsByPost[idStr][emoji] = current;
+                syncPostReactionsUI(idStr);
+                showToast('Reaktionen sind noch nicht in Supabase aktiviert.');
             }
         }
 
         // --- History API (Android "Zurück" Button) ---
         window.addEventListener('popstate', (event) => {
+            if (document.getElementById('lightboxModal').classList.contains('open')) {
+                closeLightbox();
+                return;
+            }
             if (document.getElementById('nudgeModal').classList.contains('open')) {
                 closeNudgeModal();
                 return;
@@ -2858,7 +3441,7 @@
             }
         });
 
-        // --- Shared Post Card Renderer (Editorial 2.0) ---
+        // --- Shared Post Card Renderer (Editorial 2.1) ---
         function renderPostCard(post, { inModal = false } = {}) {
             const isOwner = state.currentUser && String(post.user.id) === String(state.currentUser.id);
             const color = sanitizeColor(post.user.color);
@@ -2931,6 +3514,12 @@
                     <div class="post-image-frame">
                         <div class="post-image-container" data-post-id="${postIdEsc}" onclick="handleImageTap(this, this.dataset.postId)">
                             <img src="${escapeHTML(safeImg)}" alt="Foto von ${escapeHTML(post.user.displayName)}" loading="lazy">
+                            <button type="button" class="post-zoom-btn" data-post-id="${postIdEsc}" onclick="event.stopPropagation(); openLightbox(this.dataset.postId)" aria-label="Vollbild">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14">
+                                    <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                                    <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                                </svg>
+                            </button>
                             <svg class="heart-burst" width="84" height="84" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
@@ -2951,12 +3540,8 @@
                         </button>
                         ${!isOwner ? `
                             <button type="button" class="action-btn"
-                                data-chat-uid="${escapeHTML(post.user.id)}"
-                                data-chat-user="${escapeHTML(post.user.username)}"
-                                data-chat-name="${escapeHTML(post.user.displayName)}"
-                                data-chat-color="${color}"
-                                data-chat-avatar="${escapeHTML(sanitizeUrl(post.user.avatarUrl))}"
-                                onclick="startChatFromBtn(this)" aria-label="Nachricht senden">
+                                data-post-id="${postIdEsc}"
+                                onclick="replyToPostInChat(this.dataset.postId)" aria-label="Auf Foto im Chat antworten" title="Im Chat antworten">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="22" y1="2" x2="11" y2="13"/>
                                     <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -2972,7 +3557,10 @@
                         </button>
                     </div>
 
+                    ${renderReactionBarHtml(post.id)}
+
                     <div class="like-count" data-post-id="${postIdEsc}" onclick="openLikesList(this.dataset.postId)">${post.likes} Gefällt mir</div>
+                    ${post.tag ? `<div class="post-tag-pill">${escapeHTML(post.tag)}</div>` : ''}
                     <div class="post-caption"><strong>${escapeHTML(post.user.username)}</strong> ${escapeHTML(post.caption)}</div>
 
                     ${post.commentCount > 2 ? `
@@ -3003,6 +3591,20 @@
             input.value = prompt;
             if (counter) counter.textContent = String(prompt.length);
             input.focus();
+        }
+
+        function selectUploadMoodTag(btn) {
+            const input = document.getElementById('uploadTagInput');
+            if (!input) return;
+            const val = btn.dataset.mood || '';
+            const wasSelected = btn.classList.contains('selected');
+            document.querySelectorAll('.upload-tag-chip').forEach(c => c.classList.remove('selected'));
+            if (wasSelected) {
+                input.value = '';
+            } else {
+                btn.classList.add('selected');
+                input.value = val;
+            }
         }
 
         function renderUpload() {
@@ -3084,6 +3686,12 @@
                     <button type="button" class="prompt-chip-btn" onclick="applyWeeklyPromptToCaption()">✨ Impuls als Text übernehmen</button>
                     <textarea id="captionInput" class="upload-caption-input" maxlength="${CAPTION_MAX}" placeholder="Erzähl kurz, was dahintersteckt..." oninput="document.getElementById('captionCounter').textContent = this.value.length"></textarea>
                     <div class="char-counter"><span id="captionCounter">0</span>/${CAPTION_MAX}</div>
+                    <div class="upload-tag-section">
+                        <input type="text" id="uploadTagInput" class="form-input" maxlength="35" placeholder="📍 Ort oder Stimmung (optional, z. B. Gardasee)">
+                        <div class="upload-tag-chips">
+                            ${MOOD_TAGS.map(m => `<button type="button" class="upload-tag-chip" data-mood="${escapeHTML(m)}" onclick="selectUploadMoodTag(this)">${escapeHTML(m)}</button>`).join('')}
+                        </div>
+                    </div>
                     <div class="upload-actions">
                         <button type="button" class="btn btn-secondary" onclick="cancelUpload()">Abbrechen</button>
                         <button type="button" id="postBtn" class="btn btn-primary" onclick="submitPost()">Posten</button>
@@ -3340,6 +3948,68 @@
             }
         }
 
+        // --- Weekly Recap Card (Vorwoche) ---
+        function getPrevWeekKey() {
+            const d = getStartOfWeekDate(new Date());
+            d.setHours(12, 0, 0, 0);
+            d.setDate(d.getDate() - 7);
+            const info = getISOWeekInfo(d);
+            return { key: `${info.year}-${info.week}`, week: info.week, year: info.year };
+        }
+
+        function dismissWeeklyRecap(weekKey) {
+            try { localStorage.setItem('wicture_recap_dismissed_' + weekKey, '1'); } catch (e) {}
+            const el = document.getElementById('weeklyRecapCard');
+            if (el) el.innerHTML = '';
+        }
+
+        function renderWeeklyRecap() {
+            const wrap = document.getElementById('weeklyRecapCard');
+            if (!wrap) return;
+            if (!state.currentUser) {
+                wrap.innerHTML = '';
+                return;
+            }
+
+            const prev = getPrevWeekKey();
+            try {
+                if (localStorage.getItem('wicture_recap_dismissed_' + prev.key) === '1') {
+                    wrap.innerHTML = '';
+                    return;
+                }
+            } catch (e) {}
+
+            const prevPosts = state.posts.filter(p =>
+                (String(p.user.id) === String(state.currentUser.id) || state.following.has(String(p.user.id))) &&
+                getISOWeekKey(new Date(p.timestamp)) === prev.key
+            );
+
+            if (prevPosts.length === 0) {
+                wrap.innerHTML = '';
+                return;
+            }
+
+            const totalLikes = prevPosts.reduce((s, p) => s + (p.likes || 0), 0);
+            const topPost = [...prevPosts].sort((a, b) => (b.likes || 0) - (a.likes || 0))[0];
+            const safeThumb = sanitizeUrl(topPost.image);
+
+            wrap.innerHTML = `
+                <div class="weekly-recap-card">
+                    ${safeThumb ? `<img class="recap-thumb" src="${escapeHTML(safeThumb)}" alt="Highlight KW ${prev.week}" data-post-id="${escapeHTML(topPost.id)}" onclick="openPostModal(this.dataset.postId)">` : ''}
+                    <div class="recap-body" data-post-id="${escapeHTML(topPost.id)}" onclick="openPostModal(this.dataset.postId)">
+                        <div class="recap-eyebrow">Rückblick · KW ${prev.week}</div>
+                        <div class="recap-title">${prevPosts.length} ${prevPosts.length === 1 ? 'Wochenfoto' : 'Wochenfotos'} · ${totalLikes} Likes</div>
+                        <div class="recap-meta">Highlight von @${escapeHTML(topPost.user.username)} ansehen →</div>
+                    </div>
+                    <button type="button" class="btn-icon" style="width: 30px; height: 30px; color: var(--color-text-secondary);" data-key="${escapeHTML(prev.key)}" onclick="dismissWeeklyRecap(this.dataset.key)" aria-label="Rückblick schließen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+        }
+
         // --- Feed Filter & Feed Renderer ---
         function setFeedFilter(filter) {
             state.feedFilter = filter;
@@ -3364,13 +4034,22 @@
             const weekStart = getStartOfCurrentWeek();
             const curKey = getISOWeekKey(new Date());
             const thisWeekPosts = allFeedPosts.filter(p => p.timestamp >= weekStart || getISOWeekKey(new Date(p.timestamp)) === curKey);
+            const hasCloseFriends = state.closeFriends.size > 0;
+            const closePosts = hasCloseFriends
+                ? allFeedPosts.filter(p => String(p.user.id) === String(state.currentUser.id) || state.closeFriends.has(String(p.user.id)))
+                : [];
+
+            if (!hasCloseFriends && state.feedFilter === 'close') {
+                state.feedFilter = 'all';
+            }
 
             if (filterBar) {
                 if (allFeedPosts.length > 0) {
                     filterBar.innerHTML = `
                         <div class="segmented-control" role="tablist">
                             <button type="button" class="segmented-btn ${state.feedFilter === 'all' ? 'active' : ''}" onclick="setFeedFilter('all')">Alle</button>
-                            <button type="button" class="segmented-btn ${state.feedFilter === 'week' ? 'active' : ''}" onclick="setFeedFilter('week')">Diese Woche (${thisWeekPosts.length})</button>
+                            <button type="button" class="segmented-btn ${state.feedFilter === 'week' ? 'active' : ''}" onclick="setFeedFilter('week')">KW ${getISOWeekInfo(new Date()).week} (${thisWeekPosts.length})</button>
+                            ${hasCloseFriends ? `<button type="button" class="segmented-btn ${state.feedFilter === 'close' ? 'active' : ''}" onclick="setFeedFilter('close')">⭐ Enger Kreis</button>` : ''}
                         </div>
                     `;
                 } else {
@@ -3378,7 +4057,11 @@
                 }
             }
 
-            const feedPosts = state.feedFilter === 'week' ? thisWeekPosts : allFeedPosts;
+            const feedPosts = state.feedFilter === 'week'
+                ? thisWeekPosts
+                : state.feedFilter === 'close'
+                    ? closePosts
+                    : allFeedPosts;
 
             if (allFeedPosts.length === 0) {
                 container.innerHTML = `
@@ -3398,12 +4081,12 @@
                 return;
             }
 
-            if (feedPosts.length === 0 && state.feedFilter === 'week') {
+            if (feedPosts.length === 0 && (state.feedFilter === 'week' || state.feedFilter === 'close')) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <h3>Diese Woche noch ganz ruhig</h3>
-                        <p>Sobald du oder deine Freunde ein Foto für diese Woche teilen, erscheint es hier.</p>
-                        <button type="button" class="btn btn-secondary" style="margin-top: 16px;" onclick="setFeedFilter('all')">Archiv ansehen</button>
+                        <h3>${state.feedFilter === 'close' ? 'Noch keine Fotos im engen Kreis' : 'Diese Woche noch ganz ruhig'}</h3>
+                        <p>${state.feedFilter === 'close' ? 'Markiere Freunde im Profil mit ⭐ für deinen engen Kreis.' : 'Sobald du oder deine Freunde ein Foto für diese Woche teilen, erscheint es hier.'}</p>
+                        <button type="button" class="btn btn-secondary" style="margin-top: 16px;" onclick="setFeedFilter('all')">Alle ansehen</button>
                     </div>
                 `;
                 return;
@@ -3703,7 +4386,7 @@
                             <div class="timeline-meta">
                                 <span>❤️ ${post.likes}</span>
                                 <span>💬 ${post.commentCount}</span>
-                                <span>${post.isCamera ? '📷 Live' : '🖼 Galerie'}</span>
+                                <span>${post.tag ? escapeHTML(post.tag) : (post.isCamera ? '📷 Live' : '🖼 Galerie')}</span>
                             </div>
                         </div>
                     </div>
@@ -3714,12 +4397,68 @@
             return html;
         }
 
+        async function toggleCloseFriend(targetUserId, targetUsername) {
+            if (!state.currentUser) return;
+            const idStr = String(targetUserId);
+            const wasClose = state.closeFriends.has(idStr);
+            if (wasClose) state.closeFriends.delete(idStr);
+            else state.closeFriends.add(idStr);
+
+            if (state.lastProfileContext) {
+                const { userProfile, userPosts, followersCount, followingCount, isOwnProfile } = state.lastProfileContext;
+                document.getElementById('profileContent').innerHTML = renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile);
+            }
+            renderFeed();
+
+            try {
+                const { error } = await supabaseClient
+                    .from('follows')
+                    .update({ is_close_friend: !wasClose })
+                    .match({ follower_id: state.currentUser.id, following_id: targetUserId });
+                if (error) throw error;
+                showToast(!wasClose ? `@${targetUsername} im engen Kreis ⭐` : `@${targetUsername} aus engem Kreis entfernt`);
+            } catch (err) {
+                console.error('Enger Kreis Fehler:', err);
+                if (wasClose) state.closeFriends.add(idStr);
+                else state.closeFriends.delete(idStr);
+                if (state.lastProfileContext) {
+                    const { userProfile, userPosts, followersCount, followingCount, isOwnProfile } = state.lastProfileContext;
+                    document.getElementById('profileContent').innerHTML = renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile);
+                }
+                renderFeed();
+                showToast('Enger Kreis noch nicht in Supabase aktiviert.');
+            }
+        }
+
+        async function toggleWeeklyReminder() {
+            if (!state.currentUser) return;
+            const nextVal = !state.weeklyReminderOptIn;
+            state.weeklyReminderOptIn = nextVal;
+            const sw = document.getElementById('reminderToggleSwitch');
+            if (sw) sw.classList.toggle('on', nextVal);
+
+            try {
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update({ weekly_reminder_opt_in: nextVal })
+                    .eq('id', state.currentUser.id);
+                if (error) throw error;
+                showToast(nextVal ? 'Sonntags-Erinnerung aktiviert 🔔' : 'Sonntags-Erinnerung pausiert');
+            } catch (err) {
+                console.error('Reminder-Setting Fehler:', err);
+                state.weeklyReminderOptIn = !nextVal;
+                if (sw) sw.classList.toggle('on', !nextVal);
+                showToast('Einstellung noch nicht in Supabase aktiviert.');
+            }
+        }
+
         function renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile) {
             const color = sanitizeColor(userProfile.color);
             const totalLikes = userPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
             const activeWeeks = new Set(userPosts.map(p => p.weekLabel)).size;
             const streak = calculateWeeklyStreak(userPosts);
             const isFollowing = !isOwnProfile && state.following.has(String(userProfile.id));
+            const isCloseFriend = isFollowing && state.closeFriends.has(String(userProfile.id));
 
             return `
                 ${!isOwnProfile ? `
@@ -3799,6 +4538,16 @@
                                     onclick="toggleFollow(this.dataset.uid, this.dataset.username)">
                                     ${isFollowing ? 'Entfolgen' : 'Folgen'}
                                 </button>
+                                ${isFollowing ? `
+                                    <button type="button" class="btn btn-secondary close-friend-btn ${isCloseFriend ? 'is-close' : ''}"
+                                        data-uid="${escapeHTML(String(userProfile.id))}"
+                                        data-username="${escapeHTML(userProfile.username)}"
+                                        onclick="toggleCloseFriend(this.dataset.uid, this.dataset.username)"
+                                        title="${isCloseFriend ? 'Aus engem Kreis entfernen' : 'Zu engem Kreis hinzufügen'}"
+                                        aria-label="Enger Kreis">
+                                        ${isCloseFriend ? '★' : '☆'}
+                                    </button>
+                                ` : ''}
                                 <button type="button" class="btn btn-secondary" style="flex: 1; padding: 9px 12px; font-size: 13px;"
                                     data-chat-uid="${escapeHTML(String(userProfile.id))}"
                                     data-chat-user="${escapeHTML(userProfile.username)}"
@@ -3814,6 +4563,24 @@
                 </div>
 
                 ${renderYearMosaic(userPosts, isOwnProfile)}
+
+                ${isOwnProfile ? `
+                    <div class="profile-prefs-card">
+                        <div class="pref-row">
+                            <span>Design</span>
+                            <div class="segmented-control">
+                                <button type="button" class="segmented-btn ${state.themeMode === 'system' ? 'active' : ''}" onclick="applyTheme('system')">System</button>
+                                <button type="button" class="segmented-btn ${state.themeMode === 'light' ? 'active' : ''}" onclick="applyTheme('light')">Hell</button>
+                                <button type="button" class="segmented-btn ${state.themeMode === 'dark' ? 'active' : ''}" onclick="applyTheme('dark')">Dunkel</button>
+                            </div>
+                        </div>
+                        <div class="pref-row">
+                            <span>Sonntags-Erinnerung (Mail)</span>
+                            <button type="button" id="reminderToggleSwitch" class="toggle-switch ${state.weeklyReminderOptIn ? 'on' : ''}"
+                                onclick="toggleWeeklyReminder()" role="switch" aria-checked="${state.weeklyReminderOptIn ? 'true' : 'false'}" aria-label="Sonntags-Erinnerung umschalten"></button>
+                        </div>
+                    </div>
+                ` : ''}
 
                 ${userPosts.length > 0 ? `
                     <div class="profile-tabs-row">
@@ -4028,7 +4795,9 @@
                                 ? 'hat dich in einem Kommentar erwähnt 🔔'
                                 : n.type === 'nudge'
                                     ? 'hat dich für dein Wochenfoto angestupst 👋'
-                                    : 'folgt dir jetzt 👤';
+                                    : n.type === 'reaction'
+                                        ? 'hat auf dein Foto reagiert ✨'
+                                        : 'folgt dir jetzt 👤';
 
                     const color = sanitizeColor(n.actor.user_color);
                     const hasPost = Boolean(n.post_id);
@@ -4094,6 +4863,7 @@
 
             if (isFollowing) {
                 state.following.delete(targetIdStr);
+                state.closeFriends.delete(targetIdStr);
                 state.followingProfiles = state.followingProfiles.filter(f => String(f.id) !== targetIdStr);
             } else {
                 state.following.add(targetIdStr);
@@ -4332,6 +5102,8 @@
 
                 postBtn.textContent = 'Wird gespeichert...';
                 const now = new Date();
+                const tagEl = document.getElementById('uploadTagInput');
+                const rawTag = tagEl ? tagEl.value.trim().slice(0, 35) : '';
                 const postData = {
                     user_id: state.currentUser.id,
                     username: state.currentUser.username,
@@ -4345,10 +5117,18 @@
                     week_label: getWeekStorageLabel(now),
                     is_camera: selectedIsCamera
                 };
+                if (rawTag) postData.tag = rawTag;
 
-                const { error: insertError } = await supabaseClient
+                let { error: insertError } = await supabaseClient
                     .from('posts')
                     .insert([postData]);
+
+                // Falls Spalte 'tag' in Supabase noch nicht angelegt wurde, sauber ohne Tag erneut versuchen
+                if (insertError && postData.tag && String(insertError.message || '').toLowerCase().includes('tag')) {
+                    delete postData.tag;
+                    const retry = await supabaseClient.from('posts').insert([postData]);
+                    insertError = retry.error;
+                }
 
                 if (insertError) throw insertError;
 
@@ -4400,7 +5180,7 @@
 
             if (!state.currentUser) return;
 
-            if (viewName === 'feed') { renderWeeklyBanner(); renderWeeklyCheckinRail(); renderFeed(); }
+            if (viewName === 'feed') { renderWeeklyBanner(); renderWeeklyRecap(); renderWeeklyCheckinRail(); renderFeed(); }
             if (viewName === 'explore') renderExplore();
             if (viewName === 'upload') renderUpload();
             if (viewName === 'profile') renderProfile();
@@ -4430,37 +5210,99 @@
                         .eq('user_id', state.currentUser.id),
                     supabaseClient
                         .from('follows')
-                        .select('following_id')
+                        .select('following_id, is_close_friend')
                         .eq('follower_id', state.currentUser.id)
                 ]);
 
                 if (postsRes.error) throw postsRes.error;
                 if (likesRes.error) throw likesRes.error;
-                if (followsRes.error) throw followsRes.error;
+
+                let followsData = followsRes.data || [];
+                if (followsRes.error) {
+                    const fallbackFollows = await supabaseClient
+                        .from('follows')
+                        .select('following_id')
+                        .eq('follower_id', state.currentUser.id);
+                    if (fallbackFollows.error) throw fallbackFollows.error;
+                    followsData = fallbackFollows.data || [];
+                }
 
                 const myLikedPostIds = new Set((likesRes.data || []).map(like => String(like.post_id)));
-                const followingIds = (followsRes.data || []).map(f => String(f.following_id));
+                const followingIds = followsData.map(f => String(f.following_id));
                 state.following = new Set(followingIds);
+                state.closeFriends = new Set(followsData.filter(f => f.is_close_friend).map(f => String(f.following_id)));
                 state.posts = (postsRes.data || []).map(post => mapDbPost(post, myLikedPostIds));
 
+                const postIds = state.posts.map(p => p.id);
+                const extraTasks = [];
+
                 if (followingIds.length > 0) {
-                    const { data: profilesData } = await supabaseClient
-                        .from('users')
-                        .select('id, username, display_name, user_color, avatar_url')
-                        .in('id', followingIds);
-                    state.followingProfiles = (profilesData || []).map(u => ({
-                        id: String(u.id),
-                        username: u.username || '',
-                        displayName: u.display_name || u.username || '',
-                        color: sanitizeColor(u.user_color),
-                        avatarUrl: u.avatar_url || ''
-                    }));
+                    extraTasks.push(
+                        supabaseClient
+                            .from('users')
+                            .select('id, username, display_name, user_color, avatar_url')
+                            .in('id', followingIds)
+                            .then(({ data }) => {
+                                state.followingProfiles = (data || []).map(u => ({
+                                    id: String(u.id),
+                                    username: u.username || '',
+                                    displayName: u.display_name || u.username || '',
+                                    color: sanitizeColor(u.user_color),
+                                    avatarUrl: u.avatar_url || ''
+                                }));
+                            })
+                    );
                 } else {
                     state.followingProfiles = [];
                 }
 
+                // Reaktionen laden (fehlertolerant, falls Migration noch aussteht)
+                if (postIds.length > 0) {
+                    extraTasks.push(
+                        supabaseClient
+                            .from('post_reactions')
+                            .select('post_id, user_id, emoji')
+                            .in('post_id', postIds)
+                            .then(({ data, error }) => {
+                                const map = {};
+                                if (!error && data) {
+                                    const myUid = String(state.currentUser.id);
+                                    for (const row of data) {
+                                        const pid = String(row.post_id);
+                                        if (!map[pid]) map[pid] = {};
+                                        if (!map[pid][row.emoji]) map[pid][row.emoji] = { count: 0, reacted: false };
+                                        map[pid][row.emoji].count++;
+                                        if (String(row.user_id) === myUid) map[pid][row.emoji].reacted = true;
+                                    }
+                                }
+                                state.reactionsByPost = map;
+                            })
+                            .catch(() => { state.reactionsByPost = {}; })
+                    );
+                } else {
+                    state.reactionsByPost = {};
+                }
+
+                // Optionale Sonntags-Erinnerung-Präferenz laden
+                extraTasks.push(
+                    supabaseClient
+                        .from('users')
+                        .select('weekly_reminder_opt_in')
+                        .eq('id', state.currentUser.id)
+                        .maybeSingle()
+                        .then(({ data, error }) => {
+                            if (!error && data && typeof data.weekly_reminder_opt_in === 'boolean') {
+                                state.weeklyReminderOptIn = data.weekly_reminder_opt_in;
+                            }
+                        })
+                        .catch(() => {})
+                );
+
+                await Promise.all(extraTasks);
+
                 renderHeaderWeekPill();
                 renderWeeklyBanner();
+                renderWeeklyRecap();
                 renderWeeklyCheckinRail();
                 renderFeed();
                 if (state.currentView === 'explore') renderExplore();
@@ -5046,6 +5888,19 @@
             return colors[Math.floor(Math.random() * colors.length)];
         }
 
+        function parseDeepLinkFromHash() {
+            const hash = window.location.hash || '';
+            if (hash.startsWith('#post-')) {
+                const postId = decodeURIComponent(hash.slice('#post-'.length)).trim();
+                if (postId) return { type: 'post', id: postId };
+            }
+            if (hash.startsWith('#user-')) {
+                const username = decodeURIComponent(hash.slice('#user-'.length)).trim();
+                if (username) return { type: 'user', username };
+            }
+            return null;
+        }
+
         async function activateAuthenticatedSession(userProfile, email) {
             state.currentUser = {
                 id: String(userProfile.id),
@@ -5065,7 +5920,17 @@
                 subscribeToConversationsBadge()
             ]);
             subscribeToNotificationsBadge();
-            history.replaceState({ view: 'feed' }, '', '#feed');
+
+            const deepLink = state.pendingDeepLink || parseDeepLinkFromHash();
+            state.pendingDeepLink = null;
+            if (deepLink && deepLink.type === 'post') {
+                history.replaceState({ view: 'feed' }, '', '#feed');
+                openPostModal(deepLink.id);
+            } else if (deepLink && deepLink.type === 'user') {
+                viewUserProfile(deepLink.username, false);
+            } else {
+                history.replaceState({ view: 'feed' }, '', '#feed');
+            }
         }
 
         async function handleLogin() {
@@ -5183,10 +6048,14 @@
             state.posts = [];
             state.profilePosts = [];
             state.following = new Set();
+            state.closeFriends = new Set();
             state.followingProfiles = [];
+            state.reactionsByPost = {};
             state.feedFilter = 'all';
             state.profileTab = 'grid';
             state.lastProfileContext = null;
+            state.chatReplyPost = null;
+            state.weeklyReminderOptIn = true;
             state.pendingPartner = null;
             state.conversations = [];
             state.currentConversationId = null;
@@ -5196,7 +6065,7 @@
             updateUploadNavIndicator();
 
             // Alle offenen Modals & Badges zurücksetzen
-            ['notificationsModal', 'searchModal', 'usersModal', 'postModal', 'commentsModal', 'chatModal', 'editProfileModal', 'editCaptionModal', 'nudgeModal']
+            ['notificationsModal', 'searchModal', 'usersModal', 'postModal', 'commentsModal', 'chatModal', 'editProfileModal', 'editCaptionModal', 'nudgeModal', 'lightboxModal']
                 .forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.classList.remove('open');
@@ -5204,6 +6073,7 @@
             updateMessageBadge(0);
             document.getElementById('notificationDot').style.display = 'none';
             document.getElementById('weeklyBanner').innerHTML = '';
+            document.getElementById('weeklyRecapCard').innerHTML = '';
             document.getElementById('weeklyCheckinRail').innerHTML = '';
             document.getElementById('feedFilterBar').innerHTML = '';
             document.getElementById('feedContainer').innerHTML = '';
@@ -5223,6 +6093,7 @@
             if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
                 return;
             }
+            state.pendingDeepLink = parseDeepLinkFromHash();
             const { data: { session } } = await supabaseClient.auth.getSession();
 
             if (session) {
@@ -5680,6 +6551,67 @@
             subscribeToMessages(convId);
         }
 
+        // --- Chat Photo Reply Context ---
+        function renderChatReplyContext() {
+            const bar = document.getElementById('chatReplyContext');
+            if (!bar) return;
+            const post = state.chatReplyPost;
+            if (!post) {
+                bar.classList.remove('active');
+                bar.innerHTML = '';
+                return;
+            }
+            const safeImg = sanitizeUrl(post.image);
+            bar.innerHTML = `
+                ${safeImg ? `<img class="chat-reply-thumb" src="${escapeHTML(safeImg)}" alt="Foto">` : ''}
+                <div class="chat-reply-info">
+                    <div class="chat-reply-label">Antwort auf Foto · ${escapeHTML(getShortKWLabel(post.timestamp))}</div>
+                    <div class="chat-reply-preview">${escapeHTML(post.caption || 'Wochenfoto')}</div>
+                </div>
+                <button type="button" class="btn-icon" style="width: 30px; height: 30px; color: var(--color-text-secondary);" onclick="clearChatReplyContext()" aria-label="Antwort entfernen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            `;
+            bar.classList.add('active');
+        }
+
+        function clearChatReplyContext() {
+            state.chatReplyPost = null;
+            renderChatReplyContext();
+        }
+
+        async function replyToPostInChat(postId) {
+            const post = getPostById(postId);
+            if (!post) return;
+            if (document.getElementById('postModal').classList.contains('open')) {
+                closePostModal();
+            }
+            state.chatReplyPost = post;
+            await startChat(
+                post.user.id,
+                post.user.username,
+                post.user.displayName,
+                post.user.color,
+                post.user.avatarUrl || ''
+            );
+            renderChatReplyContext();
+            const input = document.getElementById('chatInput');
+            if (input) input.focus();
+        }
+
+        function formatChatBubbleHtml(rawContent) {
+            const text = String(rawContent || '');
+            const match = text.match(/^📸\s*\[(KW \d+)\](?:\s*\n)?([\s\S]*)$/);
+            if (match) {
+                const kw = match[1];
+                const body = (match[2] || '').trim();
+                return `<div class="msg-reply-quote">📸 Zu deinem Foto (${escapeHTML(kw)})</div>${escapeHTML(body)}`;
+            }
+            return escapeHTML(text);
+        }
+
         async function closeChatModal() {
             document.getElementById('chatModal').classList.remove('open');
             if (state.messageSubscription) {
@@ -5688,6 +6620,7 @@
             }
             state.currentConversationId = null;
             state.pendingPartner = null;
+            clearChatReplyContext();
             if (state.currentView === 'messages') loadConversations();
             await refreshUnreadMessageBadge();
         }
@@ -5738,7 +6671,7 @@
                 lastDate = msgDate;
                 const timeStr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
                 return `${divider}
-                    <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${escapeHTML(msg.content)}</div>
+                    <div class="msg-bubble ${isSent ? 'sent' : 'received'}">${formatChatBubbleHtml(msg.content)}</div>
                     <span class="msg-time ${isSent ? 'sent' : 'received'}">${timeStr}</span>`;
             }).join('');
 
@@ -5748,9 +6681,13 @@
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const btn = document.getElementById('chatSendBtn');
-            const msgContent = input.value.trim();
+            const rawInput = input.value.trim();
 
-            if (!msgContent || !state.currentUser || btn.disabled) return;
+            if (!rawInput || !state.currentUser || btn.disabled) return;
+            const replyPost = state.chatReplyPost;
+            const replyPrefix = replyPost ? `📸 [${getShortKWLabel(replyPost.timestamp)}]\n` : '';
+            const msgContent = replyPrefix + rawInput;
+
             if (msgContent.length > MSG_MAX_LENGTH) return showToast(`Max. ${MSG_MAX_LENGTH} Zeichen.`);
 
             btn.disabled = true;
@@ -5782,6 +6719,7 @@
 
             input.value = '';
             input.style.height = 'auto';
+            clearChatReplyContext();
 
             const container = document.getElementById('chatMessages');
             const emptyState = document.getElementById('chatEmptyState');
@@ -5802,7 +6740,7 @@
 
             const bubbleEl = document.createElement('div');
             bubbleEl.className = 'msg-bubble sent';
-            bubbleEl.textContent = msgContent;
+            bubbleEl.innerHTML = formatChatBubbleHtml(msgContent);
             const timeEl = document.createElement('span');
             timeEl.className = 'msg-time sent';
             timeEl.textContent = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
@@ -5820,7 +6758,9 @@
                 }]);
                 if (error) throw error;
 
-                const preview = msgContent.length > 40 ? msgContent.substring(0, 40) + '...' : msgContent;
+                const cleanPreview = rawInput.replace(/\s+/g, ' ');
+                const previewBase = replyPost ? `📸 ${cleanPreview}` : cleanPreview;
+                const preview = previewBase.length > 40 ? previewBase.substring(0, 40) + '...' : previewBase;
                 await supabaseClient
                     .from('conversations')
                     .update({ last_message: preview, last_message_at: now.toISOString() })
@@ -5830,7 +6770,11 @@
                 bubbleEl.remove();
                 timeEl.remove();
                 if (optimisticDivider) optimisticDivider.remove();
-                input.value = msgContent;
+                input.value = rawInput;
+                if (replyPost) {
+                    state.chatReplyPost = replyPost;
+                    renderChatReplyContext();
+                }
                 autoResizeTextarea(input, 120);
                 showToast('Nachricht konnte nicht gesendet werden.');
             } finally {
@@ -5906,7 +6850,7 @@
                     const timeStr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
                     container.insertAdjacentHTML(
                         'beforeend',
-                        `<div class="msg-bubble received">${escapeHTML(msg.content)}</div>
+                        `<div class="msg-bubble received">${formatChatBubbleHtml(msg.content)}</div>
                          <span class="msg-time received">${timeStr}</span>`
                     );
                     container.scrollTop = container.scrollHeight;
@@ -5917,6 +6861,7 @@
         }
 
         function startChatFromBtn(btn) {
+            clearChatReplyContext();
             startChat(
                 btn.dataset.chatUid,
                 btn.dataset.chatUser,
@@ -5927,6 +6872,7 @@
         }
 
         function openChatFromBtn(btn) {
+            clearChatReplyContext();
             openChat(btn.dataset.chatConv, {
                 id: btn.dataset.chatUid,
                 username: btn.dataset.chatUser,
@@ -5935,6 +6881,60 @@
                 avatarUrl: btn.dataset.chatAvatar || ''
             });
         }
+
+        // --- Pull-to-Refresh (Touch Feed) ---
+        (function initPullToRefresh() {
+            let startY = 0;
+            let pulling = false;
+            let refreshing = false;
+            const bar = document.getElementById('pullToRefresh');
+            const textEl = document.getElementById('pullToRefreshText');
+            if (!bar) return;
+
+            window.addEventListener('touchstart', (e) => {
+                if (refreshing || state.currentView !== 'feed' || !state.isAuthenticated) return;
+                if (window.scrollY > 2) return;
+                if (document.querySelector('.search-modal.open, .comments-modal.open, .chat-modal.open, .dialog-backdrop.open, .lightbox-modal.open')) return;
+                startY = e.touches[0].clientY;
+                pulling = true;
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!pulling || refreshing) return;
+                const dy = e.touches[0].clientY - startY;
+                if (dy <= 0) {
+                    bar.style.height = '0px';
+                    bar.classList.remove('visible');
+                    return;
+                }
+                const clamped = Math.min(dy * 0.45, 58);
+                bar.style.height = clamped + 'px';
+                bar.classList.add('visible');
+                if (textEl) textEl.textContent = clamped >= 44 ? 'Loslassen zum Aktualisieren' : 'Ziehen zum Aktualisieren';
+            }, { passive: true });
+
+            window.addEventListener('touchend', async () => {
+                if (!pulling || refreshing) return;
+                pulling = false;
+                const h = parseFloat(bar.style.height) || 0;
+                if (h >= 44) {
+                    refreshing = true;
+                    bar.style.height = '44px';
+                    bar.classList.add('refreshing');
+                    if (textEl) textEl.textContent = 'Aktualisiere...';
+                    try {
+                        await loadPostsFromSupabase();
+                    } finally {
+                        bar.classList.remove('refreshing', 'visible');
+                        bar.style.height = '0px';
+                        refreshing = false;
+                    }
+                } else {
+                    bar.classList.remove('visible');
+                    bar.style.height = '0px';
+                }
+            }, { passive: true });
+        })();
 
         // --- App Start & Auth Listener ---
         supabaseClient.auth.onAuthStateChange((event) => {

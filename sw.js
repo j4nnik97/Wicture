@@ -1,5 +1,5 @@
 // sw.js - Service Worker für Wicture PWA
-const CACHE_NAME = 'wicture-shell-v3';
+const CACHE_NAME = 'wicture-shell-v4';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -64,6 +64,40 @@ self.addEventListener('fetch', (event) => {
             }).catch(() => cached);
 
             return cached || networkFetch;
+        })
+    );
+});
+
+// Web Push Listener (bereit für Supabase Edge Function + VAPID)
+self.addEventListener('push', (event) => {
+    let data = { title: 'Wicture', body: 'Es gibt etwas Neues in deiner Woche 📸', url: './' };
+    try {
+        if (event.data) data = Object.assign(data, event.data.json());
+    } catch (e) {
+        if (event.data) data.body = event.data.text();
+    }
+    event.waitUntil(
+        self.registration.showNotification(data.title, {
+            body: data.body,
+            icon: './icon.png',
+            badge: './icon.png',
+            data: { url: data.url || './' }
+        })
+    );
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const targetUrl = (event.notification.data && event.notification.data.url) || './';
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            for (const client of windowClients) {
+                if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+                    client.navigate(targetUrl);
+                    return client.focus();
+                }
+            }
+            return clients.openWindow(targetUrl);
         })
     );
 });

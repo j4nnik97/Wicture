@@ -2166,6 +2166,136 @@
             color: #d97706;
         }
 
+        .admin-feature-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .admin-feature-pill {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: var(--radius-full);
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            color: var(--color-text);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .admin-chart-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .admin-chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .admin-chart-bars {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            align-items: end;
+            height: 92px;
+        }
+
+        .admin-bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            gap: 4px;
+        }
+
+        .admin-bar-count {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--color-text-secondary);
+        }
+
+        .admin-bar-track {
+            width: 100%;
+            max-width: 28px;
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            background: var(--color-surface-subtle);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .admin-bar-fill {
+            width: 100%;
+            border-radius: 6px;
+            background: rgba(var(--color-teal-500-rgb), 0.45);
+            min-height: 4px;
+            transition: height 250ms ease;
+        }
+
+        .admin-bar-col.current .admin-bar-fill {
+            background: var(--color-primary);
+        }
+
+        .admin-bar-col.current .admin-bar-count,
+        .admin-bar-col.current .admin-bar-label {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .admin-bar-label {
+            font-size: 9.5px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+        }
+
+        .admin-subcontrols {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--color-card-border);
+        }
+
+        .admin-sort-group {
+            display: inline-flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .admin-sort-btn {
+            border: none;
+            background: var(--color-surface-subtle);
+            color: var(--color-text-secondary);
+            padding: 4px 9px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .admin-sort-btn.active {
+            background: rgba(var(--color-teal-500-rgb), 0.16);
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
         /* Messages */
         .messages-list {
             padding: 0;
@@ -2986,6 +3116,7 @@
                 <input type="search" id="adminSearchInput" class="form-input" placeholder="Name, @username oder E-Mail suchen..."
                     oninput="setAdminSearch(this.value)" style="padding: 9px 12px; font-size: 13px;">
                 <div class="admin-filter-row" id="adminFilterChips"></div>
+                <div class="admin-subcontrols" id="adminSubControls"></div>
             </div>
             <div id="adminUsersList"></div>
         </div>
@@ -3300,7 +3431,9 @@
             isAdmin: false,
             adminData: null,
             adminFilter: 'all',
+            adminSort: 'active',
             adminSearch: '',
+            lastSeenPingAt: 0,
             pendingDeepLink: null,
             themeMode: 'system',
             weeklyPostDone: false,
@@ -5396,8 +5529,27 @@
             }
         }
 
+        function touchLastSeen(force = false) {
+            if (!state.currentUser) return;
+            const now = Date.now();
+            if (!force && now - state.lastSeenPingAt < 5 * MS_PER_MINUTE) return;
+            state.lastSeenPingAt = now;
+            supabaseClient.rpc('touch_last_seen').then(() => {}).catch(() => {});
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && state.isAuthenticated) {
+                touchLastSeen(false);
+            }
+        });
+
         function setAdminFilter(filter) {
             state.adminFilter = filter;
+            renderAdminDashboard();
+        }
+
+        function setAdminSort(sortMode) {
+            state.adminSort = sortMode;
             renderAdminDashboard();
         }
 
@@ -5416,6 +5568,59 @@
             }
         }
 
+        function getFilteredAdminUsers() {
+            const data = state.adminData;
+            if (!data || !Array.isArray(data.users)) return [];
+            const users = data.users;
+            const sevenDaysAgo = Date.now() - 7 * MS_PER_DAY;
+            const fourteenDaysAgo = Date.now() - 14 * MS_PER_DAY;
+            const q = state.adminSearch;
+
+            const filtered = users.filter(u => {
+                const activeIso = u.last_active_at || u.last_sign_in_at;
+                const activeTs = activeIso ? new Date(activeIso).getTime() : 0;
+                if (state.adminFilter === 'posted' && !u.posted_this_week) return false;
+                if (state.adminFilter === 'open' && u.posted_this_week) return false;
+                if (state.adminFilter === 'push' && !(u.push_devices > 0)) return false;
+                if (state.adminFilter === 'zero' && (u.posts_count || 0) > 0) return false;
+                if (state.adminFilter === 'inactive' && activeTs >= fourteenDaysAgo) return false;
+                if (state.adminFilter === 'new' && (!u.created_at || new Date(u.created_at).getTime() < sevenDaysAgo)) return false;
+                if (q) {
+                    const hay = `${u.display_name || ''} ${u.username || ''} ${u.email || ''}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            filtered.sort((a, b) => {
+                if (state.adminSort === 'posts') {
+                    return (b.posts_count || 0) - (a.posts_count || 0);
+                }
+                if (state.adminSort === 'newest') {
+                    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+                }
+                const aTs = new Date(a.last_active_at || a.last_sign_in_at || a.created_at || 0).getTime();
+                const bTs = new Date(b.last_active_at || b.last_sign_in_at || b.created_at || 0).getTime();
+                return bTs - aTs;
+            });
+
+            return filtered;
+        }
+
+        async function exportAdminFilteredEmails() {
+            const emails = getFilteredAdminUsers()
+                .map(u => (u.email || '').trim())
+                .filter(Boolean);
+            const unique = [...new Set(emails)];
+            if (!unique.length) return showToast('Keine E-Mails in dieser Auswahl.');
+            try {
+                await navigator.clipboard.writeText(unique.join(', '));
+                showToast(`${unique.length} E-Mail-Adressen kopiert 📋`);
+            } catch (e) {
+                showToast('Kopieren fehlgeschlagen.');
+            }
+        }
+
         function openProfileFromAdmin(username) {
             if (!username) return;
             closeAdminDashboard();
@@ -5431,12 +5636,20 @@
             }
         }
 
+        function formatAdminAgo(prefix, isoStr, fallback) {
+            const ts = isoStr ? new Date(isoStr).getTime() : NaN;
+            if (!Number.isFinite(ts)) return fallback;
+            const ago = timeAgo(ts);
+            return ago === 'Gerade eben' ? `${prefix} gerade eben` : `${prefix} vor ${ago}`;
+        }
+
         function renderAdminDashboard() {
             const data = state.adminData;
             if (!data) return;
 
             const stats = data.stats || {};
             const users = Array.isArray(data.users) ? data.users : [];
+            const trend = Array.isArray(data.weekly_trend) ? data.weekly_trend : [];
             const kw = stats.current_week || getISOWeekInfo(new Date()).week;
             const totalUsers = stats.total_users || users.length;
             const postedWeek = stats.posted_this_week || 0;
@@ -5446,6 +5659,30 @@
 
             const statsEl = document.getElementById('adminStatsContainer');
             if (statsEl) {
+                const maxBar = Math.max(1, ...trend.map(t => t.count || 0));
+                const trendHtml = trend.length ? `
+                    <div class="admin-chart-card">
+                        <div class="admin-chart-header">
+                            <span>📈 Fotos pro Woche (letzte ${trend.length} Wochen)</span>
+                            <span style="font-size: 11px; color: var(--color-text-secondary); font-weight: 500;">Max ${maxBar}</span>
+                        </div>
+                        <div class="admin-chart-bars">
+                            ${trend.map(t => {
+                                const pct = Math.max(6, Math.round(((t.count || 0) / maxBar) * 100));
+                                return `
+                                    <div class="admin-bar-col ${t.is_current ? 'current' : ''}">
+                                        <span class="admin-bar-count">${t.count || 0}</span>
+                                        <div class="admin-bar-track">
+                                            <div class="admin-bar-fill" style="height: ${t.count > 0 ? pct : 4}%;"></div>
+                                        </div>
+                                        <span class="admin-bar-label">${escapeHTML(t.label || '')}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : '';
+
                 statsEl.innerHTML = `
                     <div class="admin-stats-grid">
                         <div class="admin-stat-card">
@@ -5469,15 +5706,28 @@
                             <div class="admin-stat-sub">${stats.total_comments || 0} Komm. · ${stats.total_messages || 0} Chats</div>
                         </div>
                     </div>
+
+                    <div class="admin-feature-strip">
+                        <span class="admin-feature-pill">❤️ ${stats.total_likes || 0} Likes</span>
+                        <span class="admin-feature-pill">🔥 ${stats.total_reactions || 0} Reaktionen</span>
+                        <span class="admin-feature-pill">👋 ${stats.total_nudges || 0} Anstupser</span>
+                        <span class="admin-feature-pill">🏷️ ${stats.total_tagged_posts || 0} Tags</span>
+                        <span class="admin-feature-pill">⭐ ${stats.total_close_friends || 0} Enger Kreis</span>
+                    </div>
+
+                    ${trendHtml}
                 `;
             }
 
             const sevenDaysAgo = Date.now() - 7 * MS_PER_DAY;
+            const fourteenDaysAgo = Date.now() - 14 * MS_PER_DAY;
             const chips = [
                 { id: 'all', label: `Alle (${users.length})` },
                 { id: 'posted', label: `✅ KW ${kw} (${users.filter(u => u.posted_this_week).length})` },
                 { id: 'open', label: `⏳ Offen (${users.filter(u => !u.posted_this_week).length})` },
                 { id: 'push', label: `🔔 Push (${users.filter(u => u.push_devices > 0).length})` },
+                { id: 'zero', label: `🌱 0 Fotos (${users.filter(u => (u.posts_count || 0) === 0).length})` },
+                { id: 'inactive', label: `💤 >14T (${users.filter(u => { const t = new Date(u.last_active_at || u.last_sign_in_at || 0).getTime(); return t < fourteenDaysAgo; }).length})` },
                 { id: 'new', label: `🆕 Neu (${users.filter(u => u.created_at && new Date(u.created_at).getTime() >= sevenDaysAgo).length})` }
             ];
 
@@ -5489,18 +5739,25 @@
                 `).join('');
             }
 
-            const q = state.adminSearch;
-            const filtered = users.filter(u => {
-                if (state.adminFilter === 'posted' && !u.posted_this_week) return false;
-                if (state.adminFilter === 'open' && u.posted_this_week) return false;
-                if (state.adminFilter === 'push' && !(u.push_devices > 0)) return false;
-                if (state.adminFilter === 'new' && (!u.created_at || new Date(u.created_at).getTime() < sevenDaysAgo)) return false;
-                if (q) {
-                    const hay = `${u.display_name || ''} ${u.username || ''} ${u.email || ''}`.toLowerCase();
-                    if (!hay.includes(q)) return false;
-                }
-                return true;
-            });
+            const filtered = getFilteredAdminUsers();
+
+            const subEl = document.getElementById('adminSubControls');
+            if (subEl) {
+                const sorts = [
+                    { id: 'active', label: 'Zuletzt aktiv' },
+                    { id: 'newest', label: 'Neueste' },
+                    { id: 'posts', label: 'Meiste Fotos' }
+                ];
+                subEl.innerHTML = `
+                    <div class="admin-sort-group">
+                        ${sorts.map(s => `
+                            <button type="button" class="admin-sort-btn ${state.adminSort === s.id ? 'active' : ''}"
+                                data-sort="${s.id}" onclick="setAdminSort(this.dataset.sort)">${s.label}</button>
+                        `).join('')}
+                    </div>
+                    <button type="button" class="admin-copy-btn" onclick="exportAdminFilteredEmails()">📋 ${filtered.length} E-Mails</button>
+                `;
+            }
 
             const listEl = document.getElementById('adminUsersList');
             if (!listEl) return;
@@ -5515,9 +5772,8 @@
                 const usernameEsc = escapeHTML(u.username || '');
                 const displayNameEsc = escapeHTML(u.display_name || u.username || 'Unbekannt');
                 const emailEsc = escapeHTML(u.email || 'Keine E-Mail');
-                const lastLoginTs = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : NaN;
-                const agoStr = Number.isFinite(lastLoginTs) ? timeAgo(lastLoginTs) : '';
-                const lastLoginText = agoStr ? (agoStr === 'Gerade eben' ? 'Login gerade eben' : `Login vor ${agoStr}`) : 'Kein Login';
+                const activeText = formatAdminAgo('Aktiv', u.last_active_at || u.last_sign_in_at, 'Noch keine Aktivität');
+                const lastPostText = u.last_post_at ? formatAdminAgo('Foto', u.last_post_at, '') : 'Noch kein Foto';
                 const regDate = formatAdminDate(u.created_at);
 
                 return `
@@ -5531,7 +5787,7 @@
                                 <div class="admin-user-name" data-username="${usernameEsc}" onclick="openProfileFromAdmin(this.dataset.username)">
                                     ${displayNameEsc} ${u.is_admin ? '<span style="font-size: 11px; color: var(--color-primary);">🛡️</span>' : ''}
                                 </div>
-                                <div class="admin-user-sub">@${usernameEsc} · Seit ${regDate} · ${escapeHTML(lastLoginText)}</div>
+                                <div class="admin-user-sub">@${usernameEsc} · Seit ${regDate} · ${escapeHTML(activeText)}</div>
                             </div>
                         </div>
 
@@ -5542,10 +5798,11 @@
 
                         <div class="admin-badges-row">
                             <span class="admin-badge ${u.posted_this_week ? 'good' : 'warn'}">${u.posted_this_week ? `✅ KW ${kw}` : '⏳ Offen'}</span>
-                            <span class="admin-badge">📸 ${u.posts_count || 0} Fotos</span>
+                            <span class="admin-badge">📸 ${u.posts_count || 0} (${escapeHTML(lastPostText)})</span>
                             <span class="admin-badge ${u.push_devices > 0 ? 'good' : ''}">${u.push_devices > 0 ? `🔔 Push (${u.push_devices})` : '🔕 Kein Push'}</span>
-                            <span class="admin-badge">${u.weekly_reminder_opt_in ? '📧 Mail an' : '📧 Mail aus'}</span>
-                            <span class="admin-badge">👥 ${u.followers_count || 0} Follower</span>
+                            <span class="admin-badge">${u.weekly_reminder_opt_in ? '📧 So-Mail' : '📧 So-Aus'}</span>
+                            <span class="admin-badge">${u.newsletter_opt_in !== false ? '📰 News an' : '📰 News aus'}</span>
+                            <span class="admin-badge">👥 ${u.followers_count || 0}</span>
                         </div>
                     </div>
                 `;
@@ -7175,6 +7432,7 @@
             subscribeToNotificationsBadge();
             syncPushSubscriptionState();
             checkAdminStatus();
+            touchLastSeen(true);
 
             if (!deepLink || deepLink.type === 'invite' || !handleDeepLink(deepLink)) {
                 history.replaceState({ view: 'feed' }, '', '#feed');
@@ -7310,7 +7568,9 @@
             state.isAdmin = false;
             state.adminData = null;
             state.adminFilter = 'all';
+            state.adminSort = 'active';
             state.adminSearch = '';
+            state.lastSeenPingAt = 0;
             state.pendingPartner = null;
             state.conversations = [];
             state.currentConversationId = null;
@@ -7338,6 +7598,7 @@
             document.getElementById('notificationsList').innerHTML = '';
             document.getElementById('adminStatsContainer').innerHTML = '';
             document.getElementById('adminFilterChips').innerHTML = '';
+            document.getElementById('adminSubControls').innerHTML = '';
             document.getElementById('adminUsersList').innerHTML = '';
             const adminSearchEl = document.getElementById('adminSearchInput');
             if (adminSearchEl) adminSearchEl.value = '';

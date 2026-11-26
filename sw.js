@@ -1,5 +1,5 @@
 // sw.js - Service Worker für Wicture PWA
-const CACHE_NAME = 'wicture-shell-v6';
+const CACHE_NAME = 'wicture-shell-v7';
 const SHELL_ASSETS = [
     './',
     './index.html',

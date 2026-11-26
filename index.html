@@ -1961,7 +1961,210 @@
         #notificationsModal { z-index: 1004; }
         #chatModal { z-index: 1005; }
         #editProfileModal, #editCaptionModal { z-index: 1010; }
+        #adminModal { z-index: 1015; }
         #loginModal { z-index: 1020; }
+
+        /* Admin Dashboard (only rendered & authorized for server-verified admins) */
+        .admin-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 14px 36px;
+            background: var(--color-background);
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .admin-stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            padding: 13px 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .admin-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .admin-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .admin-stat-sub {
+            font-size: 11px;
+            color: var(--color-primary);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .admin-controls {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .admin-filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .admin-filter-chip {
+            border: 1px solid var(--color-card-border);
+            background: var(--color-surface-subtle);
+            color: var(--color-text-secondary);
+            padding: 5px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 140ms;
+        }
+
+        .admin-filter-chip.active {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: #ffffff;
+        }
+
+        .admin-user-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .admin-user-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .admin-user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .admin-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .admin-user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .admin-user-sub {
+            font-size: 11.5px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .admin-email-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 6px 10px;
+            background: var(--color-surface-subtle);
+            border-radius: 10px;
+            font-size: 11.5px;
+            color: var(--color-text-secondary);
+        }
+
+        .admin-email-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 11px;
+        }
+
+        .admin-copy-btn {
+            border: none;
+            background: none;
+            color: var(--color-primary);
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            flex-shrink: 0;
+            padding: 2px 4px;
+        }
+
+        .admin-badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .admin-badge {
+            font-size: 10.5px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+            background: var(--color-surface-subtle);
+            border: 1px solid var(--color-card-border);
+            color: var(--color-text-secondary);
+        }
+
+        .admin-badge.good {
+            background: rgba(var(--color-teal-500-rgb), 0.12);
+            border-color: rgba(var(--color-teal-500-rgb), 0.25);
+            color: var(--color-primary);
+        }
+
+        .admin-badge.warn {
+            background: rgba(217, 119, 6, 0.12);
+            border-color: rgba(217, 119, 6, 0.25);
+            color: #d97706;
+        }
 
         /* Messages */
         .messages-list {
@@ -2762,6 +2965,32 @@
         <div class="search-results" id="usersModalList"></div>
     </div>
 
+    <!-- Admin Dashboard Modal (serverseitig geschützt) -->
+    <div class="search-modal" id="adminModal">
+        <div class="search-header">
+            <button type="button" class="btn-icon" onclick="closeAdminDashboard()" aria-label="Zurück" style="margin-left: -8px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                </svg>
+            </button>
+            <h2 class="modal-title-centered" style="margin-right: 0;">🛡️ Admin</h2>
+            <button type="button" class="btn-icon" onclick="loadAdminDashboard(true)" aria-label="Aktualisieren" title="Aktualisieren">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+            </button>
+        </div>
+        <div class="admin-body">
+            <div id="adminStatsContainer"></div>
+            <div class="admin-controls">
+                <input type="search" id="adminSearchInput" class="form-input" placeholder="Name, @username oder E-Mail suchen..."
+                    oninput="setAdminSearch(this.value)" style="padding: 9px 12px; font-size: 13px;">
+                <div class="admin-filter-row" id="adminFilterChips"></div>
+            </div>
+            <div id="adminUsersList"></div>
+        </div>
+    </div>
+
     <!-- Post Detail Modal -->
     <div class="search-modal" id="postModal">
         <div class="search-header">
@@ -3068,6 +3297,10 @@
             weeklyReminderOptIn: true,
             pushEnabled: false,
             pushBusy: false,
+            isAdmin: false,
+            adminData: null,
+            adminFilter: 'all',
+            adminSearch: '',
             pendingDeepLink: null,
             themeMode: 'system',
             weeklyPostDone: false,
@@ -3580,6 +3813,10 @@
         window.addEventListener('popstate', (event) => {
             if (document.getElementById('lightboxModal').classList.contains('open')) {
                 closeLightbox();
+                return;
+            }
+            if (document.getElementById('adminModal').classList.contains('open')) {
+                closeAdminDashboard();
                 return;
             }
             if (document.getElementById('nudgeModal').classList.contains('open')) {
@@ -5102,6 +5339,217 @@
             } catch (e) {}
         }
 
+        // --- Admin Dashboard (serverseitig über Supabase is_admin RPC geschützt) ---
+        async function checkAdminStatus() {
+            if (!state.currentUser) {
+                state.isAdmin = false;
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient.rpc('is_current_user_admin');
+                state.isAdmin = !error && data === true;
+                if (state.isAdmin && state.currentView === 'profile' && state.lastProfileContext && state.lastProfileContext.isOwnProfile) {
+                    const { userProfile, userPosts, followersCount, followingCount, isOwnProfile } = state.lastProfileContext;
+                    const content = document.getElementById('profileContent');
+                    if (content) content.innerHTML = renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile);
+                }
+            } catch (e) {
+                state.isAdmin = false;
+            }
+        }
+
+        function openAdminDashboard() {
+            if (!state.isAdmin) return;
+            const modal = document.getElementById('adminModal');
+            const wasOpen = modal.classList.contains('open');
+            modal.classList.add('open');
+            if (!wasOpen) history.pushState({ modal: 'admin' }, '', '');
+            loadAdminDashboard(false);
+        }
+
+        function closeAdminDashboard() {
+            const modal = document.getElementById('adminModal');
+            if (modal) modal.classList.remove('open');
+        }
+
+        async function loadAdminDashboard(forceToast = false) {
+            if (!state.isAdmin) return;
+            const statsEl = document.getElementById('adminStatsContainer');
+            const listEl = document.getElementById('adminUsersList');
+            if (!state.adminData && listEl) {
+                listEl.innerHTML = '<div style="text-align: center; padding: 40px 16px; color: var(--color-text-secondary); font-size: 13px;">Lade Admin-Daten...</div>';
+            }
+
+            try {
+                const { data, error } = await supabaseClient.rpc('get_admin_dashboard');
+                if (error) throw error;
+                if (!data) throw new Error('Kein Zugriff');
+                state.adminData = data;
+                renderAdminDashboard();
+                if (forceToast) showToast('Admin-Daten aktualisiert ✅');
+            } catch (err) {
+                console.error('Admin-Dashboard Fehler:', err);
+                if (statsEl) statsEl.innerHTML = '';
+                if (listEl) {
+                    listEl.innerHTML = '<div style="text-align: center; padding: 40px 16px; color: var(--color-text-secondary); font-size: 13px;">Admin-Funktion in Supabase noch nicht eingerichtet oder kein Zugriff.</div>';
+                }
+            }
+        }
+
+        function setAdminFilter(filter) {
+            state.adminFilter = filter;
+            renderAdminDashboard();
+        }
+
+        function setAdminSearch(query) {
+            state.adminSearch = (query || '').trim().toLowerCase();
+            renderAdminDashboard();
+        }
+
+        async function copyAdminEmail(email) {
+            if (!email) return;
+            try {
+                await navigator.clipboard.writeText(email);
+                showToast('E-Mail kopiert 📋');
+            } catch (e) {
+                showToast(email);
+            }
+        }
+
+        function openProfileFromAdmin(username) {
+            if (!username) return;
+            closeAdminDashboard();
+            viewUserProfile(username);
+        }
+
+        function formatAdminDate(isoStr) {
+            if (!isoStr) return '—';
+            try {
+                return new Date(isoStr).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' });
+            } catch (e) {
+                return '—';
+            }
+        }
+
+        function renderAdminDashboard() {
+            const data = state.adminData;
+            if (!data) return;
+
+            const stats = data.stats || {};
+            const users = Array.isArray(data.users) ? data.users : [];
+            const kw = stats.current_week || getISOWeekInfo(new Date()).week;
+            const totalUsers = stats.total_users || users.length;
+            const postedWeek = stats.posted_this_week || 0;
+            const weekPct = totalUsers > 0 ? Math.round((postedWeek / totalUsers) * 100) : 0;
+            const pushUsers = stats.push_users || 0;
+            const pushPct = totalUsers > 0 ? Math.round((pushUsers / totalUsers) * 100) : 0;
+
+            const statsEl = document.getElementById('adminStatsContainer');
+            if (statsEl) {
+                statsEl.innerHTML = `
+                    <div class="admin-stats-grid">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-label">Nutzer gesamt</div>
+                            <div class="admin-stat-value">${totalUsers}</div>
+                            <div class="admin-stat-sub">+${stats.new_users_7d || 0} in 7 Tagen</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-label">Aktiv in KW ${kw}</div>
+                            <div class="admin-stat-value">${postedWeek}</div>
+                            <div class="admin-stat-sub">${weekPct}% haben gepostet</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-label">Push aktiviert</div>
+                            <div class="admin-stat-value">${pushUsers}</div>
+                            <div class="admin-stat-sub">${pushPct}% (${stats.push_devices || 0} Geräte)</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-label">Fotos gesamt</div>
+                            <div class="admin-stat-value">${stats.total_posts || 0}</div>
+                            <div class="admin-stat-sub">${stats.total_comments || 0} Komm. · ${stats.total_messages || 0} Chats</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const sevenDaysAgo = Date.now() - 7 * MS_PER_DAY;
+            const chips = [
+                { id: 'all', label: `Alle (${users.length})` },
+                { id: 'posted', label: `✅ KW ${kw} (${users.filter(u => u.posted_this_week).length})` },
+                { id: 'open', label: `⏳ Offen (${users.filter(u => !u.posted_this_week).length})` },
+                { id: 'push', label: `🔔 Push (${users.filter(u => u.push_devices > 0).length})` },
+                { id: 'new', label: `🆕 Neu (${users.filter(u => u.created_at && new Date(u.created_at).getTime() >= sevenDaysAgo).length})` }
+            ];
+
+            const chipsEl = document.getElementById('adminFilterChips');
+            if (chipsEl) {
+                chipsEl.innerHTML = chips.map(c => `
+                    <button type="button" class="admin-filter-chip ${state.adminFilter === c.id ? 'active' : ''}"
+                        data-filter="${c.id}" onclick="setAdminFilter(this.dataset.filter)">${c.label}</button>
+                `).join('');
+            }
+
+            const q = state.adminSearch;
+            const filtered = users.filter(u => {
+                if (state.adminFilter === 'posted' && !u.posted_this_week) return false;
+                if (state.adminFilter === 'open' && u.posted_this_week) return false;
+                if (state.adminFilter === 'push' && !(u.push_devices > 0)) return false;
+                if (state.adminFilter === 'new' && (!u.created_at || new Date(u.created_at).getTime() < sevenDaysAgo)) return false;
+                if (q) {
+                    const hay = `${u.display_name || ''} ${u.username || ''} ${u.email || ''}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            });
+
+            const listEl = document.getElementById('adminUsersList');
+            if (!listEl) return;
+
+            if (!filtered.length) {
+                listEl.innerHTML = '<div style="text-align: center; padding: 32px 16px; color: var(--color-text-secondary); font-size: 13px;">Keine Nutzer für diesen Filter gefunden.</div>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(u => {
+                const color = sanitizeColor(u.user_color);
+                const usernameEsc = escapeHTML(u.username || '');
+                const displayNameEsc = escapeHTML(u.display_name || u.username || 'Unbekannt');
+                const emailEsc = escapeHTML(u.email || 'Keine E-Mail');
+                const lastLoginText = u.last_sign_in_at ? `Login ${formatTimeAgo(u.last_sign_in_at)}` : 'Kein Login';
+                const regDate = formatAdminDate(u.created_at);
+
+                return `
+                    <div class="admin-user-card">
+                        <div class="admin-user-top">
+                            <div class="admin-user-avatar" style="background: ${color}22; color: ${color};"
+                                data-username="${usernameEsc}" onclick="openProfileFromAdmin(this.dataset.username)">
+                                ${renderAvatarInner(u.avatar_url, u.display_name, u.username)}
+                            </div>
+                            <div class="admin-user-info">
+                                <div class="admin-user-name" data-username="${usernameEsc}" onclick="openProfileFromAdmin(this.dataset.username)">
+                                    ${displayNameEsc} ${u.is_admin ? '<span style="font-size: 11px; color: var(--color-primary);">🛡️</span>' : ''}
+                                </div>
+                                <div class="admin-user-sub">@${usernameEsc} · Seit ${regDate} · ${escapeHTML(lastLoginText)}</div>
+                            </div>
+                        </div>
+
+                        <div class="admin-email-row">
+                            <span class="admin-email-text">${emailEsc}</span>
+                            ${u.email ? `<button type="button" class="admin-copy-btn" data-email="${emailEsc}" onclick="copyAdminEmail(this.dataset.email)">Kopieren</button>` : ''}
+                        </div>
+
+                        <div class="admin-badges-row">
+                            <span class="admin-badge ${u.posted_this_week ? 'good' : 'warn'}">${u.posted_this_week ? `✅ KW ${kw}` : '⏳ Offen'}</span>
+                            <span class="admin-badge">📸 ${u.posts_count || 0} Fotos</span>
+                            <span class="admin-badge ${u.push_devices > 0 ? 'good' : ''}">${u.push_devices > 0 ? `🔔 Push (${u.push_devices})` : '🔕 Kein Push'}</span>
+                            <span class="admin-badge">${u.weekly_reminder_opt_in ? '📧 Mail an' : '📧 Mail aus'}</span>
+                            <span class="admin-badge">👥 ${u.followers_count || 0} Follower</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile) {
             const color = sanitizeColor(userProfile.color);
             const totalLikes = userPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
@@ -5237,6 +5685,15 @@
                             <button type="button" id="pushToggleSwitch" class="toggle-switch ${state.pushEnabled ? 'on' : ''}"
                                 onclick="togglePushNotifications()" role="switch" aria-checked="${state.pushEnabled ? 'true' : 'false'}" aria-label="Push-Benachrichtigungen umschalten"></button>
                         </div>
+                        ${state.isAdmin ? `
+                            <div class="pref-row">
+                                <div style="display: flex; flex-direction: column; gap: 2px; padding-right: 10px;">
+                                    <span>🛡️ Admin-Dashboard</span>
+                                    <span style="font-size: 11px; font-weight: 400; color: var(--color-text-secondary);">Nutzer, Aktivität, Push- &amp; Wochenstatus</span>
+                                </div>
+                                <button type="button" class="collage-btn story-btn" onclick="openAdminDashboard()">Öffnen</button>
+                            </div>
+                        ` : ''}
                     </div>
                 ` : ''}
 
@@ -6715,6 +7172,7 @@
             ]);
             subscribeToNotificationsBadge();
             syncPushSubscriptionState();
+            checkAdminStatus();
 
             if (!deepLink || deepLink.type === 'invite' || !handleDeepLink(deepLink)) {
                 history.replaceState({ view: 'feed' }, '', '#feed');
@@ -6847,6 +7305,10 @@
             state.weeklyReminderOptIn = true;
             state.pushEnabled = false;
             state.pushBusy = false;
+            state.isAdmin = false;
+            state.adminData = null;
+            state.adminFilter = 'all';
+            state.adminSearch = '';
             state.pendingPartner = null;
             state.conversations = [];
             state.currentConversationId = null;
@@ -6856,7 +7318,7 @@
             updateUploadNavIndicator();
 
             // Alle offenen Modals & Badges zurücksetzen
-            ['notificationsModal', 'searchModal', 'usersModal', 'postModal', 'commentsModal', 'chatModal', 'editProfileModal', 'editCaptionModal', 'nudgeModal', 'lightboxModal']
+            ['notificationsModal', 'searchModal', 'usersModal', 'postModal', 'commentsModal', 'chatModal', 'editProfileModal', 'editCaptionModal', 'nudgeModal', 'lightboxModal', 'adminModal']
                 .forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.classList.remove('open');
@@ -6872,6 +7334,11 @@
             document.getElementById('profileContent').innerHTML = '';
             document.getElementById('conversationsList').innerHTML = '';
             document.getElementById('notificationsList').innerHTML = '';
+            document.getElementById('adminStatsContainer').innerHTML = '';
+            document.getElementById('adminFilterChips').innerHTML = '';
+            document.getElementById('adminUsersList').innerHTML = '';
+            const adminSearchEl = document.getElementById('adminSearchInput');
+            if (adminSearchEl) adminSearchEl.value = '';
 
             switchView('feed', false);
             showLogin();

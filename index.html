@@ -966,10 +966,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
             gap: 8px;
             margin-top: 12px;
             padding-top: 10px;
             border-top: 1px solid var(--color-card-border);
+        }
+
+        .mosaic-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .mosaic-legend {
@@ -1006,9 +1014,143 @@
 
         .collage-btn:hover { background: rgba(var(--color-teal-500-rgb), 0.18); }
 
+        .collage-btn.story-btn {
+            background: var(--color-primary);
+            color: #ffffff;
+        }
+
+        .collage-btn.story-btn:hover {
+            background: var(--color-teal-600);
+        }
+
         @media (prefers-color-scheme: dark) {
             .collage-btn { background: rgba(var(--color-teal-300-rgb), 0.14); }
+            .collage-btn.story-btn { background: var(--color-primary); color: #ffffff; }
         }
+
+        /* Welcome / Landing Screen & Invite Banner */
+        .auth-dialog-card {
+            padding: 26px 24px !important;
+            max-width: 420px !important;
+            max-height: 92vh;
+            overflow-y: auto;
+        }
+
+        .welcome-invite-pill {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(var(--color-teal-500-rgb), 0.12);
+            color: var(--color-primary);
+            border: 1px solid rgba(var(--color-teal-500-rgb), 0.22);
+            border-radius: var(--radius-full);
+            padding: 7px 13px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 auto 16px;
+            text-align: center;
+            line-height: 1.35;
+        }
+
+        .welcome-invite-pill.visible {
+            display: flex;
+        }
+
+        .welcome-preview-card {
+            background: var(--color-surface-subtle);
+            border: 1px solid var(--color-card-border);
+            border-radius: 16px;
+            padding: 14px;
+            margin: 18px 0 14px;
+            text-align: left;
+        }
+
+        .welcome-preview-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .welcome-preview-badge {
+            background: rgba(var(--color-teal-500-rgb), 0.14);
+            color: var(--color-primary);
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .welcome-mini-mosaic {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-mini-cell {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            background: rgba(var(--color-brown-600-rgb), 0.1);
+        }
+
+        .welcome-mini-cell.on {
+            background: var(--color-primary);
+        }
+
+        .welcome-mini-cell.now {
+            border: 1.5px solid var(--color-primary);
+            background: rgba(var(--color-teal-500-rgb), 0.18);
+        }
+
+        .welcome-preview-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .welcome-feature-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-feature-pill {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            background: var(--color-surface-subtle);
+            border: 1px solid var(--color-card-border);
+            padding: 5px 10px;
+            border-radius: var(--radius-full);
+        }
+
+        .auth-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-bottom: 12px;
+        }
+
+        .auth-back-btn:hover { color: var(--color-primary); }
 
         /* Profile Grid / Timeline Switch */
         .profile-tabs-row {
@@ -2759,18 +2901,51 @@
 
     <!-- Auth Modal -->
     <div id="loginModal" class="dialog-backdrop">
-        <div class="dialog-card" style="padding: 32px;">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px; color: var(--color-primary); margin: 0 auto 12px; display: block;">
+        <div class="dialog-card auth-dialog-card">
+            <div style="text-align: center; margin-bottom: 18px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 44px; height: 44px; color: var(--color-primary); margin: 0 auto 10px; display: block;">
                     <rect x="3" y="3" width="18" height="18" rx="2"/>
                     <circle cx="12" cy="12" r="3.5"/>
                     <circle cx="17.5" cy="6.5" r="1"/>
                 </svg>
-                <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Willkommen bei Wicture</h2>
-                <p style="font-size: 14px; color: var(--color-text-secondary);">Ein Foto pro Woche. Nicht mehr, nicht weniger.</p>
+                <h2 style="font-family: var(--font-family-display); font-size: 26px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em;">Wicture</h2>
+                <p style="font-size: 13.5px; color: var(--color-text-secondary); line-height: 1.4;">Ein Foto pro Woche. Nicht mehr, nicht weniger.</p>
             </div>
 
-            <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+            <div id="authInviteBanner" class="welcome-invite-pill" role="status"></div>
+
+            <!-- 1-Screen Welcome / Landing View -->
+            <div id="welcomeView" style="text-align: center;">
+                <p style="font-size: 13.5px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 4px;">
+                    Kein Algorithmus, keine Werbung, kein Gebimmel — nur echte Wochenmomente mit deinen liebsten Menschen.
+                </p>
+
+                <div class="welcome-preview-card" aria-hidden="true">
+                    <div class="welcome-preview-top">
+                        <span>Dein Jahr in 52 Wochen</span>
+                        <span class="welcome-preview-badge">🔥 6 Wochen-Serie</span>
+                    </div>
+                    <div class="welcome-mini-mosaic">
+                        <span class="welcome-mini-cell on"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell on"></span><span class="welcome-mini-cell now"></span><span class="welcome-mini-cell"></span><span class="welcome-mini-cell"></span><span class="welcome-mini-cell"></span>
+                    </div>
+                    <div class="welcome-preview-meta">
+                        <span>☕ Entspannt · 1/1 Foto diese Woche</span>
+                        <span>❤️ 4 · 🔥 2</span>
+                    </div>
+                </div>
+
+                <div class="welcome-feature-pills">
+                    <span class="welcome-feature-pill">📸 1 Foto / Woche</span>
+                    <span class="welcome-feature-pill">⭐ Enger Kreis</span>
+                    <span class="welcome-feature-pill">🔕 Ruhiges Slow-Social</span>
+                </div>
+
+                <button type="button" onclick="showSignup()" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Kostenlos starten</button>
+                <button type="button" onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Ich habe schon ein Konto</button>
+            </div>
+
+            <form id="loginForm" style="display: none;" onsubmit="event.preventDefault(); handleLogin();">
+                <button type="button" class="auth-back-btn" onclick="showWelcome()">← Zurück zur Übersicht</button>
                 <div class="form-group">
                     <label for="loginEmail" class="form-label">E-Mail</label>
                     <input type="email" id="loginEmail" class="form-input" placeholder="deine@email.de" autocomplete="email" required>
@@ -2783,10 +2958,11 @@
                     <button type="button" onclick="showForgotPassword()" style="background: none; border: none; font-size: 12px; color: var(--color-primary); cursor: pointer; font-weight: 500; font-family: inherit;">Passwort vergessen?</button>
                 </div>
                 <button type="submit" id="loginBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Anmelden</button>
-                <button type="button" onclick="showSignup()" class="btn btn-secondary" style="width: 100%;">Registrieren</button>
+                <button type="button" onclick="showSignup()" class="btn btn-secondary" style="width: 100%;">Neu hier? Konto erstellen</button>
             </form>
 
             <form id="signupForm" style="display: none;" onsubmit="event.preventDefault(); handleSignup();">
+                <button type="button" class="auth-back-btn" onclick="showWelcome()">← Zurück zur Übersicht</button>
                 <div class="form-group">
                     <label for="signupUsername" class="form-label">Benutzername</label>
                     <input type="text" id="signupUsername" class="form-input" placeholder="deinname" autocomplete="username" maxlength="15" required>
@@ -2804,7 +2980,7 @@
                     <input type="password" id="signupPassword" class="form-input" placeholder="••••••••" autocomplete="new-password" minlength="6" required>
                 </div>
                 <button type="submit" id="signupBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">Konto erstellen</button>
-                <button type="button" onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Zurück zur Anmeldung</button>
+                <button type="button" onclick="showLogin()" class="btn btn-secondary" style="width: 100%;">Schon dabei? Anmelden</button>
             </form>
 
             <form id="forgotPasswordForm" style="display: none;" onsubmit="event.preventDefault(); handleSendResetLink();">
@@ -3212,20 +3388,28 @@
         }
 
         // --- Share, Deep-Links & Invite Helpers ---
+        function getPersonalInviteUrl() {
+            if (state.currentUser && state.currentUser.username) {
+                return `https://wicture.app/#invite-${encodeURIComponent(state.currentUser.username)}`;
+            }
+            return 'https://wicture.app';
+        }
+
         async function inviteFriends() {
+            const inviteUrl = getPersonalInviteUrl();
             const shareData = {
                 title: 'Wicture – Ein Foto pro Woche',
-                text: 'Komm zu Wicture! Ein Foto pro Woche, kein Doomscrolling – nur echte Momente unter Freunden 📸',
-                url: 'https://wicture.app'
+                text: 'Komm zu Wicture! Ein Foto pro Woche statt Social-Media-Stress – über meinen Link sind wir direkt verbunden 📸',
+                url: inviteUrl
             };
             try {
                 if (navigator.share) {
                     await navigator.share(shareData);
                 } else if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-                    showToast('Einladungslink kopiert! 🔗');
+                    await navigator.clipboard.writeText(`${shareData.text}\n${inviteUrl}`);
+                    showToast('Persönlicher Einladungslink kopiert! 🔗');
                 } else {
-                    showToast('Teile wicture.app mit deinen Freunden!');
+                    showToast(`Teile deinen Link: ${inviteUrl}`);
                 }
             } catch (err) {
                 if (err && err.name !== 'AbortError') showToast('Teilen abgebrochen.');
@@ -4233,14 +4417,25 @@
                             <span><i class="mosaic-legend-dot" style="background: var(--color-primary);"></i>Gepostet</span>
                             <span><i class="mosaic-legend-dot" style="border: 1.5px solid var(--color-primary);"></i>KW ${currentWeek}</span>
                         </div>
-                        ${isOwnProfile && userPosts.length >= 2 ? `
-                            <button type="button" class="collage-btn" onclick="exportProfileCollage()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
-                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                                </svg>
-                                Collage teilen
-                            </button>
+                        ${isOwnProfile && userPosts.length >= 1 ? `
+                            <div class="mosaic-actions">
+                                <button type="button" class="collage-btn story-btn" onclick="exportStoryCard()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                                        <rect x="6" y="2" width="12" height="20" rx="2.5"/>
+                                        <line x1="10" y1="18" x2="14" y2="18"/>
+                                    </svg>
+                                    Story-Karte
+                                </button>
+                                ${userPosts.length >= 2 ? `
+                                    <button type="button" class="collage-btn" onclick="exportProfileCollage()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                                            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                        </svg>
+                                        Collage
+                                    </button>
+                                ` : ''}
+                            </div>
                         ` : ''}
                     </div>
                 </div>
@@ -4255,6 +4450,17 @@
                 img.onerror = reject;
                 img.src = url;
             });
+        }
+
+        function drawRoundedRectPath(ctx, x, y, w, h, r) {
+            const radius = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + w, y, x + w, y + h, radius);
+            ctx.arcTo(x + w, y + h, x, y + h, radius);
+            ctx.arcTo(x, y + h, x, y, radius);
+            ctx.arcTo(x, y, x + w, y, radius);
+            ctx.closePath();
         }
 
         async function exportProfileCollage() {
@@ -4304,14 +4510,7 @@
                     const y = headerH + row * (cellSize + gap);
 
                     ctx.save();
-                    const r = 18;
-                    ctx.beginPath();
-                    ctx.moveTo(x + r, y);
-                    ctx.arcTo(x + cellSize, y, x + cellSize, y + cellSize, r);
-                    ctx.arcTo(x + cellSize, y + cellSize, x, y + cellSize, r);
-                    ctx.arcTo(x, y + cellSize, x, y, r);
-                    ctx.arcTo(x, y, x + cellSize, y, r);
-                    ctx.closePath();
+                    drawRoundedRectPath(ctx, x, y, cellSize, cellSize, 18);
                     ctx.clip();
 
                     ctx.fillStyle = '#E6E3DA';
@@ -4351,6 +4550,282 @@
                 if (err && err.name !== 'AbortError') {
                     console.error('Collage-Export Fehler:', err);
                     showToast('Collage konnte nicht erstellt werden.');
+                }
+            }
+        }
+
+        async function exportStoryCard() {
+            const ctxData = state.lastProfileContext;
+            if (!ctxData || !ctxData.userPosts || ctxData.userPosts.length < 1) {
+                showToast('Mindestens 1 Foto für eine Story-Karte nötig.');
+                return;
+            }
+
+            showToast('Story-Karte (9:16) wird erstellt...');
+            try {
+                const allPosts = ctxData.userPosts;
+                const pickCount = allPosts.length >= 9 ? 9 : allPosts.length >= 6 ? 6 : allPosts.length >= 4 ? 4 : allPosts.length;
+                const posts = allPosts.slice(0, pickCount);
+                const { week: currentWeek, year: currentYear } = getISOWeekInfo(new Date());
+                const totalWeeks = getISOWeekInfo(new Date(currentYear, 11, 28)).week;
+                const streak = calculateWeeklyStreak(allPosts);
+
+                const weekSet = new Set();
+                for (const p of allPosts) {
+                    const info = getISOWeekInfo(new Date(p.timestamp));
+                    if (info.year === currentYear) weekSet.add(info.week);
+                }
+
+                const W = 1080;
+                const H = 1920;
+                const pad = 72;
+                const innerW = W - pad * 2; // 936
+
+                const canvas = document.createElement('canvas');
+                canvas.width = W;
+                canvas.height = H;
+                const ctx = canvas.getContext('2d');
+
+                // Warm editorial cream background + soft ambient glow
+                ctx.fillStyle = '#F4F2EC';
+                ctx.fillRect(0, 0, W, H);
+
+                const g1 = ctx.createRadialGradient(W - 80, 140, 40, W - 80, 140, 560);
+                g1.addColorStop(0, 'rgba(30, 123, 136, 0.10)');
+                g1.addColorStop(1, 'rgba(30, 123, 136, 0)');
+                ctx.fillStyle = g1;
+                ctx.fillRect(0, 0, W, H);
+
+                const g2 = ctx.createRadialGradient(120, H - 180, 40, 120, H - 180, 540);
+                g2.addColorStop(0, 'rgba(217, 119, 6, 0.08)');
+                g2.addColorStop(1, 'rgba(217, 119, 6, 0)');
+                ctx.fillStyle = g2;
+                ctx.fillRect(0, 0, W, H);
+
+                // Header
+                ctx.fillStyle = '#1E7B88';
+                ctx.font = '700 25px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.fillText(`WICTURE  ·  ${currentYear}`, pad, 132);
+
+                const headline = pickCount === 1
+                    ? 'Mein Wochenmoment'
+                    : pickCount <= 3
+                        ? `Meine ${pickCount} Wochen`
+                        : pickCount === 4
+                            ? 'Meine letzten 4 Wochen'
+                            : pickCount === 6
+                                ? 'Meine letzten 6 Wochen'
+                                : `Mein Jahr in Wictures`;
+
+                ctx.fillStyle = '#132D33';
+                ctx.font = '600 60px Georgia, serif';
+                ctx.fillText(headline, pad, 206);
+
+                const statsParts = [`@${ctxData.userProfile.username}`, `${weekSet.size} / ${totalWeeks} Wochen`];
+                if (streak > 0) statsParts.push(`🔥 ${streak} ${streak === 1 ? 'Woche' : 'Wochen'}`);
+                ctx.fillStyle = '#606A6F';
+                ctx.font = '500 28px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.fillText(statsParts.join('  ·  '), pad, 258);
+
+                // Photo Showcase Card
+                const cardX = pad;
+                const cardY = 304;
+                const cardW = innerW;
+                const cardH = 1044;
+                ctx.save();
+                drawRoundedRectPath(ctx, cardX, cardY, cardW, cardH, 34);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#E6E3DA';
+                ctx.stroke();
+                ctx.restore();
+
+                const images = await Promise.all(posts.map(p => loadCrossOriginImage(sanitizeUrl(p.image)).catch(() => null)));
+
+                const boxX = cardX + 28;
+                const boxY = cardY + 28;
+                const boxW = cardW - 56; // 880
+                const boxH = cardH - 56; // 988
+
+                // Compute dynamic editorial tile rects
+                const rects = [];
+                if (pickCount === 1) {
+                    const heroH = posts[0].caption ? 860 : boxH;
+                    rects.push({ x: boxX, y: boxY, w: boxW, h: heroH });
+                } else if (pickCount === 2) {
+                    const gap = 24;
+                    const rh = Math.floor((boxH - gap) / 2);
+                    rects.push({ x: boxX, y: boxY, w: boxW, h: rh });
+                    rects.push({ x: boxX, y: boxY + rh + gap, w: boxW, h: rh });
+                } else if (pickCount === 3) {
+                    const gap = 24;
+                    const topH = 510;
+                    const botH = boxH - topH - gap;
+                    const halfW = Math.floor((boxW - gap) / 2);
+                    rects.push({ x: boxX, y: boxY, w: boxW, h: topH });
+                    rects.push({ x: boxX, y: boxY + topH + gap, w: halfW, h: botH });
+                    rects.push({ x: boxX + halfW + gap, y: boxY + topH + gap, w: halfW, h: botH });
+                } else {
+                    const cols = pickCount === 9 ? 3 : 2;
+                    const rows = Math.ceil(pickCount / cols);
+                    const gap = pickCount === 9 ? 20 : 24;
+                    const tw = Math.floor((boxW - gap * (cols - 1)) / cols);
+                    const th = Math.floor((boxH - gap * (rows - 1)) / rows);
+                    for (let i = 0; i < pickCount; i++) {
+                        const c = i % cols;
+                        const r = Math.floor(i / cols);
+                        rects.push({ x: boxX + c * (tw + gap), y: boxY + r * (th + gap), w: tw, h: th });
+                    }
+                }
+
+                rects.forEach((rect, idx) => {
+                    const img = images[idx];
+                    const post = posts[idx];
+                    ctx.save();
+                    drawRoundedRectPath(ctx, rect.x, rect.y, rect.w, rect.h, 22);
+                    ctx.clip();
+
+                    ctx.fillStyle = '#E6E3DA';
+                    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+
+                    if (img) {
+                        const scale = Math.max(rect.w / img.naturalWidth, rect.h / img.naturalHeight);
+                        const sw = img.naturalWidth * scale;
+                        const sh = img.naturalHeight * scale;
+                        ctx.drawImage(img, rect.x + (rect.w - sw) / 2, rect.y + (rect.h - sh) / 2, sw, sh);
+                    }
+
+                    // KW corner pill
+                    const kwLabel = getShortKWLabel(post.timestamp);
+                    ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif';
+                    const pillW = ctx.measureText(kwLabel).width + 28;
+                    const pillH = 38;
+                    const px = rect.x + 16;
+                    const py = rect.y + rect.h - pillH - 16;
+                    drawRoundedRectPath(ctx, px, py, pillW, pillH, 19);
+                    ctx.fillStyle = 'rgba(19, 45, 51, 0.72)';
+                    ctx.fill();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillText(kwLabel, px + 14, py + 26);
+
+                    ctx.restore();
+                });
+
+                // Caption preview for single-photo story card
+                if (pickCount === 1 && posts[0].caption) {
+                    const rawCap = String(posts[0].caption).replace(/\s+/g, ' ').trim();
+                    const clipped = rawCap.length > 56 ? `${rawCap.slice(0, 53)}…` : rawCap;
+                    ctx.fillStyle = '#132D33';
+                    ctx.font = '500 28px Georgia, serif';
+                    ctx.fillText(`„${clipped}“`, boxX + 8, boxY + 920);
+                    if (posts[0].tag) {
+                        ctx.fillStyle = '#1E7B88';
+                        ctx.font = '600 24px -apple-system, BlinkMacSystemFont, sans-serif';
+                        ctx.fillText(posts[0].tag, boxX + 8, boxY + 962);
+                    }
+                }
+
+                // 52-Week Live Mosaic Card
+                const mCardY = 1380;
+                const mCardH = 240;
+                ctx.save();
+                drawRoundedRectPath(ctx, cardX, mCardY, cardW, mCardH, 28);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#E6E3DA';
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.fillStyle = '#132D33';
+                ctx.font = '700 24px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.fillText(`Jahr ${currentYear} in Wochen`, cardX + 32, mCardY + 46);
+
+                ctx.fillStyle = '#1E7B88';
+                ctx.font = '700 24px -apple-system, BlinkMacSystemFont, sans-serif';
+                const rightMeta = `${weekSet.size} / ${totalWeeks}`;
+                const rightMetaW = ctx.measureText(rightMeta).width;
+                ctx.fillText(rightMeta, cardX + cardW - 32 - rightMetaW, mCardY + 46);
+
+                const mCols = 13;
+                const mGap = 10;
+                const mPadX = 32;
+                const mCellW = Math.floor((cardW - mPadX * 2 - mGap * (mCols - 1)) / mCols);
+                const mCellH = 28;
+                const mStartY = mCardY + 68;
+
+                for (let w = 1; w <= totalWeeks; w++) {
+                    const idx = w - 1;
+                    const col = idx % mCols;
+                    const row = Math.floor(idx / mCols);
+                    const cx = cardX + mPadX + col * (mCellW + mGap);
+                    const cy = mStartY + row * (mCellH + mGap);
+
+                    drawRoundedRectPath(ctx, cx, cy, mCellW, mCellH, 7);
+                    if (weekSet.has(w)) {
+                        ctx.fillStyle = '#1E7B88';
+                        ctx.fill();
+                    } else if (w === currentWeek) {
+                        ctx.fillStyle = 'rgba(30, 123, 136, 0.16)';
+                        ctx.fill();
+                        ctx.lineWidth = 2.5;
+                        ctx.strokeStyle = '#1E7B88';
+                        ctx.stroke();
+                    } else if (w < currentWeek) {
+                        ctx.fillStyle = '#E8E4DC';
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = '#F3F0EA';
+                        ctx.fill();
+                    }
+                }
+
+                // Editorial Footer + Brand Pill
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#606A6F';
+                ctx.font = '500 28px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.fillText('Ein Foto pro Woche. Nicht mehr, nicht weniger.', W / 2, 1702);
+
+                const badgeW = 340;
+                const badgeH = 76;
+                const badgeX = (W - badgeW) / 2;
+                const badgeY = 1742;
+                drawRoundedRectPath(ctx, badgeX, badgeY, badgeW, badgeH, 38);
+                ctx.fillStyle = '#1E7B88';
+                ctx.fill();
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '700 32px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.fillText('wicture.app', W / 2, badgeY + 49);
+                ctx.textAlign = 'left';
+
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.93));
+                if (!blob) throw new Error('Story-Export fehlgeschlagen');
+
+                const fileName = `wicture_story_${ctxData.userProfile.username}_${currentYear}.jpg`;
+                const file = new File([blob], fileName, { type: 'image/jpeg' });
+                const inviteUrl = getPersonalInviteUrl();
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Meine Wicture Story',
+                        text: `Mein Wochenrückblick auf Wicture 📸 ${inviteUrl}`
+                    });
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    showToast('Story-Karte (9:16) gespeichert! 📲');
+                }
+            } catch (err) {
+                if (err && err.name !== 'AbortError') {
+                    console.error('Story-Export Fehler:', err);
+                    showToast('Story-Karte konnte nicht erstellt werden.');
                 }
             }
         }
@@ -5999,7 +6474,39 @@
         }
 
         // --- Authentication ---
+        function getStoredInviteUsername() {
+            try {
+                return (sessionStorage.getItem('wicture_invite_user') || '').trim();
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function setStoredInviteUsername(username) {
+            try {
+                if (username) {
+                    sessionStorage.setItem('wicture_invite_user', String(username).trim());
+                } else {
+                    sessionStorage.removeItem('wicture_invite_user');
+                }
+            } catch (e) {}
+        }
+
+        function renderAuthInviteBanner() {
+            const banner = document.getElementById('authInviteBanner');
+            if (!banner) return;
+            const inviter = getStoredInviteUsername();
+            if (inviter) {
+                banner.innerHTML = `✨ <span><strong>@${escapeHTML(inviter)}</strong> lädt dich ein – ihr seid direkt verbunden</span>`;
+                banner.classList.add('visible');
+            } else {
+                banner.textContent = '';
+                banner.classList.remove('visible');
+            }
+        }
+
         function showLoginModal() {
+            renderAuthInviteBanner();
             document.getElementById('loginModal').classList.add('open');
         }
 
@@ -6008,11 +6515,14 @@
         }
 
         function showAuthForm(formId) {
-            ['loginForm', 'signupForm', 'forgotPasswordForm', 'updatePasswordForm'].forEach(id => {
-                document.getElementById(id).style.display = (id === formId) ? 'block' : 'none';
+            ['welcomeView', 'loginForm', 'signupForm', 'forgotPasswordForm', 'updatePasswordForm'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = (id === formId) ? 'block' : 'none';
             });
+            renderAuthInviteBanner();
         }
 
+        function showWelcome() { showAuthForm('welcomeView'); }
         function showLogin() { showAuthForm('loginForm'); }
         function showSignup() { showAuthForm('signupForm'); }
         function showForgotPassword() { showAuthForm('forgotPasswordForm'); }
@@ -6081,9 +6591,60 @@
                 const username = decodeURIComponent(hash.slice('#user-'.length)).trim();
                 if (username) return { type: 'user', username };
             }
+            if (hash.startsWith('#invite-')) {
+                const username = decodeURIComponent(hash.slice('#invite-'.length)).trim();
+                if (username) return { type: 'invite', username };
+            }
+            const params = new URLSearchParams(window.location.search || '');
+            const queryInvite = (params.get('invite') || '').trim();
+            if (queryInvite) return { type: 'invite', username: queryInvite };
+
             if (hash === '#messages') return { type: 'messages' };
             if (hash === '#upload') return { type: 'upload' };
             return null;
+        }
+
+        async function applyPendingInviteFollow(inviterUsername) {
+            const cleanUsername = (inviterUsername || '').trim();
+            if (!cleanUsername || !state.currentUser) return null;
+            setStoredInviteUsername('');
+
+            try {
+                const { data: inviter, error } = await supabaseClient
+                    .from('users')
+                    .select('id, username, display_name')
+                    .ilike('username', cleanUsername)
+                    .maybeSingle();
+
+                if (error || !inviter || String(inviter.id) === String(state.currentUser.id)) {
+                    return null;
+                }
+
+                const { data: existing } = await supabaseClient
+                    .from('follows')
+                    .select('id')
+                    .eq('follower_id', state.currentUser.id)
+                    .eq('following_id', inviter.id)
+                    .maybeSingle();
+
+                if (!existing) {
+                    const { error: followErr } = await supabaseClient
+                        .from('follows')
+                        .insert([{
+                            follower_id: state.currentUser.id,
+                            following_id: inviter.id
+                        }]);
+                    if (!followErr) {
+                        state.following.add(String(inviter.id));
+                        sendNotification(inviter.id, 'follow');
+                        showToast(`Direkt mit @${inviter.username} verbunden! 🎉`);
+                    }
+                }
+                return inviter;
+            } catch (e) {
+                console.error('Auto-Follow per Einladung fehlgeschlagen:', e);
+                return null;
+            }
         }
 
         function handleDeepLink(deepLink) {
@@ -6095,6 +6656,13 @@
             }
             if (deepLink.type === 'user') {
                 viewUserProfile(deepLink.username, false);
+                return true;
+            }
+            if (deepLink.type === 'invite') {
+                history.replaceState({ view: 'feed' }, '', '#feed');
+                applyPendingInviteFollow(deepLink.username).then(inviter => {
+                    if (inviter) loadPostsFromSupabase();
+                });
                 return true;
             }
             if (deepLink.type === 'messages') {
@@ -6109,8 +6677,14 @@
         }
 
         window.addEventListener('hashchange', () => {
-            if (!state.isAuthenticated) return;
             const dl = parseDeepLinkFromHash();
+            if (!state.isAuthenticated) {
+                if (dl && dl.type === 'invite') {
+                    setStoredInviteUsername(dl.username);
+                    renderAuthInviteBanner();
+                }
+                return;
+            }
             if (dl) handleDeepLink(dl);
         });
 
@@ -6127,6 +6701,13 @@
             state.isAuthenticated = true;
             hideLoginModal();
 
+            const deepLink = state.pendingDeepLink || parseDeepLinkFromHash();
+            state.pendingDeepLink = null;
+            const inviteUsername = (deepLink && deepLink.type === 'invite' ? deepLink.username : '') || getStoredInviteUsername();
+            if (inviteUsername) {
+                await applyPendingInviteFollow(inviteUsername);
+            }
+
             await Promise.all([
                 loadPostsFromSupabase(),
                 loadNotifications(),
@@ -6135,9 +6716,7 @@
             subscribeToNotificationsBadge();
             syncPushSubscriptionState();
 
-            const deepLink = state.pendingDeepLink || parseDeepLinkFromHash();
-            state.pendingDeepLink = null;
-            if (!handleDeepLink(deepLink)) {
+            if (!deepLink || deepLink.type === 'invite' || !handleDeepLink(deepLink)) {
                 history.replaceState({ view: 'feed' }, '', '#feed');
             }
         }
@@ -6306,6 +6885,9 @@
                 return;
             }
             state.pendingDeepLink = parseDeepLinkFromHash();
+            if (state.pendingDeepLink && state.pendingDeepLink.type === 'invite') {
+                setStoredInviteUsername(state.pendingDeepLink.username);
+            }
             const { data: { session } } = await supabaseClient.auth.getSession();
 
             if (session) {
@@ -6323,6 +6905,7 @@
                     console.error('Profil konnte nicht geladen werden:', e);
                 }
             }
+            showWelcome();
             showLoginModal();
         }
 

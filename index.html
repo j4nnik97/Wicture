@@ -2872,6 +2872,7 @@
 
         const REACTION_EMOJIS = ['🔥', '😍', '😂', '🤯'];
         const MOOD_TAGS = ['☕ Entspannt', '🌿 Draußen', '✨ Highlight', '🎉 Unterwegs', '🍽 Genuss', '🌧 Gemütlich'];
+        const VAPID_PUBLIC_KEY = 'BNDzAhw0sdnUsaxTYC1AX4qKQCv48QIGlmkSThik7B9lgvVL6a1kpuWuNB0-aRv6uQ4C2QXlZgLZiUc01rx_Lew';
 
         // --- App State ---
         const state = {
@@ -2889,6 +2890,8 @@
             lastProfileContext: null,
             chatReplyPost: null,
             weeklyReminderOptIn: true,
+            pushEnabled: false,
+            pushBusy: false,
             pendingDeepLink: null,
             themeMode: 'system',
             weeklyPostDone: false,
@@ -4452,6 +4455,178 @@
             }
         }
 
+        // --- Web Push Benachrichtigungen (VAPID) ---
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; i++) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        function isIosBrowserWithoutPwa() {
+            const ua = navigator.userAgent || '';
+            const isIos = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+            return isIos && !isStandalone;
+        }
+
+        function isWebPushSupported() {
+            return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+        }
+
+        function updatePushSwitchUI() {
+            const sw = document.getElementById('pushToggleSwitch');
+            if (!sw) return;
+            sw.classList.toggle('on', Boolean(state.pushEnabled));
+            sw.setAttribute('aria-checked', state.pushEnabled ? 'true' : 'false');
+        }
+
+        async function persistPushSubscription(sub) {
+            if (!state.currentUser || !sub) return;
+            const subJson = sub.toJSON ? sub.toJSON() : sub;
+            const endpoint = subJson && subJson.endpoint;
+            const p256dh = subJson && subJson.keys && subJson.keys.p256dh;
+            const auth = subJson && subJson.keys && subJson.keys.auth;
+            if (!endpoint || !p256dh || !auth) throw new Error('Ungültige Push-Subscription');
+
+            const { error: rpcError } = await supabaseClient.rpc('save_push_subscription', {
+                p_endpoint: endpoint,
+                p_p256dh: p256dh,
+                p_auth: auth
+            });
+            if (!rpcError) return;
+
+            // Fallback, falls die RPC-Funktion noch nicht eingespielt wurde
+            await supabaseClient
+                .from('push_subscriptions')
+                .delete()
+                .eq('endpoint', endpoint)
+                .eq('user_id', state.currentUser.id);
+            const { error: insertError } = await supabaseClient
+                .from('push_subscriptions')
+                .insert([{
+                    user_id: state.currentUser.id,
+                    endpoint,
+                    p256dh,
+                    auth
+                }]);
+            if (insertError) throw insertError;
+        }
+
+        async function removePushSubscriptionFromDb(endpoint) {
+            if (!endpoint || !state.currentUser) return;
+            const { error: rpcError } = await supabaseClient.rpc('delete_push_subscription', {
+                p_endpoint: endpoint
+            });
+            if (!rpcError) return;
+
+            await supabaseClient
+                .from('push_subscriptions')
+                .delete()
+                .eq('endpoint', endpoint)
+                .eq('user_id', state.currentUser.id);
+        }
+
+        async function syncPushSubscriptionState() {
+            if (!state.currentUser || !isWebPushSupported()) {
+                state.pushEnabled = false;
+                updatePushSwitchUI();
+                return;
+            }
+            try {
+                const reg = await navigator.serviceWorker.ready;
+                const sub = await reg.pushManager.getSubscription();
+                if (sub && Notification.permission === 'granted') {
+                    state.pushEnabled = true;
+                    updatePushSwitchUI();
+                    await persistPushSubscription(sub).catch(() => {});
+                } else {
+                    state.pushEnabled = false;
+                    updatePushSwitchUI();
+                }
+            } catch (e) {
+                state.pushEnabled = false;
+                updatePushSwitchUI();
+            }
+        }
+
+        async function togglePushNotifications() {
+            if (!state.currentUser || state.pushBusy) return;
+
+            if (!state.pushEnabled) {
+                if (isIosBrowserWithoutPwa()) {
+                    showToast('Auf dem iPhone zuerst über Teilen → „Zum Home-Bildschirm“ öffnen.');
+                    return;
+                }
+                if (!isWebPushSupported()) {
+                    showToast('Push wird von diesem Browser leider nicht unterstützt.');
+                    return;
+                }
+            }
+
+            state.pushBusy = true;
+            try {
+                const reg = await navigator.serviceWorker.ready;
+
+                if (state.pushEnabled) {
+                    const existingSub = await reg.pushManager.getSubscription();
+                    if (existingSub) {
+                        await removePushSubscriptionFromDb(existingSub.endpoint).catch(() => {});
+                        await existingSub.unsubscribe().catch(() => {});
+                    }
+                    state.pushEnabled = false;
+                    updatePushSwitchUI();
+                    showToast('Push-Benachrichtigungen pausiert');
+                } else {
+                    const permission = Notification.permission === 'granted'
+                        ? 'granted'
+                        : await Notification.requestPermission();
+
+                    if (permission !== 'granted') {
+                        state.pushEnabled = false;
+                        updatePushSwitchUI();
+                        showToast(permission === 'denied'
+                            ? 'Benachrichtigungen sind in den Browser-Einstellungen blockiert.'
+                            : 'Benachrichtigungen wurden nicht erlaubt.');
+                        return;
+                    }
+
+                    let sub = await reg.pushManager.getSubscription();
+                    if (!sub) {
+                        sub = await reg.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                        });
+                    }
+
+                    await persistPushSubscription(sub);
+                    state.pushEnabled = true;
+                    updatePushSwitchUI();
+                    showToast('Push-Benachrichtigungen aktiviert 🔔');
+                }
+            } catch (err) {
+                console.error('Push-Toggle Fehler:', err);
+                showToast('Push konnte gerade nicht gespeichert werden.');
+            } finally {
+                state.pushBusy = false;
+            }
+        }
+
+        async function cleanupPushOnLogout() {
+            if (!isWebPushSupported() || !state.currentUser) return;
+            try {
+                const reg = await navigator.serviceWorker.getRegistration();
+                const sub = reg ? await reg.pushManager.getSubscription() : null;
+                if (sub) {
+                    await removePushSubscriptionFromDb(sub.endpoint).catch(() => {});
+                }
+            } catch (e) {}
+        }
+
         function renderProfileMarkup(userProfile, userPosts, followersCount, followingCount, isOwnProfile) {
             const color = sanitizeColor(userProfile.color);
             const totalLikes = userPosts.reduce((sum, p) => sum + (p.likes || 0), 0);
@@ -4578,6 +4753,14 @@
                             <span>Sonntags-Erinnerung (Mail)</span>
                             <button type="button" id="reminderToggleSwitch" class="toggle-switch ${state.weeklyReminderOptIn ? 'on' : ''}"
                                 onclick="toggleWeeklyReminder()" role="switch" aria-checked="${state.weeklyReminderOptIn ? 'true' : 'false'}" aria-label="Sonntags-Erinnerung umschalten"></button>
+                        </div>
+                        <div class="pref-row">
+                            <div style="display: flex; flex-direction: column; gap: 2px; padding-right: 10px;">
+                                <span>Push-Benachrichtigungen</span>
+                                <span style="font-size: 11px; font-weight: 400; color: var(--color-text-secondary);">${isIosBrowserWithoutPwa() ? 'Auf iOS zuerst zum Home-Bildschirm hinzufügen' : 'Chat, Kommentare, Anstupsen, Follower &amp; Wochenstart'}</span>
+                            </div>
+                            <button type="button" id="pushToggleSwitch" class="toggle-switch ${state.pushEnabled ? 'on' : ''}"
+                                onclick="togglePushNotifications()" role="switch" aria-checked="${state.pushEnabled ? 'true' : 'false'}" aria-label="Push-Benachrichtigungen umschalten"></button>
                         </div>
                     </div>
                 ` : ''}
@@ -5898,8 +6081,38 @@
                 const username = decodeURIComponent(hash.slice('#user-'.length)).trim();
                 if (username) return { type: 'user', username };
             }
+            if (hash === '#messages') return { type: 'messages' };
+            if (hash === '#upload') return { type: 'upload' };
             return null;
         }
+
+        function handleDeepLink(deepLink) {
+            if (!deepLink) return false;
+            if (deepLink.type === 'post') {
+                history.replaceState({ view: 'feed' }, '', '#feed');
+                openPostModal(deepLink.id);
+                return true;
+            }
+            if (deepLink.type === 'user') {
+                viewUserProfile(deepLink.username, false);
+                return true;
+            }
+            if (deepLink.type === 'messages') {
+                switchView('messages', false);
+                return true;
+            }
+            if (deepLink.type === 'upload') {
+                switchView('upload', false);
+                return true;
+            }
+            return false;
+        }
+
+        window.addEventListener('hashchange', () => {
+            if (!state.isAuthenticated) return;
+            const dl = parseDeepLinkFromHash();
+            if (dl) handleDeepLink(dl);
+        });
 
         async function activateAuthenticatedSession(userProfile, email) {
             state.currentUser = {
@@ -5920,15 +6133,11 @@
                 subscribeToConversationsBadge()
             ]);
             subscribeToNotificationsBadge();
+            syncPushSubscriptionState();
 
             const deepLink = state.pendingDeepLink || parseDeepLinkFromHash();
             state.pendingDeepLink = null;
-            if (deepLink && deepLink.type === 'post') {
-                history.replaceState({ view: 'feed' }, '', '#feed');
-                openPostModal(deepLink.id);
-            } else if (deepLink && deepLink.type === 'user') {
-                viewUserProfile(deepLink.username, false);
-            } else {
+            if (!handleDeepLink(deepLink)) {
                 history.replaceState({ view: 'feed' }, '', '#feed');
             }
         }
@@ -6027,6 +6236,7 @@
         }
 
         async function handleLogout() {
+            await cleanupPushOnLogout();
             try {
                 await supabaseClient.auth.signOut();
             } catch (error) {
@@ -6056,6 +6266,8 @@
             state.lastProfileContext = null;
             state.chatReplyPost = null;
             state.weeklyReminderOptIn = true;
+            state.pushEnabled = false;
+            state.pushBusy = false;
             state.pendingPartner = null;
             state.conversations = [];
             state.currentConversationId = null;

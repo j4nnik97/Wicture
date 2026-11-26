@@ -1,5 +1,5 @@
 // sw.js - Service Worker für Wicture PWA
-const CACHE_NAME = 'wicture-shell-v4';
+const CACHE_NAME = 'wicture-shell-v5';
 const SHELL_ASSETS = [
     './',
     './index.html',
@@ -68,9 +68,14 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Web Push Listener (bereit für Supabase Edge Function + VAPID)
+// Web Push Listener (VAPID + Supabase Edge Function)
 self.addEventListener('push', (event) => {
-    let data = { title: 'Wicture', body: 'Es gibt etwas Neues in deiner Woche 📸', url: './' };
+    let data = {
+        title: 'Wicture',
+        body: 'Es gibt etwas Neues in deiner Woche 📸',
+        url: './',
+        tag: 'wicture-general'
+    };
     try {
         if (event.data) data = Object.assign(data, event.data.json());
     } catch (e) {
@@ -81,6 +86,8 @@ self.addEventListener('push', (event) => {
             body: data.body,
             icon: './icon.png',
             badge: './icon.png',
+            tag: data.tag || 'wicture-general',
+            renotify: true,
             data: { url: data.url || './' }
         })
     );
@@ -88,12 +95,15 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    const targetUrl = (event.notification.data && event.notification.data.url) || './';
+    const rawUrl = (event.notification.data && event.notification.data.url) || './';
+    const targetUrl = new URL(rawUrl, self.location.origin).href;
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
             for (const client of windowClients) {
                 if (client.url.startsWith(self.location.origin) && 'focus' in client) {
-                    client.navigate(targetUrl);
+                    if ('navigate' in client) {
+                        return client.navigate(targetUrl).then(() => client.focus()).catch(() => client.focus());
+                    }
                     return client.focus();
                 }
             }
